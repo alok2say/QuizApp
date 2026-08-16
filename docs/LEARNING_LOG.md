@@ -225,4 +225,32 @@ a duplicate email *before* hashing the password, since hashing is the
 expensive step and shouldn't be paid for a request about to be rejected
 anyway. All 3 tests passed on the first real run — no detours this time.
 
+---
+
+## Task 5: Credential verification + NextAuth configuration
+
+Confirmed installed `next-auth@4.24.15` matches the plan's pinned `^4`
+before writing v4-specific code, given how many other libraries in this
+stack turned out to have breaking changes vs. the plan's assumptions —
+no surprises this time. TDD flow for `verifyCredentials` (mocks both
+`prisma` *and* `password.ts`, since this function is meant to be thin
+orchestration, not re-testing bcrypt/DB logic already covered elsewhere).
+**Deliberate security choice**: `verifyCredentials` returns `null` for
+both "no such user" and "wrong password" — never distinguishing which,
+so an attacker can't enumerate valid emails by comparing error responses.
+Added `src/types/next-auth.d.ts` (TypeScript "module augmentation" —
+merges our `id`/`role` fields into NextAuth's built-in `Session`/`User`/
+`JWT` interfaces instead of replacing them, so `session.user.role` is
+type-checked everywhere in the app). `authOptions` in `src/lib/auth.ts`:
+`authorize()` is where NextAuth calls into our `verifyCredentials`; the
+`jwt` callback copies `id`/`role` onto the token at login (the token is
+what's actually encrypted into the session cookie), and the separate
+`session` callback copies those same fields onto `session.user` on every
+session read — two callbacks because NextAuth keeps the JWT and the
+session object as separate data structures, and `session` never sees the
+original user object directly. The `[...nextauth]` catch-all route folder
+handles every NextAuth sub-path (`/signin`, `/callback/credentials`,
+`/session`, etc.) through one exported handler. Full suite: 10/10 passing
+across all 4 test files — no detours this task.
+
 <!-- Continue appending one entry per step as we go. -->
