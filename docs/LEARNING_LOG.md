@@ -92,4 +92,103 @@ Ran `npm run dev`, visited `localhost:3000`, confirmed the default Next.js
 starter page rendered. Confirms the scaffold is actually runnable, not
 just correct-looking files on disk.
 
+### Step 7 — Commit
+Committed the scaffold. Along the way, `.serena/` (Serena MCP tool config,
+unrelated to the app) got staged and committed by accident before we
+gitignored it — fixed with a follow-up commit (`git rm -r --cached
+.serena`) that removes it from tracking without deleting it from disk.
+Lesson: check `git status` right before committing, not just when first
+staging — state can shift between the two if commands run out of order.
+
+**Task 1 complete.** Next: Task 2 (Prisma schema + client singleton).
+
+---
+
+## Task 2: Prisma schema + client singleton
+
+### Step 1 — Write the full Prisma schema
+Wrote `prisma/schema.prisma` with all models from `SPEC.md` (`User`,
+`Quiz`, `Question`, `Option`, `Attempt`, `AttemptAnswer`) even though only
+`User` is needed for this task's auth goal. **Why:** Prisma migrations are
+additive and simplest to reason about when the full shape is defined up
+front — adding models later means a second migration touching foreign
+keys that already exist. Notable choices: `cuid()` IDs (collision-
+resistant, no DB round-trip, don't leak row count/order like auto-
+increment integers); `onDelete: Cascade` on `Question→Quiz` and
+`Option→Question` but deliberately *not* on `Attempt` relations (deleting
+a quiz shouldn't silently wipe historical attempt records); the
+`isLeaderboardEligible` flag + composite index — the denormalized
+leaderboard-eligibility flag from `SPEC.md`, letting leaderboard queries
+filter on an indexed boolean instead of recomputing "is this the user's
+best attempt" on every read; `@@unique([attemptId, questionId])` enforces
+"one answer per question per attempt" at the DB level rather than trusting
+application code.
+
+### Step 2 — Document environment variables
+Created `.env.example` (committed) documenting `DATABASE_URL`,
+`NEXTAUTH_SECRET`, `NEXTAUTH_URL` without real values — versus the real
+`.env` (gitignored, Step 3) which holds actual secrets.
+
+### Step 3 — Provision Postgres + real `.env` (with detours)
+Provisioned a free-tier Supabase Postgres project and filled in `.env`.
+Hit several real-world snags worth remembering:
+- **Direct connection blocked**: `db.<ref>.supabase.co:5432` requires
+  IPv6; many networks block it. Fix: use Supabase's **connection
+  pooler** host (`aws-0-<region>.pooler.supabase.com`) instead, which
+  works over IPv4.
+- **`@` in password breaks the URL**: a password containing a literal
+  `@` character collides with the `@` that separates credentials from
+  host in a connection-string URL, silently corrupting the parsed
+  username/host. Fix: regenerate a password without special characters
+  needing percent-encoding (simplest for a learning project), or
+  percent-encode it (`%40` for `@`) if keeping it.
+- **Transaction-mode pooler (port `6543`) doesn't work for migrations**:
+  it doesn't support the session-level features (advisory locks) Prisma
+  Migrate needs, so `prisma migrate dev` just hangs indefinitely rather
+  than erroring clearly. Fix: use the **Session pooler** (same host,
+  port `5432`) for migrations. Transaction mode is fine for the app's
+  normal query traffic later, just not for `migrate`.
+- **A real secret leaked into this chat twice** — once via the
+  environment-notification hook echoing `.env`'s contents, once via an
+  unmasked `grep` while debugging. Lesson for the future: always mask
+  credential values before printing them (e.g.
+  `sed -E 's#(:)[^:@]+(@)#\1***\2#'`), and rotate any secret that ends up
+  in a chat transcript, since transcripts should be treated as exposed.
+  Password was rotated after this.
+
+### Step 4 — Run the initial migration (real breaking-change detour)
+`npx prisma migrate dev --name init` failed outright at first with
+`P1012`: **Prisma 7 removed `datasource.url` from `schema.prisma`** —
+connection config now lives in a separate `prisma.config.ts` file, loaded
+via `dotenv` and passed through `defineConfig()`. This is exactly the
+kind of breaking change `AGENTS.md` warns about — the installed CLI
+(`prisma@7.9.1`) is newer than the plan (written against Prisma 5/6's
+API). Fixed by: installing `dotenv` as a dev dependency, removing the
+`url` line from the `datasource` block, and adding `prisma.config.ts`
+that reads `DATABASE_URL` from `process.env` (mirroring what `prisma
+init` itself now generates for npm-based projects). Also installed `pg`
+directly, which Prisma 7's client will need later (Step 6) since driver-
+based database access replaced the old built-in connector for some
+providers. After the connection-string detours above, migration applied
+successfully — `prisma/migrations/20260816140212_init/` created.
+
+### Step 5 — Verify tables were created
+Ran `npx prisma studio`, confirmed all six tables (`User`, `Quiz`,
+`Question`, `Option`, `Attempt`, `AttemptAnswer`) appear in the sidebar,
+backed by the real Supabase DB — visual proof the migration didn't just
+report success but actually created the schema.
+
+### Step 6 — Prisma client singleton (another Prisma 7 detour)
+Installed `@prisma/adapter-pg` and wrote `src/lib/prisma.ts` using the
+driver-adapter pattern (see chat for why). Hit one more snag: TypeScript
+reported `Module '"@prisma/client"' has no exported member 'PrismaClient'`
+— turned out the client had never actually been generated into
+`node_modules/@prisma/client` (it re-exports from `.prisma/client`, which
+didn't exist yet). Normally `prisma migrate dev` auto-runs `prisma
+generate` after migrating, but that apparently didn't happen here (likely
+due to the earlier connection-string retries interrupting the flow). Fixed
+with an explicit `npx prisma generate`. Lesson: after any Prisma schema
+or migration change, if types look stale/missing, `prisma generate` is
+the first thing to try before assuming the code itself is wrong.
+
 <!-- Continue appending one entry per step as we go. -->

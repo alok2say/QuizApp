@@ -85,21 +85,24 @@ user's behalf. Full rationale saved in memory (`feedback-hands-on-execution`).
 
 Plan file: `docs/superpowers/plans/2026-08-16-project-foundation.md`
 
-**Task 1, Step 1 is now DONE** — the user ran the scaffold command
-successfully:
-```bash
-npx create-next-app@latest . --typescript --app --eslint --src-dir --import-alias "@/*" --no-tailwind
-```
-(Had to temporarily move `CONTEXT.md`/`SPEC.md` out of the directory first,
-since `create-next-app` refuses to run in a non-empty directory — moved
-back afterward. `CONTEXT.md` got lost in that shuffle and was restored
-verbatim from conversation history — no content lost.) Next.js also
-auto-generated `AGENTS.md` and `CLAUDE.md` in the project root and
-initialized its own git repo — not yet reconciled with any prior repo
-state; not urgent, revisit later if it causes friction.
+**Task 1 is fully COMPLETE** (all 7 steps: scaffold, deps installed,
+Vitest configured, smoke test passing, dev server confirmed, committed
+in two commits — `211edcd` scaffold, `dca3033` fixing `.serena/` being
+accidentally tracked). Full step-by-step rationale for every step is now
+recorded in `docs/LEARNING_LOG.md` (started this session per user
+request — see [[feedback-learning-log]]).
 
-Resume by proceeding to **Task 1, Step 2** (installing additional
-dependencies — Prisma, NextAuth, etc.) per the plan file.
+Note: `create-next-app` refused to run in the directory at first because
+`CONTEXT.md`/`SPEC.md` tripped its "must be empty" check — worked around
+by moving them out temporarily and back. `CONTEXT.md` got lost in that
+shuffle and was restored verbatim from conversation history (no content
+lost). Next.js also auto-generated `AGENTS.md` and `CLAUDE.md` in the
+project root; this repo's git history predates this session (`50ef82c
+Initial commit from Create Next App`) and was preserved, not overwritten,
+by `create-next-app`'s `git init` call.
+
+Resume by proceeding to **Task 2: Prisma schema + client singleton**
+(Step 1: write `prisma/schema.prisma`) per the plan file.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
