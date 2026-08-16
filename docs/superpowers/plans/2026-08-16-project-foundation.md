@@ -1,6 +1,6 @@
 # Project Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Stand up the Next.js project, database schema, and Credentials-based authentication (with role-based route protection) that every later feature (MCQ engine, admin authoring, leaderboard, home page) depends on.
 
@@ -52,7 +52,7 @@
 **Interfaces:**
 - Produces: a runnable Next.js dev server (`npm run dev`) and a working test runner (`npm test`) that every later task builds on.
 
-- [ ] **Step 1: Scaffold the Next.js project**
+- [x] **Step 1: Scaffold the Next.js project**
 
 Run:
 ```bash
@@ -60,7 +60,7 @@ npx create-next-app@latest . --typescript --app --eslint --src-dir --import-alia
 ```
 When prompted, accept defaults. This creates `package.json`, `tsconfig.json`, `next.config.mjs`, `src/app/layout.tsx`, `src/app/page.tsx`, `.eslintrc.json`, `.gitignore`.
 
-- [ ] **Step 2: Install additional dependencies**
+- [x] **Step 2: Install additional dependencies**
 
 Run:
 ```bash
@@ -68,7 +68,7 @@ npm install next-auth@^4 bcrypt zod @prisma/client
 npm install -D prisma vitest @vitejs/plugin-react vite-tsconfig-paths @types/bcrypt
 ```
 
-- [ ] **Step 3: Configure Vitest**
+- [x] **Step 3: Configure Vitest**
 
 Create `vitest.config.ts`:
 ```typescript
@@ -88,7 +88,7 @@ Add to `package.json` `"scripts"`:
 "test": "vitest run"
 ```
 
-- [ ] **Step 4: Write a smoke test to confirm the test runner works**
+- [x] **Step 4: Write a smoke test to confirm the test runner works**
 
 Create `src/lib/smoke.test.ts`:
 ```typescript
@@ -101,16 +101,16 @@ describe('smoke test', () => {
 })
 ```
 
-- [ ] **Step 5: Run the smoke test to confirm it passes**
+- [x] **Step 5: Run the smoke test to confirm it passes**
 
 Run: `npm test`
 Expected: PASS — `smoke test > runs`
 
-- [ ] **Step 6: Confirm the dev server boots**
+- [x] **Step 6: Confirm the dev server boots**
 
 Run: `npm run dev`, visit `http://localhost:3000`, confirm the default Next.js page loads. Stop the server (Ctrl+C).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git init
@@ -131,7 +131,7 @@ git commit -m "chore: scaffold Next.js project with TypeScript and Vitest"
 **Interfaces:**
 - Produces: `prisma` (default export from `src/lib/prisma.ts`) — a `PrismaClient` instance every later task imports to query the DB. Models: `User`, `Quiz`, `Question`, `Option`, `Attempt`, `AttemptAnswer`, enums `Role`, `RetakePolicy`, `FeedbackMode`, `QuestionType`.
 
-- [ ] **Step 1: Write the full Prisma schema**
+- [x] **Step 1: Write the full Prisma schema**
 
 Create `prisma/schema.prisma`:
 ```prisma
@@ -239,7 +239,7 @@ model AttemptAnswer {
 }
 ```
 
-- [ ] **Step 2: Document required environment variables**
+- [x] **Step 2: Document required environment variables**
 
 Create `.env.example`:
 ```
@@ -248,14 +248,14 @@ NEXTAUTH_SECRET="replace-with-a-random-32-byte-base64-string"
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
-- [ ] **Step 3: Provision a free-tier Postgres instance and set `.env`**
+- [x] **Step 3: Provision a free-tier Postgres instance and set `.env`**
 
 Create a free Postgres database on Neon (neon.tech) or Supabase. Copy `.env.example` to `.env` and fill in the real `DATABASE_URL` from the provider dashboard. Generate a secret for `NEXTAUTH_SECRET`:
 ```bash
 openssl rand -base64 32
 ```
 
-- [ ] **Step 4: Run the initial migration**
+- [x] **Step 4: Run the initial migration**
 
 Run:
 ```bash
@@ -263,11 +263,11 @@ npx prisma migrate dev --name init
 ```
 Expected: prints "Your database is now in sync with your schema" and creates `prisma/migrations/<timestamp>_init/`.
 
-- [ ] **Step 5: Verify tables were created**
+- [x] **Step 5: Verify tables were created**
 
 Run: `npx prisma studio`, confirm `User`, `Quiz`, `Question`, `Option`, `Attempt`, `AttemptAnswer` tables are listed. Close Prisma Studio.
 
-- [ ] **Step 6: Create the Prisma client singleton**
+- [x] **Step 6: Create the Prisma client singleton**
 
 Create `src/lib/prisma.ts`:
 ```typescript
@@ -284,12 +284,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 (The global caching avoids exhausting DB connections from repeated hot-reload instantiation in dev — a standard Next.js + Prisma pattern.)
 
-- [ ] **Step 7: Confirm `.env` is gitignored**
+- [x] **Step 7: Confirm `.env` is gitignored**
 
 Run: `git check-ignore .env`
 Expected: prints `.env` (confirming it is ignored). If it prints nothing, add `.env` to `.gitignore` and re-run.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add prisma/schema.prisma prisma/migrations src/lib/prisma.ts .env.example .gitignore
@@ -307,7 +307,7 @@ git commit -m "feat: add Prisma schema for all data models and DB client singlet
 **Interfaces:**
 - Produces: `hashPassword(plain: string): Promise<string>`, `verifyPassword(plain: string, hash: string): Promise<boolean>` — used by Task 4 (signup) and Task 5 (credential verification).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `src/lib/password.test.ts`:
 ```typescript
@@ -332,12 +332,12 @@ describe('password hashing', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npm test -- src/lib/password.test.ts`
 Expected: FAIL — `Cannot find module './password'`
 
-- [ ] **Step 3: Implement the utility**
+- [x] **Step 3: Implement the utility**
 
 Create `src/lib/password.ts`:
 ```typescript
@@ -354,12 +354,12 @@ export async function verifyPassword(plain: string, hash: string): Promise<boole
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test -- src/lib/password.test.ts`
 Expected: PASS — all 3 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/password.ts src/lib/password.test.ts
@@ -378,7 +378,7 @@ git commit -m "feat: add bcrypt-based password hashing utility"
 - Consumes: `hashPassword` from `src/lib/password.ts` (Task 3), `prisma` from `src/lib/prisma.ts` (Task 2).
 - Produces: `POST /api/signup` — accepts `{ email: string, password: string, name?: string }`, returns `201` with `{ id, email, name }` on success, `400` with `{ error: string }` on validation failure or duplicate email.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `src/app/api/signup/route.test.ts`:
 ```typescript
@@ -440,12 +440,12 @@ describe('POST /api/signup', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npm test -- src/app/api/signup/route.test.ts`
 Expected: FAIL — `Cannot find module './route'`
 
-- [ ] **Step 3: Implement the route**
+- [x] **Step 3: Implement the route**
 
 Create `src/app/api/signup/route.ts`:
 ```typescript
@@ -483,12 +483,12 @@ export async function POST(request: Request) {
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test -- src/app/api/signup/route.test.ts`
 Expected: PASS — all 3 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/api/signup/route.ts src/app/api/signup/route.test.ts
@@ -510,7 +510,7 @@ git commit -m "feat: add signup API route with validation and password hashing"
 - Consumes: `prisma` (Task 2), `verifyPassword` (Task 3).
 - Produces: `verifyCredentials(email: string, password: string): Promise<{ id: string, email: string, role: 'USER' | 'ADMIN' } | null>` — used by `authOptions`. `authOptions: NextAuthOptions` — used by the route handler and later by middleware/session reads in every other plan.
 
-- [ ] **Step 1: Write the failing tests for credential verification**
+- [x] **Step 1: Write the failing tests for credential verification**
 
 Create `src/lib/credentials.test.ts`:
 ```typescript
@@ -564,12 +564,12 @@ describe('verifyCredentials', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npm test -- src/lib/credentials.test.ts`
 Expected: FAIL — `Cannot find module './credentials'`
 
-- [ ] **Step 3: Implement `verifyCredentials`**
+- [x] **Step 3: Implement `verifyCredentials`**
 
 Create `src/lib/credentials.ts`:
 ```typescript
@@ -590,12 +590,12 @@ export async function verifyCredentials(
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test -- src/lib/credentials.test.ts`
 Expected: PASS — all 3 tests
 
-- [ ] **Step 5: Add NextAuth type augmentation**
+- [x] **Step 5: Add NextAuth type augmentation**
 
 Create `src/types/next-auth.d.ts`:
 ```typescript
@@ -622,7 +622,7 @@ declare module 'next-auth/jwt' {
 }
 ```
 
-- [ ] **Step 6: Write `authOptions`**
+- [x] **Step 6: Write `authOptions`**
 
 Create `src/lib/auth.ts`:
 ```typescript
@@ -666,7 +666,7 @@ export const authOptions: NextAuthOptions = {
 }
 ```
 
-- [ ] **Step 7: Wire up the NextAuth route handler**
+- [x] **Step 7: Wire up the NextAuth route handler**
 
 Create `src/app/api/auth/[...nextauth]/route.ts`:
 ```typescript
@@ -678,12 +678,12 @@ const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
 ```
 
-- [ ] **Step 8: Run the full test suite to confirm nothing broke**
+- [x] **Step 8: Run the full test suite to confirm nothing broke**
 
 Run: `npm test`
 Expected: PASS — all tests across all files
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/lib/credentials.ts src/lib/credentials.test.ts src/lib/auth.ts src/types/next-auth.d.ts src/app/api/auth
@@ -702,7 +702,7 @@ git commit -m "feat: add NextAuth Credentials provider with JWT sessions and rol
 - Consumes: `signIn` from `next-auth/react` (login page), `POST /api/signup` (signup page, Task 4).
 - Produces: working `/login` and `/signup` pages — this task is UI-only and verified manually in the browser, not via unit test (no meaningful pure logic to unit-test here beyond what Tasks 3–5 already cover).
 
-- [ ] **Step 1: Build the signup page**
+- [x] **Step 1: Build the signup page**
 
 Create `src/app/signup/page.tsx`:
 ```tsx
@@ -773,7 +773,7 @@ export default function SignupPage() {
 }
 ```
 
-- [ ] **Step 2: Build the login page**
+- [x] **Step 2: Build the login page**
 
 Create `src/app/login/page.tsx`:
 ```tsx
@@ -838,7 +838,7 @@ export default function LoginPage() {
 }
 ```
 
-- [ ] **Step 3: Wrap the app in NextAuth's SessionProvider**
+- [x] **Step 3: Wrap the app in NextAuth's SessionProvider**
 
 Modify `src/app/layout.tsx` to wrap children in a client-side session provider component. Create `src/app/providers.tsx`:
 ```tsx
@@ -867,7 +867,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-- [ ] **Step 4: Manually verify the signup → login flow in the browser**
+- [x] **Step 4: Manually verify the signup → login flow in the browser**
 
 Run: `npm run dev`
 1. Visit `http://localhost:3000/signup`, create an account with a real email/password (8+ chars).
@@ -878,7 +878,7 @@ Run: `npm run dev`
 
 Stop the dev server.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/login/page.tsx src/app/signup/page.tsx src/app/providers.tsx src/app/layout.tsx
@@ -898,7 +898,7 @@ git commit -m "feat: add login and signup pages wired to NextAuth"
 - Consumes: nothing from earlier tasks directly (pure function), but conceptually mirrors the `role` shape produced by Task 5's JWT/session callbacks.
 - Produces: `isAuthorizedForPath(pathname: string, role: 'USER' | 'ADMIN' | null): boolean` — pure authorization decision, used by `src/middleware.ts`. This is what later plans' route additions (e.g. `/quizzes`, `/admin/quizzes`) rely on for protection semantics.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `src/lib/authorization.test.ts`:
 ```typescript
@@ -932,12 +932,12 @@ describe('isAuthorizedForPath', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npm test -- src/lib/authorization.test.ts`
 Expected: FAIL — `Cannot find module './authorization'`
 
-- [ ] **Step 3: Implement the authorization decision function**
+- [x] **Step 3: Implement the authorization decision function**
 
 Create `src/lib/authorization.ts`:
 ```typescript
@@ -956,12 +956,12 @@ export function isAuthorizedForPath(pathname: string, role: 'USER' | 'ADMIN' | n
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test -- src/lib/authorization.test.ts`
 Expected: PASS — all 5 tests
 
-- [ ] **Step 5: Wire the decision function into Next.js middleware**
+- [x] **Step 5: Wire the decision function into Next.js middleware**
 
 Create `src/middleware.ts`:
 ```typescript
@@ -989,7 +989,7 @@ export const config = {
 
 (The `matcher` only lists paths that exist or will exist under the MCQ/admin plans — `/` and `/login`/`/signup` don't need to be matched at all since they're always public.)
 
-- [ ] **Step 6: Manually verify middleware redirect behavior**
+- [x] **Step 6: Manually verify middleware redirect behavior**
 
 Run: `npm run dev`
 1. While logged out, visit `http://localhost:3000/quizzes` (it will 404 since the page doesn't exist yet in this plan — confirm you're redirected to `/login` *before* hitting any 404, i.e. the middleware runs first).
@@ -998,12 +998,12 @@ Run: `npm run dev`
 
 Stop the dev server.
 
-- [ ] **Step 7: Run the full test suite one final time**
+- [x] **Step 7: Run the full test suite one final time**
 
 Run: `npm test`
 Expected: PASS — all tests across all files (smoke, password, signup route, credentials, authorization)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/lib/authorization.ts src/lib/authorization.test.ts src/middleware.ts

@@ -101,8 +101,59 @@ project root; this repo's git history predates this session (`50ef82c
 Initial commit from Create Next App`) and was preserved, not overwritten,
 by `create-next-app`'s `git init` call.
 
-Resume by proceeding to **Task 2: Prisma schema + client singleton**
-(Step 1: write `prisma/schema.prisma`) per the plan file.
+**Task 2 is fully COMPLETE** (commit `b94e7b5`). Hit real Prisma 7
+breaking changes along the way — full detail in `docs/LEARNING_LOG.md`:
+`datasource.url` moved to a new `prisma.config.ts` file; `PrismaClient`
+now requires an explicit driver `adapter` (`@prisma/adapter-pg` + `pg`)
+instead of implicitly reading `DATABASE_URL`; and DB connectivity itself
+needed Supabase's **Session pooler** (port `5432`), not the direct
+connection (IPv6-blocked) or the Transaction pooler (port `6543`, doesn't
+support the session-level locks `migrate` needs — hangs, doesn't error).
+`.gitignore`'s `.env*` pattern also had to be amended with `!.env.example`
+so the safe template file wasn't excluded from git along with the real
+`.env`. A real DB password leaked into this chat transcript twice (once
+via an env-change notification, once via an unmasked `grep`) and was
+rotated afterward — mask credential values in any future debugging output.
+
+**Task 3 is fully COMPLETE** (commit `a104434`) — `hashPassword`/
+`verifyPassword` in `src/lib/password.ts`, TDD flow, 3/3 tests passing.
+
+**Task 4 is fully COMPLETE** (commit `a3b7029`) — `POST /api/signup`
+route, TDD flow, 3/3 tests passing, no detours.
+
+**Task 5 is fully COMPLETE** (commit `eca296b`) — `verifyCredentials`,
+`authOptions`, NextAuth type augmentation, and the `[...nextauth]` route
+handler, all matching the plan as written (`next-auth@4.24.15` confirmed
+to match the plan's assumptions, unlike Prisma). 10/10 tests passing
+across all 4 test files.
+
+**Task 6 is fully COMPLETE** (commit `f536f1a`) — signup/login pages,
+`SessionProvider` wired into `layout.tsx`, full signup→login→wrong-
+password flow manually verified in the browser against the real
+Supabase DB, all 5 checks passed first try.
+
+## PROJECT FOUNDATION PLAN: FULLY COMPLETE (commit `e1b018a`)
+
+All 7 tasks done — scaffold, Prisma schema/DB, password hashing, signup
+API, NextAuth Credentials+JWT, login/signup pages, role-based middleware.
+15/15 tests passing. All checkboxes in
+`docs/superpowers/plans/2026-08-16-project-foundation.md` marked `[x]`.
+Full step-by-step "what + why" for every step (including several real
+Prisma 7 / Supabase breaking-change detours) is in `docs/LEARNING_LOG.md`.
+
+## Next: MCQ Core plan
+
+Per the ordering agreed earlier: MCQ Core (quiz list/take/submit/score)
+is next, depending on this Foundation work. **Not yet written.** Use the
+writing-plans skill to create it (same style as the Foundation plan:
+task/step breakdown, TDD where there's real logic, manual verification
+for UI-only pieces), scoped from `SPEC.md`'s MCQ feature section (data
+model, submission & scoring flow — `END_ONLY` feedback mode only for now,
+per spec). Continue the same execution mode: guide step-by-step, explain
+why, log to `docs/LEARNING_LOG.md`, user runs test-writing edits
+themselves while boilerplate/config file creation and command execution
+can be done directly when explicitly asked (established pattern this
+session — see [[feedback-hands-on-execution]]).
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
