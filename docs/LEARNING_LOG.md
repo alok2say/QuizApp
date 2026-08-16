@@ -253,4 +253,26 @@ handles every NextAuth sub-path (`/signin`, `/callback/credentials`,
 `/session`, etc.) through one exported handler. Full suite: 10/10 passing
 across all 4 test files — no detours this task.
 
+---
+
+## Task 6: Login and signup pages
+
+UI-only task, verified manually rather than via unit tests (no pure logic
+here beyond what Tasks 3–5 already cover). Signup page (`'use client'`,
+required for `useState`/form interactivity) calls our own `/api/signup`
+route via `fetch` — client code never touches Prisma or password hashing
+directly, that stays server-side. Login page calls `signIn('credentials',
+{ redirect: false })` so we can show the error inline ourselves instead
+of NextAuth doing a full-page redirect to a generic error page. Wrapped
+the app in `<SessionProvider>` (via a small `providers.tsx` client
+component) inside `layout.tsx`, since `useSession`/`signIn`/`signOut`
+rely on React Context that must wrap the whole app near the root. Minor
+version-drift note (not a break, just different from the plan's
+assumption): the scaffolded `layout.tsx` used Next.js 16's typed-routes
+`LayoutProps<"/">` instead of a plain `{ children: React.ReactNode }`
+prop type — didn't need to change it, just wrapped `{children}` as-is.
+Manually verified the full signup → login → wrong-password flow in the
+browser against the real Supabase DB — all 5 checks passed on the first
+try, no detours.
+
 <!-- Continue appending one entry per step as we go. -->
