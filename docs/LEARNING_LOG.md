@@ -191,4 +191,21 @@ with an explicit `npx prisma generate`. Lesson: after any Prisma schema
 or migration change, if types look stale/missing, `prisma generate` is
 the first thing to try before assuming the code itself is wrong.
 
+---
+
+## Task 3: Password hashing utility
+
+Followed TDD: wrote `src/lib/password.test.ts` first, confirmed it failed
+for the right reason (`Cannot find module './password'` — one detour: the
+file was initially saved empty, re-pasting fixed it), then implemented
+`src/lib/password.ts` using `bcrypt.hash`/`bcrypt.compare`. All 3 tests
+passed on the first real run. **Why bcrypt's two-function API, not a
+simple hash-and-compare**: `bcrypt.hash` generates a random salt per call
+and embeds it in the output, so identical passwords produce different
+hashes — `bcrypt.compare` extracts that embedded salt to redo the
+computation correctly, which a naive `hash(input) === storedHash` check
+couldn't do. `SALT_ROUNDS = 10` is bcrypt's standard default cost factor:
+expensive enough to resist brute-forcing, cheap enough not to slow down
+real logins noticeably.
+
 <!-- Continue appending one entry per step as we go. -->
