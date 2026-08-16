@@ -208,4 +208,21 @@ couldn't do. `SALT_ROUNDS = 10` is bcrypt's standard default cost factor:
 expensive enough to resist brute-forcing, cheap enough not to slow down
 real logins noticeably.
 
+---
+
+## Task 4: Signup logic + API route
+
+TDD again: `src/app/api/signup/route.test.ts` mocks `@/lib/prisma`
+entirely (via `vi.mock`), so tests run instantly against fake DB
+responses instead of the real Supabase DB, and can force scenarios like
+"duplicate email" without needing matching real rows. Implemented
+`src/app/api/signup/route.ts` as a Next.js App Router route handler — a
+plain `export async function POST(request: Request)` returning a
+`Response`, no Express-style `req`/`res`. Used zod's `safeParse` (returns
+a result object) instead of `parse` (throws) so invalid input becomes a
+normal `400` rather than an uncaught exception. Deliberately checks for
+a duplicate email *before* hashing the password, since hashing is the
+expensive step and shouldn't be paid for a request about to be rejected
+anyway. All 3 tests passed on the first real run — no detours this time.
+
 <!-- Continue appending one entry per step as we go. -->
