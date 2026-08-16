@@ -275,4 +275,30 @@ Manually verified the full signup → login → wrong-password flow in the
 browser against the real Supabase DB — all 5 checks passed on the first
 try, no detours.
 
+---
+
+## Task 7: Role-based route protection middleware
+
+TDD for `isAuthorizedForPath` — deliberately a *pure* function
+(`(path, role) → boolean`, no request/cookies/NextAuth involved), same
+separation-of-concerns pattern as `verifyCredentials` being separate from
+`authOptions`: decide the rule in something trivially unit-testable, then
+have a thin framework-specific wrapper (`src/middleware.ts`) plug it in.
+5/5 tests passed first try. The rule itself is deliberately coarse
+(public / admin-only / any-logged-in-user) per the spec's stated scope of
+role-based, not fine-grained, authorization; `pathname.startsWith('/admin')`
+covers every nested admin path without listing each one. Middleware uses
+`getToken` to read+verify the JWT straight from request cookies (no full
+NextAuth session round-trip needed) and runs `isAuthorizedForPath` before
+Next.js does any page/404 resolution — confirmed manually: logged-out
+`/quizzes` redirects to `/login` before any 404; a `USER` role is blocked
+from `/admin/quizzes`; promoting that user to `ADMIN` in Prisma Studio had
+no effect until logging out and back in (the JWT is only re-issued at
+login, so a live role change doesn't retroactively apply to an existing
+session) — after re-login, `/admin/quizzes` was no longer redirected.
+Full suite: 15/15 passing across 5 files.
+
+**Project Foundation plan is now fully complete.** Next up: write and
+execute the MCQ Core plan.
+
 <!-- Continue appending one entry per step as we go. -->
