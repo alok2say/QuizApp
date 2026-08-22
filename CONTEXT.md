@@ -14,6 +14,21 @@ clarifying questions (one at a time) → propose approaches → design sections
 → written spec (`SPEC.md`) → later, writing-plans skill for implementation.
 We are still mid-design — no implementation plan yet, no code written.
 
+### Spec Integrity Check (added 2026-08-22, after SPEC.md was found empty)
+`SPEC.md` once went silently empty of real content for multiple sessions
+— `CONTEXT.md` kept claiming decisions were "written into `SPEC.md`" but
+the file only ever held continuity-log text (lost during a
+`create-next-app` file-shuffle with no git checkpoint to catch it). To
+prevent a repeat:
+- After writing a decision into `SPEC.md`, read/diff the file back before
+  declaring it saved — don't trust a prior summary.
+- Commit `SPEC.md` right after each locked decision, not batched at
+  session end, so `git log -- SPEC.md` is a reliable safety net.
+- Before any operation that touches the working directory wholesale
+  (scaffolding tools, moving files aside), commit first and diff after.
+- End of session: confirm `SPEC.md` and `CONTEXT.md` have actually
+  diverged in content — near-identical text is a red flag.
+
 ## Where we are
 Deep-diving the **MCQ Quiz feature** first (the priority), before touching
 auth or the books/events content pages. Tech stack for the whole app was
@@ -141,35 +156,62 @@ API, NextAuth Credentials+JWT, login/signup pages, role-based middleware.
 Full step-by-step "what + why" for every step (including several real
 Prisma 7 / Supabase breaking-change detours) is in `docs/LEARNING_LOG.md`.
 
-## Next: MCQ Core plan
+## MCQ Core plan: WRITTEN, not yet executed
 
-Per the ordering agreed earlier: MCQ Core (quiz list/take/submit/score)
-is next, depending on this Foundation work. **Not yet written.** Use the
-writing-plans skill to create it (same style as the Foundation plan:
-task/step breakdown, TDD where there's real logic, manual verification
-for UI-only pieces), scoped from `SPEC.md`'s MCQ feature section (data
-model, submission & scoring flow — `END_ONLY` feedback mode only for now,
-per spec). Continue the same execution mode: guide step-by-step, explain
-why, log to `docs/LEARNING_LOG.md`, user runs test-writing edits
-themselves while boilerplate/config file creation and command execution
-can be done directly when explicitly asked (established pattern this
-session — see [[feedback-hands-on-execution]]).
+Plan file: `docs/superpowers/plans/2026-08-22-mcq-core.md` (7 tasks:
+session helper, scoring logic, start-attempt + API route, submit-attempt/
+scoring + API route, quiz list page, take-quiz page with timer +
+localStorage cache, result page).
+
+**Important discovery this session:** `SPEC.md` never actually contained
+the MCQ design content — it only had the same continuity-log text as
+`CONTEXT.md` (confirmed via `git log -- SPEC.md`: untouched since the
+very first scaffold commit `211edcd`). The design decisions summarized in
+this file were re-confirmed with the user and are now the authoritative
+source, captured in the plan's "Global Constraints" section:
+- Retake (`SINGLE_ATTEMPT`): blocks a second start, resumes the existing
+  unsubmitted attempt or redirects to its result if already submitted.
+- Scoring: exact-match only, no partial credit, same rule for
+  `SINGLE_SELECT`/`MULTI_SELECT`.
+- `isLeaderboardEligible` recomputed on every submit across the user's
+  attempts for that quiz (`UNLIMITED_BEST` picks highest score,
+  earliest-submitted tiebreak; `UNLIMITED_LATEST` picks most recent).
+- `Attempt` row created on start (`submittedAt: null`), updated on submit.
+- Timer expiry auto-submits whatever's cached in `localStorage`.
+- Quiz list cards show title/description/time limit + the user's past
+  attempt status.
+
+**TODO after this plan executes:** copy these decisions into `SPEC.md`
+for real (see the plan's "Post-plan spec repair" section) so it's
+load-bearing again for Admin Authoring and Leaderboard, which depend on
+this data model.
+
+Also caught mid-planning: this repo is Next.js **16** (`AGENTS.md`'s
+warning about breaking changes is real) — dynamic route/page `params` are
+now `Promise<T>` and must be `await`ed, not the old synchronous object.
+Checked `node_modules/next/dist/docs/01-app/01-getting-started/
+15-route-handlers.md` and `03-layouts-and-pages.md` to confirm before
+finalizing the plan's route handlers and page components.
+
+Continue the same execution mode: guide step-by-step, explain why, log to
+`docs/LEARNING_LOG.md`, user runs test-writing edits themselves while
+boilerplate/config file creation and command execution can be done
+directly when explicitly asked (established pattern — see
+[[feedback-hands-on-execution]]).
+
+## Next steps
+1. Walk the user through MCQ Core plan Task 1 (session helper), one step
+   at a time, same guided style as Project Foundation.
+2. Continue through Tasks 2–7 the same way.
+3. After execution, do the "Post-plan spec repair" — write the real MCQ
+   design into `SPEC.md`.
+4. Then Admin Authoring, then Leaderboard, then Home Placeholder.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
 only Vitest's internal engine for running unit tests, not the app's dev
 server; Next.js dev server has Fast Refresh (hot reload) on by default,
 no config needed.
-
-## Next steps (in order)
-1. Continue guiding the user through Task 1 of the Project Foundation
-   plan, one step at a time, starting from Step 2 above.
-2. After Task 1 finishes, continue with Tasks 2–7 the same way.
-3. Write and execute (same guided style) the MCQ Core plan next (depends
-   on Foundation).
-4. Then Admin Authoring, then Leaderboard, then Home Placeholder.
-5. Once each plan is executed and verified, note completion here and in
-   `SPEC.md` if anything deviated from the design during implementation.
 
 ## Notes on working style (for continuity, not preference change)
 - User answers one question at a time; sometimes rejects a question to ask
