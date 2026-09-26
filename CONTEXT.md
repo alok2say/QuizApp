@@ -214,20 +214,58 @@ commits going forward, just how this session's history fell):
   `startAttempt()` (retake-policy enforcement) +
   `src/app/api/quizzes/[quizId]/start/route.ts`. 5/5 + 3/3 tests passing.
 
-**Not started:** Task 4 (submit-attempt logic + API route — the biggest
-remaining task: scores every question via `scoreAnswer`, writes
-`AttemptAnswer` rows, recomputes `isLeaderboardEligible` across the
-user's attempts for that quiz), Task 5 (quiz list page), Task 6 (take-quiz
-page with timer + localStorage), Task 7 (result page).
+## MCQ CORE PLAN: FULLY COMPLETE (2026-09-27)
+
+Tasks 4–7 finished this session, each following the same TDD rhythm
+(failing test → implement → passing test → commit query/logic, then
+manual browser verification → commit UI):
+
+- **Task 4 (submit-attempt logic + API route)** — `submitAttempt()` +
+  `resolveLeaderboardEligibility()` in `src/lib/quiz/attempts.ts`,
+  `POST /api/attempts/[attemptId]/submit`. Commits `3cb0d75` (code),
+  `5d7f605` (docs).
+- **Task 5 (quiz list page)** — `getQuizzesWithStatus()`
+  (`ac1c8df`), then `page.tsx` + `StartQuizButton.tsx` (`361bd30` —
+  committed a session later than the query, since Step 9 was initially
+  missed; caught and fixed when starting Task 6).
+- **Task 6 (take-quiz page)** — `getQuizForTaking()` (`f01bd5e`), then
+  `page.tsx` + `QuizTakeForm.tsx` (`a80ebd7`). Manually verified: timer
+  countdown, radio/checkbox rendering per question type, `localStorage`
+  answer persistence across refresh, submit → redirect.
+- **Task 7 (result page)** — `getAttemptResult()` (`5350ec2`), then
+  `page.tsx` (`706beac`). Manually verified: score + per-question
+  correct/selected labeling, `/quizzes` list reflecting the new
+  attempt status.
+
+Test quiz used for manual verification throughout: "Sample Quiz"
+(id `cmuiplsqr0000zcsifjnz15md`), 5 questions (mixed `SINGLE_SELECT`/
+`MULTI_SELECT`), `UNLIMITED_BEST` retake policy — left in the dev DB,
+along with a couple of throwaway signup test accounts (one fixed at
+`quiztest.manual@example.com` / `TestPass123!` for repeat manual
+testing). Not cleaned up — harmless dev-only data, not part of any
+migration/seed.
+
+Full plan file `docs/superpowers/plans/2026-08-22-mcq-core.md`: all 7
+tasks' checkboxes marked `[x]`. Task 4–7 decisions (submission/scoring
+flow, leaderboard eligibility recompute rule, take/result page
+contracts) copied into `SPEC.md` per the plan's "Post-plan spec repair"
+section — verified by reading the file back after the edit, per
+[[feedback-spec-integrity-check]]. While doing that repair, also
+removed a stale continuity-log block that had accumulated at the bottom
+of `SPEC.md` (leftover text from before Project Foundation was even
+executed) — same category of issue the Spec Integrity Check section
+above was written to prevent; asked the user before deleting it.
 
 ## Next steps
-1. Resume at MCQ Core plan **Task 4** (`docs/superpowers/plans/2026-08-22-mcq-core.md`,
-   "Task 4: Submit-attempt logic + API route"), same guided TDD style,
-   one step at a time.
-2. Continue through Tasks 5–7 the same way.
-3. After execution, do the "Post-plan spec repair" — write the real MCQ
-   design into `SPEC.md`.
-4. Then Admin Authoring, then Leaderboard, then Home Placeholder.
+1. Plan and execute **Admin Authoring** (JSON editor CRUD for
+   quizzes/questions, role-gated, full-replace-on-save) — not yet
+   planned at all; write the plan file first (writing-plans skill).
+2. Then **Leaderboard** (eligibility-flag-driven query, top-N +
+   own-rank) — depends on `isLeaderboardEligible`, already in place.
+3. Then **Home Placeholder** — small, may fold into another plan's
+   scope.
+4. `IMMEDIATE` feedback mode remains explicitly out of scope until a
+   future plan targets it.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
