@@ -87,3 +87,66 @@ export async function getQuizForTaking(
         questions,
     }
 }
+
+export type AnsweredQuestion = {
+    id: string
+    text: string
+    isCorrect: boolean
+    pointsAwarded: number
+    points: number
+    options: { id: string; text: string; isCorrect: boolean; wasSelected: boolean }[]
+}
+
+export type AttemptResult =
+    | { ok: true; quizTitle: string; score: number; maxScore: number; questions: AnsweredQuestion[] }
+    | { ok: false; status: 403 | 404 | 409; error: string }
+
+export async function getAttemptResult(attemptId: string, userId: string): Promise<AttemptResult> {
+    const attempt = await prisma.attempt.findUnique({
+        where: { id: attemptId },
+        include: {
+            quiz: { include: { questions: { include: { options: true } } } },
+            answers: true,
+        },
+    })
+
+    if (!attempt) {
+        return { ok: false, status: 404, error: 'Attempt not found.' }
+    }
+    if (attempt.userId !== userId) {
+        return { ok: false, status: 403, error: 'Forbidden.' }
+    }
+    if (attempt.submittedAt === null) {
+        return { ok: false, status: 409, error: 'This attempt has not been submitted yet.' }
+    }
+
+    const answersByQuestion = new Map(attempt.answers.map((a) => [a.questionId, a]))
+    const maxScore = attempt.quiz.questions.reduce((sum, q) => sum + q.points, 0)
+
+    const questions = attempt.quiz.questions.map((question) => {
+        const answer = answersByQuestion.get(question.id)
+        const selected = new Set(answer?.selectedOptionIds ?? [])
+
+        return {
+            id: question.id,
+            text: question.text,
+            isCorrect: answer?.isCorrect ?? false,
+            pointsAwarded: answer?.pointsAwarded ?? 0,
+            points: question.points,
+            options: question.options.map((o) => ({
+                id: o.id,
+                text: o.text,
+                isCorrect: o.isCorrect,
+                wasSelected: selected.has(o.id),
+            })),
+        }
+    })
+
+    return {
+        ok: true,
+        quizTitle: attempt.quiz.title,
+        score: attempt.score,
+        maxScore,
+        questions,
+    }
+}

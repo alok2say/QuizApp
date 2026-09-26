@@ -8,7 +8,7 @@ vi.mock('@/lib/prisma', () => ({
 }))
 
 import { prisma } from '@/lib/prisma'
-import { getQuizzesWithStatus, getQuizForTaking } from './queries'
+import { getQuizzesWithStatus, getQuizForTaking, getAttemptResult } from './queries'
 
 describe('getQuizzesWithStatus', () => {
   beforeEach(() => {
@@ -157,6 +157,90 @@ describe('getQuizForTaking', () => {
           order: 2,
           type: 'SINGLE_SELECT',
           options: [{ id: 'c', text: 'C' }],
+        },
+      ],
+    })
+  })
+})
+
+describe('getAttemptResult', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns 404 when the attempt does not exist', async () => {
+    vi.mocked(prisma.attempt.findUnique).mockResolvedValue(null)
+    const result = await getAttemptResult('attempt-1', 'user-1')
+    expect(result).toEqual({ ok: false, status: 404, error: 'Attempt not found.' })
+  })
+
+  it('returns 403 when the attempt belongs to a different user', async () => {
+    vi.mocked(prisma.attempt.findUnique).mockResolvedValue({
+      id: 'attempt-1',
+      userId: 'someone-else',
+      submittedAt: new Date(),
+      score: 0,
+      quiz: { title: 'Q', questions: [] },
+      answers: [],
+    } as any)
+    const result = await getAttemptResult('attempt-1', 'user-1')
+    expect(result).toEqual({ ok: false, status: 403, error: 'Forbidden.' })
+  })
+
+  it('returns 409 when the attempt has not been submitted yet', async () => {
+    vi.mocked(prisma.attempt.findUnique).mockResolvedValue({
+      id: 'attempt-1',
+      userId: 'user-1',
+      submittedAt: null,
+      score: 0,
+      quiz: { title: 'Q', questions: [] },
+      answers: [],
+    } as any)
+    const result = await getAttemptResult('attempt-1', 'user-1')
+    expect(result).toEqual({ ok: false, status: 409, error: 'This attempt has not been submitted yet.' })
+  })
+
+  it('builds a per-question breakdown revealing correctness and selections', async () => {
+    vi.mocked(prisma.attempt.findUnique).mockResolvedValue({
+      id: 'attempt-1',
+      userId: 'user-1',
+      submittedAt: new Date(),
+      score: 10,
+      quiz: {
+        title: 'Quiz One',
+        questions: [
+          {
+            id: 'q1',
+            text: 'First?',
+            points: 10,
+            options: [
+              { id: 'a', text: 'A', isCorrect: true },
+              { id: 'b', text: 'B', isCorrect: false },
+            ],
+          },
+        ],
+      },
+      answers: [{ questionId: 'q1', selectedOptionIds: ['a'], isCorrect: true, pointsAwarded: 10 }],
+    } as any)
+
+    const result = await getAttemptResult('attempt-1', 'user-1')
+
+    expect(result).toEqual({
+      ok: true,
+      quizTitle: 'Quiz One',
+      score: 10,
+      maxScore: 10,
+      questions: [
+        {
+          id: 'q1',
+          text: 'First?',
+          isCorrect: true,
+          pointsAwarded: 10,
+          points: 10,
+          options: [
+            { id: 'a', text: 'A', isCorrect: true, wasSelected: true },
+            { id: 'b', text: 'B', isCorrect: false, wasSelected: false },
+          ],
         },
       ],
     })
