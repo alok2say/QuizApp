@@ -199,10 +199,32 @@ boilerplate/config file creation and command execution can be done
 directly when explicitly asked (established pattern — see
 [[feedback-hands-on-execution]]).
 
+## MCQ Core plan: execution progress (updated 2026-08-22, later same day)
+
+Tasks 1–3 of 7 are fully complete (code + tests passing + committed,
+commit `532494c` — all in one commit this session since CONTEXT.md/plan
+files and the code landed together; not a deviation from per-task
+commits going forward, just how this session's history fell):
+
+- **Task 1 (session helper)** — `src/lib/session.ts` /
+  `getCurrentUser()`. 2/2 tests passing.
+- **Task 2 (scoring logic)** — `src/lib/quiz/scoring.ts` /
+  `scoreAnswer()`, pure exact-match function. 7/7 tests passing.
+- **Task 3 (start-attempt logic + API route)** — `src/lib/quiz/attempts.ts`
+  `startAttempt()` (retake-policy enforcement) +
+  `src/app/api/quizzes/[quizId]/start/route.ts`. 5/5 + 3/3 tests passing.
+
+**Not started:** Task 4 (submit-attempt logic + API route — the biggest
+remaining task: scores every question via `scoreAnswer`, writes
+`AttemptAnswer` rows, recomputes `isLeaderboardEligible` across the
+user's attempts for that quiz), Task 5 (quiz list page), Task 6 (take-quiz
+page with timer + localStorage), Task 7 (result page).
+
 ## Next steps
-1. Walk the user through MCQ Core plan Task 1 (session helper), one step
-   at a time, same guided style as Project Foundation.
-2. Continue through Tasks 2–7 the same way.
+1. Resume at MCQ Core plan **Task 4** (`docs/superpowers/plans/2026-08-22-mcq-core.md`,
+   "Task 4: Submit-attempt logic + API route"), same guided TDD style,
+   one step at a time.
+2. Continue through Tasks 5–7 the same way.
 3. After execution, do the "Post-plan spec repair" — write the real MCQ
    design into `SPEC.md`.
 4. Then Admin Authoring, then Leaderboard, then Home Placeholder.

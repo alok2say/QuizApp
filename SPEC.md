@@ -1,3 +1,93 @@
+# Spec — Brainstorm Web App
+
+This is the approved, final feature-by-feature spec. For in-progress
+discussion state, paused questions, and execution position, see
+`CONTEXT.md` instead — this file holds only locked decisions.
+
+> **2026-08-22 note:** this file was previously stale for multiple
+> sessions (see `CONTEXT.md`'s "Spec Integrity Check" for the incident).
+> The sections below are being rebuilt incrementally, in step with what's
+> actually implemented, rather than all at once from memory — so anything
+> not yet in this file should be treated as **not yet locked**, even if
+> an older paragraph elsewhere implies otherwise.
+
+## MCQ Quiz Engine
+
+### Data model (`prisma/schema.prisma`, committed — ground truth for fields/enums)
+
+- `User` — `id`, `email` (unique), `passwordHash`, `name?`, `role`
+  (`USER` | `ADMIN`), `createdAt`.
+- `Quiz` — `id`, `title`, `description?`, `timeLimitSeconds`,
+  `retakePolicy` (`UNLIMITED_BEST` | `UNLIMITED_LATEST` |
+  `SINGLE_ATTEMPT`), `feedbackMode` (`END_ONLY` | `IMMEDIATE`),
+  `maxScore`, `createdAt`, `updatedAt`.
+- `Question` — belongs to `Quiz` (cascade delete), `text`, `order`,
+  `type` (`SINGLE_SELECT` | `MULTI_SELECT`), `points`.
+- `Option` — belongs to `Question` (cascade delete), `text`, `isCorrect`.
+- `Attempt` — belongs to `Quiz` + `User`, `startedAt` (default now),
+  `submittedAt?` (null until submit), `completionSeconds?`, `score`
+  (default 0), `isLeaderboardEligible` (default false, denormalized —
+  see below). Indexed on `[quizId, isLeaderboardEligible]` for cheap
+  leaderboard reads.
+- `AttemptAnswer` — belongs to `Attempt` (cascade delete) + `Question`,
+  `selectedOptionIds` (string array), `isCorrect`, `pointsAwarded`.
+  Unique on `[attemptId, questionId]`.
+
+### Scoring
+
+Exact-match only, no partial credit — a question is correct only if the
+submitted `selectedOptionIds` set is exactly equal to the set of options
+where `isCorrect: true`. Same rule for `SINGLE_SELECT` and
+`MULTI_SELECT`; one function (`scoreAnswer`, `src/lib/quiz/scoring.ts`)
+covers both, order-independent (set comparison, not array comparison).
+An unanswered question scores 0.
+
+### Feedback mode scope
+
+`END_ONLY` is the only mode being implemented in the MCQ Core plan.
+`IMMEDIATE` mode (per-question server check calls, so correct answers
+aren't exposed upfront) is explicitly deferred — its flow will be
+designed when `IMMEDIATE` mode actually gets built, not assumed now.
+
+### Retake policy / attempt lifecycle
+
+An `Attempt` row is created when the user starts the quiz
+(`submittedAt: null`) and updated in place on submit — never created
+fresh at submit time.
+
+- `SINGLE_ATTEMPT`: starting a second attempt is blocked. If the user's
+  existing attempt is unsubmitted, they resume it; if already submitted,
+  they're redirected to its result instead.
+- `UNLIMITED_BEST` / `UNLIMITED_LATEST`: always allow a new `Attempt` row
+  to be created, regardless of prior attempts.
+
+Implemented in `startAttempt()` (`src/lib/quiz/attempts.ts`), called from
+`POST /api/quizzes/[quizId]/start`.
+
+### Auth / session access pattern
+
+Every server component/route that needs the caller's identity goes
+through one helper, `getCurrentUser()` (`src/lib/session.ts`) — a thin
+wrapper around NextAuth's `getServerSession(authOptions)` returning
+`{ id, role } | null`. Auth itself (NextAuth Credentials + JWT strategy,
+signup/login pages, role-based route middleware) was specced and
+implemented in the Project Foundation plan; not repeated here.
+
+### Not yet locked in this file (tracked in the MCQ Core plan, pending implementation)
+
+- Submission & scoring flow detail (client-side `localStorage` answer
+  cache, single batch submit, server-side all-or-nothing scoring) —
+  Task 4.
+- `isLeaderboardEligible` recomputation rule across a user's attempts for
+  a quiz (`UNLIMITED_BEST` picks highest score with earliest-submitted
+  tiebreak; `UNLIMITED_LATEST` picks most recent) — Task 4.
+- Quiz list, take-quiz (timer + localStorage), and result pages — Tasks
+  5–7.
+- Admin authoring flow, leaderboard API/page, Home placeholder — not yet
+  planned at all.
+
+---
+
 # Session Continuity — Brainstorming Log
 
 Purpose: pick up exactly where we left off in the next session. Update this
