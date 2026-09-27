@@ -150,10 +150,149 @@ All 7 tasks of `docs/superpowers/plans/2026-08-22-mcq-core.md` are
 complete and committed. This closes out the MCQ Quiz Engine feature as
 originally scoped for `END_ONLY` feedback mode.
 
+## Admin Authoring
+
+Role-gated (`ADMIN` only, already enforced by the Project Foundation
+middleware on `/admin/*`) JSON editor for creating and editing quizzes.
+Design locked 2026-09-27 (brainstorming session); implementation plan
+not yet written.
+
+### JSON schema
+
+Pure content — no DB row IDs anywhere (`Quiz.id`/`Question.id`/
+`Option.id` are always server-generated `cuid()`s, same mechanism as
+every other model in the schema; the JSON never carries or accepts
+them). Quiz-level metadata and questions live in one blob, edited as a
+single unit:
+
+```json
+{
+  "title": "Capitals Quiz",
+  "description": "Test your knowledge of world capitals",
+  "timeLimitSeconds": 300,
+  "retakePolicy": "UNLIMITED_BEST",
+  "feedbackMode": "END_ONLY",
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "SINGLE_SELECT",
+      "points": 10,
+      "options": [
+        { "text": "Paris", "isCorrect": true },
+        { "text": "London", "isCorrect": false },
+        { "text": "Berlin", "isCorrect": false }
+      ]
+    },
+    {
+      "text": "Which of these are in Asia?",
+      "type": "MULTI_SELECT",
+      "options": [
+        { "text": "Japan", "isCorrect": true },
+        { "text": "Egypt", "isCorrect": false },
+        { "text": "Vietnam", "isCorrect": true }
+      ]
+    }
+  ]
+}
+```
+
+Notes:
+- Question `order` is implicit from array position — no explicit `order`
+  field in the JSON.
+- Option correctness is inline (`{text, isCorrect}`), not a separate
+  correct-answers list — avoids two lists drifting out of sync.
+- `points` is optional per question, defaulting to `10` if omitted
+  (second question above relies on the default).
+- `maxScore` is **not** in the JSON — always server-computed as
+  `sum(question.points)`, never admin-authored directly.
+- `feedbackMode` must be `END_ONLY` — rejected at validation time
+  otherwise (see below), since `IMMEDIATE` mode's flow was never
+  designed or implemented anywhere in the take/result pages; accepting
+  it in the JSON would silently produce a quiz that behaves like
+  `END_ONLY` while claiming otherwise.
+
+### Validation (before any DB write)
+
+Two layers, both enforced server-side before the save transaction runs:
+
+1. **Shape/type** (via `zod`, same library already used by
+   `/api/signup` and `/api/attempts/[attemptId]/submit`): every field
+   present with the right type/enum — `title: string`,
+   `timeLimitSeconds: positive int`, `retakePolicy` ∈ the 3 enum
+   values, `feedbackMode` must be `'END_ONLY'`, question `type` ∈
+   `SINGLE_SELECT`/`MULTI_SELECT`, `points` optional positive int,
+   `options: {text: string, isCorrect: boolean}[]`.
+2. **Semantic**:
+   - `questions.length >= 1`
+   - each question's `options.length >= 2`
+   - each question has `>= 1` option with `isCorrect: true`
+   - `SINGLE_SELECT` questions have **exactly 1** correct option;
+     `MULTI_SELECT` allows 2+
+
+Both layers live in one pure function (e.g. `validateQuizJson`),
+unit-testable in isolation before touching Prisma — same pattern as
+`scoreAnswer`. A failed save returns `400` with the specific list of
+validation errors, not a generic "invalid" message.
+
+### API routes & save flow
+
+- `GET /admin/quizzes` (page) — lists all quizzes (title, question
+  count, created date) with Edit/Delete actions and a "New Quiz" button.
+- `POST /api/admin/quizzes` — create: validates the JSON, then creates
+  `Quiz` + nested `Question`/`Option` rows in one Prisma nested-write,
+  computing `maxScore` server-side.
+- `GET /admin/quizzes/[quizId]/edit` (page) — loads the quiz, reverse-
+  maps it into the same JSON shape (IDs stripped) via a new query (e.g.
+  `getQuizAsJson`), pre-fills the editor with it (pretty-printed).
+- `PUT /api/admin/quizzes/[quizId]` — full replace, in one Prisma
+  transaction: delete all existing `Question` rows for the quiz
+  (cascades to their `Option` rows via the existing
+  `onDelete: Cascade`), update the `Quiz`'s metadata fields, create the
+  new `Question`/`Option` rows fresh, recompute `maxScore`.
+- `DELETE /api/admin/quizzes/[quizId]` — deletes the quiz outright
+  (cascades to its questions/options).
+
+Both writes are transactional so a failure partway through leaves the
+original quiz untouched.
+
+**Known limitation (backlog, not blocking this plan):** neither
+`AttemptAnswer.questionId` nor `Attempt.quizId` cascade-deletes from
+their parent. If a quiz already has submitted attempts, the `PUT`/
+`DELETE` above will hit a raw Prisma FK-violation error (surfaced as an
+unhandled `500`, no graceful message) instead of succeeding — full
+delete-then-recreate is fundamentally incompatible with preserving
+historical `Attempt`/`AttemptAnswer` references. Deferred because this
+project is still in its early building phase with no real attempt
+history to protect yet. Two follow-up items, either of which resolves
+it:
+- Block edits/deletes on any quiz that already has `>= 1` `Attempt` row,
+  with a clean error message instead of the raw DB failure.
+- Replace full-replace-on-save with an **incremental update** (diff
+  existing questions/options against the new JSON, update in place
+  where possible) — also fixes the related fact that every full-replace
+  save currently mints entirely new `Question`/`Option` IDs even when
+  the content didn't change.
+
+### Editor UI shape
+
+Both `/admin/quizzes/new` and `/admin/quizzes/[quizId]/edit` render the
+same client component (e.g. `QuizJsonEditor`) — a single `<textarea>`
+holding raw JSON text, plus a "Save" button. No syntax highlighting, no
+schema-driven form fields, no live-validate-as-you-type — matches the
+"rough is fine, polish deferred" pattern already established for
+leaderboard/admin UI elsewhere in this project.
+
+- **New:** textarea starts pre-filled with a minimal one-question
+  template.
+- **Edit:** textarea is pre-filled server-side with the quiz's current
+  content (pretty-printed `JSON.stringify(..., null, 2)`).
+- **On Save:** client `JSON.parse()`s first — a syntax error is shown
+  immediately with no network call. If it parses, POST/PUT to the API
+  route; a `400` renders the validation error list above the textarea
+  without wiping what was typed. Success redirects to `/admin/quizzes`.
+
 ### Not yet locked in this file
 
-- Admin authoring flow (JSON editor, role-gated, full-replace-on-save) —
-  not yet planned.
 - Leaderboard (eligibility-flag-driven query, top-N + own-rank) — not yet
   planned.
 - Home placeholder page — not yet planned.
