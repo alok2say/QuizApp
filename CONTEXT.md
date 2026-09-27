@@ -256,16 +256,62 @@ of `SPEC.md` (leftover text from before Project Foundation was even
 executed) — same category of issue the Spec Integrity Check section
 above was written to prevent; asked the user before deleting it.
 
+## ADMIN AUTHORING PLAN: FULLY COMPLETE (2026-09-27, same session)
+
+All 8 tasks of `docs/superpowers/plans/2026-09-27-admin-authoring.md`
+done, following the same TDD rhythm as MCQ Core:
+
+- **Task 1** (`validateQuizJson`, `src/lib/quiz/quizJsonSchema.ts`) —
+  `96e0a02`.
+- **Task 2** (`getAllQuizzesForAdmin`) — `508e66a`.
+- **Task 3** (`createQuizFromJson` + `POST /api/admin/quizzes`) —
+  `83dd34e`.
+- **Task 4** (`replaceQuizFromJson` + `PUT /api/admin/quizzes/[quizId]`)
+  — `a3848fd`.
+- **Task 5** (`deleteQuizById` + `DELETE /api/admin/quizzes/[quizId]`)
+  — `136edd0`.
+- **Task 6** (admin quiz list page + `DeleteQuizButton`) — `4926b37`.
+- **Task 7** (`QuizJsonEditor` + new-quiz page) — `f2558e1`, plus a
+  user-requested addition mid-task: download-as-file and
+  upload-from-file actions on the editor, designed as a bounded change
+  and locked into `SPEC.md` (`e1b2569`) before implementing.
+- **Task 8** (`getQuizAsJson` + edit-quiz page) — `01aa328` (query),
+  `45a8da3` (page). Hit and fixed a real bug during Task 8: the query's
+  "sort questions by order" test failed because the mocked Prisma
+  `findUnique` doesn't actually apply `orderBy` — needed an explicit
+  `.sort()` in application code, same pattern `getQuizForTaking`
+  (MCQ Core) already used; missed it the first time, caught by the
+  test itself.
+
+Also cleaned up two lingering issues surfaced during Admin Authoring,
+neither caught by the test suite — both via `eslint`/editor red
+squiggle instead: a `String` (JS wrapper type) vs `string` (primitive)
+typo in `QuizListItem` from MCQ Core Task 5 (`1f056ab`), and unused
+stray imports in the create-quiz route (`9af51cc`). Worth an
+`eslint`/`tsc --noEmit` sweep at the end of any plan, not just
+`vitest`.
+
+**Test quiz used for Task 8's edit-testing:** deliberately *not*
+"Sample Quiz" (already has 4 submitted attempts) — used one of the
+zero-attempt "New Quiz" rows created during Task 7's manual testing
+instead, to avoid the documented FK-violation backlog limitation.
+
+`SPEC.md`'s Admin Authoring section updated to reflect full
+implementation, including the download/upload addition.
+
 ## Next steps
-1. Plan and execute **Admin Authoring** (JSON editor CRUD for
-   quizzes/questions, role-gated, full-replace-on-save) — not yet
-   planned at all; write the plan file first (writing-plans skill).
-2. Then **Leaderboard** (eligibility-flag-driven query, top-N +
-   own-rank) — depends on `isLeaderboardEligible`, already in place.
-3. Then **Home Placeholder** — small, may fold into another plan's
+1. Plan and execute **Leaderboard** (eligibility-flag-driven query,
+   top-N + own-rank) — depends on `isLeaderboardEligible`, already in
+   place since MCQ Core; not yet planned at all, write the plan file
+   first (writing-plans skill).
+2. Then **Home Placeholder** — small, may fold into another plan's
    scope.
-4. `IMMEDIATE` feedback mode remains explicitly out of scope until a
+3. `IMMEDIATE` feedback mode remains explicitly out of scope until a
    future plan targets it.
+4. Backlog (from Admin Authoring's design, not yet scheduled): protect
+   quizzes with existing attempts from edit/delete (currently throws a
+   raw 500), and/or move full-replace-on-save to an incremental
+   (diff-based) update.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is

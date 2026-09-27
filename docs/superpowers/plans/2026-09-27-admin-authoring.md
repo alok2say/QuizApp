@@ -162,7 +162,7 @@ New/modified files this plan touches:
   ```
   Tasks 3 and 4 call this before any Prisma write.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```typescript
 // src/lib/quiz/quizJsonSchema.test.ts
@@ -302,12 +302,12 @@ describe('validateQuizJson', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/lib/quiz/quizJsonSchema.test.ts`
 Expected: FAIL with "Cannot find module './quizJsonSchema'"
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // src/lib/quiz/quizJsonSchema.ts
@@ -390,12 +390,12 @@ export function validateQuizJson(input: unknown): ValidateQuizJsonResult {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/quiz/quizJsonSchema.test.ts`
 Expected: PASS (9/9)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/quiz/quizJsonSchema.ts src/lib/quiz/quizJsonSchema.test.ts
@@ -421,7 +421,7 @@ git commit -m "feat: add quiz JSON validation"
   ```
   Task 6's list page calls this.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```typescript
 // add to the bottom of src/lib/quiz/queries.test.ts
@@ -462,12 +462,12 @@ describe('getAllQuizzesForAdmin', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: FAIL — `getAllQuizzesForAdmin` is not exported yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // append to src/lib/quiz/queries.ts
@@ -488,12 +488,12 @@ export async function getAllQuizzesForAdmin(): Promise<AdminQuizListItem[]> {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: PASS (all queries tests, including the new one)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/quiz/queries.ts src/lib/quiz/queries.test.ts
@@ -521,7 +521,7 @@ git commit -m "feat: add getAllQuizzesForAdmin query"
   The route in this task is what Task 7's `QuizJsonEditor` calls over
   HTTP when creating a new quiz.
 
-- [ ] **Step 1: Write the failing test for `createQuizFromJson`**
+- [x] **Step 1: Write the failing test for `createQuizFromJson`**
 
 ```typescript
 // src/lib/quiz/adminQuizzes.test.ts
@@ -627,12 +627,12 @@ describe('createQuizFromJson', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: FAIL with "Cannot find module './adminQuizzes'"
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // src/lib/quiz/adminQuizzes.ts
@@ -671,12 +671,12 @@ export async function createQuizFromJson(data: QuizJsonInput): Promise<{ id: str
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: PASS (2/2)
 
-- [ ] **Step 5: Write the failing test for the route**
+- [x] **Step 5: Write the failing test for the route**
 
 ```typescript
 // src/app/api/admin/quizzes/route.test.ts
@@ -756,12 +756,12 @@ describe('POST /api/admin/quizzes', () => {
 })
 ```
 
-- [ ] **Step 6: Run test to verify it fails**
+- [x] **Step 6: Run test to verify it fails**
 
 Run: `npx vitest run src/app/api/admin/quizzes/route.test.ts`
 Expected: FAIL with "Cannot find module './route'"
 
-- [ ] **Step 7: Write minimal implementation**
+- [x] **Step 7: Write minimal implementation**
 
 ```typescript
 // src/app/api/admin/quizzes/route.ts
@@ -795,12 +795,12 @@ export async function POST(request: Request) {
 }
 ```
 
-- [ ] **Step 8: Run test to verify it passes**
+- [x] **Step 8: Run test to verify it passes**
 
 Run: `npx vitest run src/app/api/admin/quizzes/route.test.ts`
 Expected: PASS (5/5)
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/lib/quiz/adminQuizzes.ts src/lib/quiz/adminQuizzes.test.ts \
@@ -830,7 +830,7 @@ git commit -m "feat: add create-quiz logic and API route"
   ```
   Task 8's edit page calls the route this task builds.
 
-- [ ] **Step 1: Write the failing test for `replaceQuizFromJson`**
+- [x] **Step 1: Write the failing test for `replaceQuizFromJson`**
 
 Replace the top-level `vi.mock('@/lib/prisma', ...)` factory in
 `src/lib/quiz/adminQuizzes.test.ts` with this extended version (adds
@@ -918,12 +918,12 @@ describe('replaceQuizFromJson', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: FAIL — `replaceQuizFromJson` is not exported yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // append to src/lib/quiz/adminQuizzes.ts
@@ -978,12 +978,12 @@ export async function replaceQuizFromJson(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: PASS (all `createQuizFromJson` + `replaceQuizFromJson` tests)
 
-- [ ] **Step 5: Write the failing test for the route**
+- [x] **Step 5: Write the failing test for the route**
 
 ```typescript
 // src/app/api/admin/quizzes/[quizId]/route.test.ts
@@ -1069,12 +1069,12 @@ describe('PUT /api/admin/quizzes/[quizId]', () => {
 })
 ```
 
-- [ ] **Step 6: Run test to verify it fails**
+- [x] **Step 6: Run test to verify it fails**
 
 Run: `npx vitest run "src/app/api/admin/quizzes/[quizId]/route.test.ts"`
 Expected: FAIL with "Cannot find module './route'"
 
-- [ ] **Step 7: Write minimal implementation**
+- [x] **Step 7: Write minimal implementation**
 
 ```typescript
 // src/app/api/admin/quizzes/[quizId]/route.ts
@@ -1117,12 +1117,12 @@ export async function PUT(
 }
 ```
 
-- [ ] **Step 8: Run test to verify it passes**
+- [x] **Step 8: Run test to verify it passes**
 
 Run: `npx vitest run "src/app/api/admin/quizzes/[quizId]/route.test.ts"`
 Expected: PASS (5/5)
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/lib/quiz/adminQuizzes.ts src/lib/quiz/adminQuizzes.test.ts \
@@ -1152,7 +1152,7 @@ git commit -m "feat: add replace-quiz logic and API route"
   ```
   Task 6's `DeleteQuizButton` calls the route this task builds.
 
-- [ ] **Step 1: Write the failing test for `deleteQuizById`**
+- [x] **Step 1: Write the failing test for `deleteQuizById`**
 
 Add `delete: vi.fn()` to the `quiz` object in the `vi.mock('@/lib/prisma', ...)`
 factory at the top of `src/lib/quiz/adminQuizzes.test.ts`:
@@ -1188,12 +1188,12 @@ describe('deleteQuizById', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: FAIL — `deleteQuizById` is not exported yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // append to src/lib/quiz/adminQuizzes.ts
@@ -1210,13 +1210,13 @@ export async function deleteQuizById(quizId: string): Promise<DeleteQuizResult> 
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/quiz/adminQuizzes.test.ts`
 Expected: PASS (all `createQuizFromJson` + `replaceQuizFromJson` +
 `deleteQuizById` tests)
 
-- [ ] **Step 5: Write the failing test for the DELETE route**
+- [x] **Step 5: Write the failing test for the DELETE route**
 
 First, update the existing `vi.mock('@/lib/quiz/adminQuizzes', ...)`
 factory at the top of `src/app/api/admin/quizzes/[quizId]/route.test.ts`
@@ -1280,12 +1280,12 @@ describe('DELETE /api/admin/quizzes/[quizId]', () => {
 })
 ```
 
-- [ ] **Step 6: Run test to verify it fails**
+- [x] **Step 6: Run test to verify it fails**
 
 Run: `npx vitest run "src/app/api/admin/quizzes/[quizId]/route.test.ts"`
 Expected: FAIL — `DELETE` is not exported yet.
 
-- [ ] **Step 7: Write minimal implementation**
+- [x] **Step 7: Write minimal implementation**
 
 ```typescript
 // append to src/app/api/admin/quizzes/[quizId]/route.ts
@@ -1314,12 +1314,12 @@ export async function DELETE(
 }
 ```
 
-- [ ] **Step 8: Run test to verify it passes**
+- [x] **Step 8: Run test to verify it passes**
 
 Run: `npx vitest run "src/app/api/admin/quizzes/[quizId]/route.test.ts"`
 Expected: PASS (9/9 — 5 from `PUT`, 4 from `DELETE`)
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/lib/quiz/adminQuizzes.ts src/lib/quiz/adminQuizzes.test.ts \
@@ -1342,7 +1342,7 @@ git commit -m "feat: add delete-quiz logic and API route"
 - Produces: nothing consumed by a later task — this is the entry point
   admins land on, linking out to Task 7 (new) and Task 8 (edit).
 
-- [ ] **Step 1: Write the delete button client component**
+- [x] **Step 1: Write the delete button client component**
 
 ```typescript
 // src/app/admin/quizzes/DeleteQuizButton.tsx
@@ -1387,7 +1387,7 @@ export function DeleteQuizButton({ quizId }: { quizId: string }) {
 }
 ```
 
-- [ ] **Step 2: Write the list page**
+- [x] **Step 2: Write the list page**
 
 ```typescript
 // src/app/admin/quizzes/page.tsx
@@ -1430,7 +1430,7 @@ export default async function AdminQuizzesPage() {
 }
 ```
 
-- [ ] **Step 3: Manually verify in the browser**
+- [x] **Step 3: Manually verify in the browser**
 
 Run `npm run dev`, promote your test account's `role` to `ADMIN` in
 Prisma Studio (`npx prisma studio`), log out and back in (the role is
@@ -1443,7 +1443,7 @@ and confirm visiting `/admin/quizzes` redirects to `/login` (middleware
 still enforces this even though the page's own `notFound()` check is
 belt-and-suspenders).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/app/admin/quizzes/page.tsx src/app/admin/quizzes/DeleteQuizButton.tsx
@@ -1464,7 +1464,7 @@ git commit -m "feat: add admin quiz list page with delete action"
 - Produces: `QuizJsonEditor` component, reused as-is by Task 8's edit
   page (imported via a relative path one level further up).
 
-- [ ] **Step 1: Write the shared editor component**
+- [x] **Step 1: Write the shared editor component**
 
 ```typescript
 // src/app/admin/quizzes/QuizJsonEditor.tsx
@@ -1538,7 +1538,7 @@ export function QuizJsonEditor({ initialJson, submitUrl, method }: Props) {
 }
 ```
 
-- [ ] **Step 2: Write the new-quiz page**
+- [x] **Step 2: Write the new-quiz page**
 
 ```typescript
 // src/app/admin/quizzes/new/page.tsx
@@ -1587,7 +1587,7 @@ export default async function NewQuizPage() {
 }
 ```
 
-- [ ] **Step 3: Manually verify in the browser**
+- [x] **Step 3: Manually verify in the browser**
 
 As the `ADMIN` test account, visit `/admin/quizzes/new`. Confirm the
 textarea is pre-filled with the template. First, try saving with a
@@ -1597,7 +1597,7 @@ the textarea without your edits being lost. Then fix it and Save;
 confirm it redirects to `/admin/quizzes` and the new quiz appears in the
 list with the right question count.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/app/admin/quizzes/QuizJsonEditor.tsx src/app/admin/quizzes/new/page.tsx
@@ -1635,7 +1635,7 @@ git commit -m "feat: add quiz JSON editor and new-quiz page"
   ```
   Nothing later depends on this — it's the last task in this plan.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```typescript
 // add to the bottom of src/lib/quiz/queries.test.ts
@@ -1714,12 +1714,12 @@ describe('getQuizAsJson', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: FAIL — `getQuizAsJson` is not exported yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // append to src/lib/quiz/queries.ts
@@ -1766,19 +1766,19 @@ export async function getQuizAsJson(quizId: string): Promise<QuizJsonData | null
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: PASS (all queries tests, including the two new ones)
 
-- [ ] **Step 5: Commit the query logic**
+- [x] **Step 5: Commit the query logic**
 
 ```bash
 git add src/lib/quiz/queries.ts src/lib/quiz/queries.test.ts
 git commit -m "feat: add getQuizAsJson query"
 ```
 
-- [ ] **Step 6: Write the edit page**
+- [x] **Step 6: Write the edit page**
 
 ```typescript
 // src/app/admin/quizzes/[quizId]/edit/page.tsx
@@ -1819,7 +1819,7 @@ export default async function EditQuizPage({
 }
 ```
 
-- [ ] **Step 7: Manually verify in the browser end to end**
+- [x] **Step 7: Manually verify in the browser end to end**
 
 Use the quiz you created in Task 7's manual test (fresh, no attempts
 yet) — **not** the "Sample Quiz" from MCQ Core manual testing, since
@@ -1835,7 +1835,7 @@ confirm the change persisted. Then, separately, visit
 confirm the learner-facing pages still work correctly against the
 replaced question set.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add "src/app/admin/quizzes/[quizId]/edit/page.tsx"

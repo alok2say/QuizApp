@@ -154,8 +154,10 @@ originally scoped for `END_ONLY` feedback mode.
 
 Role-gated (`ADMIN` only, already enforced by the Project Foundation
 middleware on `/admin/*`) JSON editor for creating and editing quizzes.
-Design locked 2026-09-27 (brainstorming session); implementation plan
-not yet written.
+Design locked and fully implemented 2026-09-27 — all 8 tasks of
+`docs/superpowers/plans/2026-09-27-admin-authoring.md` complete and
+committed, including the download/upload JSON actions added mid-plan
+(see "Editor UI shape" below).
 
 ### JSON schema
 
