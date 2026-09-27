@@ -214,3 +214,70 @@ export async function getQuizAsJson(quizId: string): Promise<QuizJsonData | null
             })),
     }
 }
+
+export type LeaderboardEntry = {
+    userId: string
+    displayName: string
+    score: number
+    completionSeconds: number | null
+}
+
+export type LeaderboardResult =
+    | {
+        ok: true
+        quizTitle: string
+        maxScore: number
+        top: LeaderboardEntry[]
+        ownRank: LeaderboardEntry | null
+        hasAttempted: boolean
+    }
+    | { ok: false; status: 404; error: string }
+
+export async function getLeaderboard(quizId: string, userId: string): Promise<LeaderboardResult> {
+    const quiz = await prisma.quiz.findUnique({
+        where: { id: quizId },
+        include: { questions: true },
+    })
+
+    if (!quiz) {
+        return { ok: false, status: 404, error: 'Quiz not found.' }
+    }
+
+    const attempts = await prisma.attempt.findMany({
+        where: { quizId, isLeaderboardEligible: true },
+        include: { user: true },
+    })
+
+    // score desc, then completionSeconds asc (fastest wins), then submittedAt asc (earliest wins)
+    const ranked = [...attempts].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score
+        const aTime = a.completionSeconds ?? Infinity
+        const bTime = b.completionSeconds ?? Infinity
+        if (aTime !== bTime) return aTime - bTime
+        return a.submittedAt!.getTime() - b.submittedAt!.getTime()
+    })
+
+    const entries: LeaderboardEntry[] = ranked.map((attempt) => ({
+        userId: attempt.userId,
+        displayName: attempt.user.name ?? attempt.user.email.split('@')[0],
+        score: attempt.score,
+        completionSeconds: attempt.completionSeconds,
+    }))
+
+    const top = entries.slice(0, quiz.leaderboardSize)
+    const maxScore = quiz.questions.reduce((sum, q) => sum + q.points, 0)
+
+    const ownEntry = entries.find((entry) => entry.userId === userId)
+    const isInTop = top.some((entry) => entry.userId === userId)
+
+    return {
+        ok: true,
+        quizTitle: quiz.title,
+        maxScore,
+        top,
+        // null covers two cases the caller must tell apart via hasAttempted:
+        // already visible in top, or never attempted at all
+        ownRank: ownEntry && !isInTop ? ownEntry : null,
+        hasAttempted: ownEntry !== undefined,
+    }
+}

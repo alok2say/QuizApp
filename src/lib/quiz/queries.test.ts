@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     quiz: { findMany: vi.fn(), findUnique: vi.fn() },
-    attempt: { findUnique: vi.fn() },
+    attempt: { findUnique: vi.fn(), findMany: vi.fn() },
   },
 }))
 
@@ -14,6 +14,7 @@ import {
   getAttemptResult,
   getAllQuizzesForAdmin,
   getQuizAsJson,
+  getLeaderboard,
 } from './queries'
 
 describe('getQuizzesWithStatus', () => {
@@ -358,5 +359,180 @@ describe('getQuizAsJson', () => {
       where: { id: 'quiz-1' },
       include: { questions: { include: { options: true }, orderBy: { order: 'asc' } } },
     })
+  })
+})
+
+function eligibleAttempt(overrides: Partial<{
+  userId: string
+  score: number
+  completionSeconds: number | null
+  submittedAt: Date
+  name: string | null
+  email: string
+}>) {
+  const { name, email, ...rest } = overrides
+  return {
+    userId: 'user-x',
+    score: 0,
+    completionSeconds: 60,
+    submittedAt: new Date('2026-09-01T00:00:00Z'),
+    ...rest,
+    user: {
+      name: name ?? null,
+      email: email ?? 'user-x@example.com',
+    },
+  }
+}
+
+describe('getLeaderboard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns 404 when the quiz does not exist', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue(null)
+    const result = await getLeaderboard('missing-quiz', 'user-1')
+    expect(result).toEqual({ ok: false, status: 404, error: 'Quiz not found.' })
+  })
+
+  it('ranks by score desc, then completionSeconds asc, then submittedAt asc', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 10,
+      questions: [{ points: 10 }, { points: 20 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 20, completionSeconds: 100, submittedAt: new Date('2026-09-01T00:00:00Z'), name: 'Alice' }),
+      eligibleAttempt({ userId: 'user-b', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-02T00:00:00Z'), name: 'Bob' }),
+      // ties user-c and user-d on both score and completionSeconds — submittedAt must break it
+      eligibleAttempt({ userId: 'user-c', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-03T00:00:00Z'), name: 'Carol' }),
+      eligibleAttempt({ userId: 'user-d', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-01T12:00:00Z'), name: 'Dave' }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-a')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      // user-b/c/d tie on score (30) and completionSeconds (50); submittedAt breaks it, earliest first
+      expect(result.top.map((e) => e.userId)).toEqual(['user-d', 'user-b', 'user-c', 'user-a'])
+      expect(result.maxScore).toBe(30)
+    }
+    // pins the query shape itself — output-only assertions above wouldn't
+    // catch a bug like forgetting the isLeaderboardEligible filter, since
+    // the mock returns whatever it's told regardless of the query args
+    expect(prisma.attempt.findMany).toHaveBeenCalledWith({
+      where: { quizId: 'quiz-1', isLeaderboardEligible: true },
+      include: { user: true },
+    })
+  })
+
+  it('derives displayName from name, falling back to the email prefix', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 10,
+      questions: [{ points: 10 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 10, name: 'Alice' }),
+      eligibleAttempt({ userId: 'user-b', score: 5, name: null, email: 'bob.smith@example.com' }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-a')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.top[0]).toEqual(expect.objectContaining({ userId: 'user-a', displayName: 'Alice' }))
+      expect(result.top[1]).toEqual(expect.objectContaining({ userId: 'user-b', displayName: 'bob.smith' }))
+    }
+  })
+
+  it('caps top at leaderboardSize but returns fewer if that many do not exist', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 1,
+      questions: [{ points: 10 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 10 }),
+      eligibleAttempt({ userId: 'user-b', score: 5 }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-a')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.top).toHaveLength(1)
+      expect(result.top[0].userId).toBe('user-a')
+    }
+
+    // fewer eligible attempts than leaderboardSize — no padding, no error
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 10,
+      questions: [{ points: 10 }],
+    } as any)
+    const result2 = await getLeaderboard('quiz-1', 'user-a')
+    expect(result2.ok).toBe(true)
+    if (result2.ok) {
+      expect(result2.top).toHaveLength(2)
+    }
+  })
+
+  it('sets ownRank when the caller is outside top, and hasAttempted true either way', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 1,
+      questions: [{ points: 10 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 10 }),
+      eligibleAttempt({ userId: 'user-b', score: 5 }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-b')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.hasAttempted).toBe(true)
+      expect(result.ownRank).toEqual(expect.objectContaining({ userId: 'user-b' }))
+    }
+  })
+
+  it('leaves ownRank null (no duplicate) when the caller is already inside top', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 10,
+      questions: [{ points: 10 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 10 }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-a')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.hasAttempted).toBe(true)
+      expect(result.ownRank).toBeNull()
+    }
+  })
+
+  it('sets hasAttempted false and ownRank null when the caller never attempted', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      leaderboardSize: 10,
+      questions: [{ points: 10 }],
+    } as any)
+    vi.mocked(prisma.attempt.findMany).mockResolvedValue([
+      eligibleAttempt({ userId: 'user-a', score: 10 }),
+    ] as any)
+
+    const result = await getLeaderboard('quiz-1', 'user-never-attempted')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.hasAttempted).toBe(false)
+      expect(result.ownRank).toBeNull()
+    }
   })
 })
