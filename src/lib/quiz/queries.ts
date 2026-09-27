@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 export type QuizListItem = {
     id: string
-    title: String
+    title: string
     description: string | null
     timeLimitSeconds: number
     retakePolicy: 'UNLIMITED_BEST' | 'UNLIMITED_LATEST' | 'SINGLE_ATTEMPT'
