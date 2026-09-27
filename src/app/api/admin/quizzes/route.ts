@@ -1,8 +1,6 @@
-import { use } from "react";
-import { getCurrentUser } from "../../../../lib/session";
-import { validateQuizJson } from "../../../../lib/quiz/quizJsonSchema";
-import {createQuizFromJson} from "@/lib/quiz/adminQuizzes"
-import { error } from "console";
+import { getCurrentUser } from "@/lib/session";
+import { validateQuizJson } from "@/lib/quiz/quizJsonSchema";
+import { createQuizFromJson } from "@/lib/quiz/adminQuizzes"
 
 export async function POST(request: Request) {
     const user = await getCurrentUser()
