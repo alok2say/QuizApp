@@ -307,8 +307,108 @@ leaderboard/admin UI elsewhere in this project.
 
 ### Not yet locked in this file
 
-- Leaderboard (eligibility-flag-driven query, top-N + own-rank) — not yet
-  planned.
 - Home placeholder page — not yet planned.
 - `IMMEDIATE` feedback mode — explicitly out of scope until a future plan
   targets it (see "Feedback mode scope" above).
+
+## Leaderboard
+
+Per-quiz ranking (not global/cross-quiz — score comparisons across
+different quizzes with different `maxScore`s and difficulty aren't
+meaningful). Design locked 2026-09-27 (brainstorming session);
+implementation plan not yet written.
+
+### Data model addition
+
+`Quiz` gains one field:
+
+```prisma
+leaderboardSize  Int  @default(10)
+```
+
+Needs a Prisma migration. Per-quiz configurable (not a fixed app-wide
+constant) — matches this project's established pattern of pushing
+config to the quiz/question level (`timeLimitSeconds`, `retakePolicy`,
+`feedbackMode`, per-question `points` already work this way) rather
+than fixed global rules.
+
+**Cross-plan impact:** since Admin Authoring's JSON editor is the only
+way to author quiz metadata, `leaderboardSize` must be threaded through
+its already-shipped files: `quizJsonSchema.ts` (optional positive int,
+default `10` — same optional-with-default pattern as per-question
+`points`), `adminQuizzes.ts`'s `createQuizFromJson`/`replaceQuizFromJson`
+(persist it), and `getQuizAsJson` (include it in the reverse-mapped
+JSON so it round-trips on edit). This is in scope for the Leaderboard
+implementation plan, not a separate plan — the field only exists to
+serve this feature.
+
+### Ranking query
+
+`getLeaderboard(quizId, userId)` (`src/lib/quiz/queries.ts`):
+
+```typescript
+export type LeaderboardEntry = {
+  rank: number
+  userId: string
+  displayName: string
+  score: number
+  completionSeconds: number | null
+}
+
+export type LeaderboardResult =
+  | {
+      ok: true
+      quizTitle: string
+      maxScore: number
+      top: LeaderboardEntry[]
+      ownRank: LeaderboardEntry | null
+      hasAttempted: boolean
+    }
+  | { ok: false; status: 404; error: string }
+```
+
+- `404` if the quiz doesn't exist.
+- Otherwise fetches every `Attempt` for the quiz where
+  `isLeaderboardEligible: true`, joined with `User` (`name`, `email`).
+- Ranks by: **`score` desc → `completionSeconds` asc (fastest wins) →
+  `submittedAt` asc (earliest wins)** — the completion-time and
+  submission-time tiebreaks are new; the `score`-desc-first rule is
+  consistent with (but distinct from) the eligibility tiebreak used
+  when recomputing `isLeaderboardEligible` in `submitAttempt`.
+- `displayName`: `user.name` if set, otherwise the email's prefix
+  before `@` (never the full email — avoids exposing addresses on a
+  ranking visible to other users).
+- `userId` is on every entry (`top` and `ownRank` alike) — every entry
+  is the same shape, no special-cased intersection type.
+- `top`: the first `quiz.leaderboardSize` ranked entries.
+- `hasAttempted`: `true` if the calling user has an eligible attempt
+  for this quiz at all, regardless of whether it landed in `top`.
+- `ownRank`: the calling user's own entry (with its real rank number)
+  **only** when `hasAttempted` is `true` **and** their `userId` isn't
+  already present in `top` (no duplicate row); `null` otherwise —
+  which covers two distinct cases the page must tell apart using
+  `hasAttempted`, not `ownRank` alone: already visible in `top`
+  (`hasAttempted: true`), or never attempted (`hasAttempted: false`).
+
+### Page & access
+
+`src/app/quizzes/[quizId]/leaderboard/page.tsx` — server component.
+Requires being logged in (redirect to `/login`), but **no role
+restriction and no requirement to have attempted the quiz** — any
+logged-in user can view any quiz's leaderboard, same access level as
+browsing `/quizzes` itself. Already covered by the existing middleware
+matcher (`/quizzes/:path*`) with no changes needed.
+
+Renders the `top` table (rank, name, score, completion time), then:
+- `ownRank` present → render it as an extra "Your rank" row below the
+  table.
+- `ownRank` is `null` and `hasAttempted` is `true` → nothing extra
+  needed; the user is already visible inside `top`.
+- `ownRank` is `null` and `hasAttempted` is `false` → a message
+  ("You haven't attempted this quiz yet") linking to `/quizzes`, not
+  simply omitted, so it's clear why no rank is shown.
+
+**Navigation:** a "Leaderboard" link added to each quiz card on
+`/quizzes` and to the result page
+(`/quizzes/[quizId]/result/[attemptId]`) — the two natural jump-off
+points.
