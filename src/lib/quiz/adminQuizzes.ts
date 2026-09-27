@@ -84,3 +84,14 @@ export async function replaceQuizFromJson(
 
   return { ok: true }
 }
+
+export type DeleteQuizResult = {ok: true} | {ok: false; status: 404; error: string} 
+
+export async function deleteQuizById(quizId: string): Promise<DeleteQuizResult> {
+  const existing = await prisma.quiz.findUnique({where: {id: quizId}})
+  if (!existing){
+    return {ok: false, status: 404, error: 'Quiz not found.'}
+  }
+  await prisma.quiz.delete({where: {id: quizId}})
+  return {ok: true}
+}

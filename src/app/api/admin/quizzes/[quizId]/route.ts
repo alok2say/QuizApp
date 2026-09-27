@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/lib/session'
 import { validateQuizJson } from '@/lib/quiz/quizJsonSchema'
-import { replaceQuizFromJson } from '@/lib/quiz/adminQuizzes'
+import { replaceQuizFromJson, deleteQuizById } from '@/lib/quiz/adminQuizzes'
 
 export async function PUT(
   request: Request,
@@ -36,4 +36,28 @@ export async function PUT(
   }
 
   return Response.json({ ok: true }, { status: 200 })
+}
+
+export async function DELETE(
+  // unused, but required by Next.js's route-handler signature
+  _request: Request,
+  { params }: { params: Promise<{ quizId: string }> },
+) {
+  const user = await getCurrentUser()
+  if (!user) {
+    return Response.json({ error: 'Not authenticated.' }, { status: 401 })
+  }
+  if (user.role !== 'ADMIN') {
+    return Response.json({ error: 'Forbidden.' }, { status: 403 })
+  }
+
+  const { quizId } = await params
+  const result = await deleteQuizById(quizId)
+
+  if (!result.ok) {
+    return Response.json({ error: result.error }, { status: result.status })
+  }
+
+  // 204: deleted, no body to send back
+  return new Response(null, { status: 204 })
 }

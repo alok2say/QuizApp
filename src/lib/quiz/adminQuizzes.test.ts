@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/prisma', () => {
   const prismaMock: any = {
-    quiz: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
+    quiz: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
     question: { deleteMany: vi.fn(), create: vi.fn() },
   }
   prismaMock.$transaction = vi.fn((fn: any) => fn(prismaMock))
@@ -10,7 +10,7 @@ vi.mock('@/lib/prisma', () => {
 })
 
 import { prisma } from '@/lib/prisma'
-import { createQuizFromJson, replaceQuizFromJson } from './adminQuizzes'
+import { createQuizFromJson, replaceQuizFromJson, deleteQuizById } from './adminQuizzes'
 
 const quizInput = {
   title: 'Capitals Quiz',
@@ -161,5 +161,26 @@ describe('replaceQuizFromJson', () => {
         },
       },
     })
+  })
+})
+
+describe('deleteQuizById', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns 404 when the quiz does not exist', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue(null)
+    const result = await deleteQuizById('missing-quiz')
+    expect(result).toEqual({ ok: false, status: 404, error: 'Quiz not found.' })
+  })
+
+  it('deletes the quiz when it exists', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({ id: 'quiz-1' } as any)
+
+    const result = await deleteQuizById('quiz-1')
+
+    expect(result).toEqual({ ok: true })
+    expect(prisma.quiz.delete).toHaveBeenCalledWith({ where: { id: 'quiz-1' } })
   })
 })

@@ -7,8 +7,8 @@ vi.mock('@/lib/quiz/adminQuizzes', () => ({
 }))
 
 import { getCurrentUser } from '@/lib/session'
-import { replaceQuizFromJson } from '@/lib/quiz/adminQuizzes'
-import { PUT } from './route'
+import { replaceQuizFromJson, deleteQuizById } from '@/lib/quiz/adminQuizzes'
+import { PUT, DELETE } from './route'
 
 function makeRequest(body: unknown) {
   return new Request('http://localhost/api/admin/quizzes/quiz-1', {
@@ -76,5 +76,45 @@ describe('PUT /api/admin/quizzes/[quizId]', () => {
 
     expect(res.status).toBe(200)
     expect(replaceQuizFromJson).toHaveBeenCalledWith('quiz-1', expect.objectContaining({ title: 'Capitals Quiz' }))
+  })
+})
+
+function makeDeleteRequest() {
+  return new Request('http://localhost/api/admin/quizzes/quiz-1', { method: 'DELETE' })
+}
+
+describe('DELETE /api/admin/quizzes/[quizId]', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns 401 when not logged in', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(null)
+    const res = await DELETE(makeDeleteRequest(), { params: Promise.resolve({ quizId: 'quiz-1' }) })
+    expect(res.status).toBe(401)
+  })
+
+  it('returns 403 when logged in but not an admin', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1', role: 'USER' })
+    const res = await DELETE(makeDeleteRequest(), { params: Promise.resolve({ quizId: 'quiz-1' }) })
+    expect(res.status).toBe(403)
+  })
+
+  it('returns 404 when deleteQuizById reports the quiz missing', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
+    vi.mocked(deleteQuizById).mockResolvedValue({ ok: false, status: 404, error: 'Quiz not found.' })
+
+    const res = await DELETE(makeDeleteRequest(), { params: Promise.resolve({ quizId: 'quiz-1' }) })
+
+    expect(res.status).toBe(404)
+  })
+
+  it('deletes the quiz and returns 204 on success', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
+    vi.mocked(deleteQuizById).mockResolvedValue({ ok: true })
+
+    const res = await DELETE(makeDeleteRequest(), { params: Promise.resolve({ quizId: 'quiz-1' }) })
+
+    expect(res.status).toBe(204)
   })
 })
