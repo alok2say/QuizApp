@@ -166,3 +166,49 @@ export async function getAllQuizzesForAdmin(): Promise<AdminQuizListItem[]> {
         createdAt: quiz.createdAt,
     }))
 }
+
+export type QuizJsonData = {
+    title: string
+    description?: string
+    timeLimitSeconds: number
+    retakePolicy: 'UNLIMITED_BEST' | 'UNLIMITED_LATEST' | 'SINGLE_ATTEMPT'
+    feedbackMode: 'END_ONLY' | 'IMMEDIATE'
+    questions: {
+        text: string
+        type: 'SINGLE_SELECT' | 'MULTI_SELECT'
+        points: number
+        options: { text: string; isCorrect: boolean }[]
+    }[]
+}
+
+export async function getQuizAsJson(quizId: string): Promise<QuizJsonData | null> {
+    const quiz = await prisma.quiz.findUnique({
+        where: { id: quizId },
+        include: { questions: { include: { options: true }, orderBy: { order: 'asc' } } },
+    })
+
+    if (!quiz) {
+        return null
+    }
+
+    return {
+        title: quiz.title,
+        description: quiz.description ?? undefined,
+        timeLimitSeconds: quiz.timeLimitSeconds,
+        retakePolicy: quiz.retakePolicy,
+        feedbackMode: quiz.feedbackMode,
+        // sort explicitly — Prisma's own orderBy only applies against a real DB, not this fn's tests
+        questions: [...quiz.questions]
+            .sort((a, b) => a.order - b.order)
+            .map((question) => ({
+                text: question.text,
+                type: question.type,
+                points: question.points,
+                // order and IDs deliberately dropped — matches the admin JSON's "pure content" shape
+                options: question.options.map((option) => ({
+                    text: option.text,
+                    isCorrect: option.isCorrect,
+                })),
+            })),
+    }
+}

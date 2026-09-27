@@ -8,7 +8,13 @@ vi.mock('@/lib/prisma', () => ({
 }))
 
 import { prisma } from '@/lib/prisma'
-import { getQuizzesWithStatus, getQuizForTaking, getAttemptResult, getAllQuizzesForAdmin } from './queries'
+import {
+  getQuizzesWithStatus,
+  getQuizForTaking,
+  getAttemptResult,
+  getAllQuizzesForAdmin,
+  getQuizAsJson,
+} from './queries'
 
 describe('getQuizzesWithStatus', () => {
   beforeEach(() => {
@@ -277,6 +283,78 @@ describe('getAllQuizzesForAdmin', () => {
     expect(prisma.quiz.findMany).toHaveBeenCalledWith({
       include: { _count: { select: { questions: true } } },
       orderBy: { createdAt: 'desc' },
+    })
+  })
+})
+
+describe('getQuizAsJson', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns null when the quiz does not exist', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue(null)
+    const result = await getQuizAsJson('missing-quiz')
+    expect(result).toBeNull()
+  })
+
+  it('reverse-maps the quiz into the admin JSON shape, sorted by order', async () => {
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
+      title: 'Quiz One',
+      description: null,
+      timeLimitSeconds: 300,
+      retakePolicy: 'UNLIMITED_BEST',
+      feedbackMode: 'END_ONLY',
+      questions: [
+        {
+          text: 'Second?',
+          order: 2,
+          type: 'SINGLE_SELECT',
+          points: 20,
+          options: [{ text: 'C', isCorrect: true }],
+        },
+        {
+          text: 'First?',
+          order: 1,
+          type: 'SINGLE_SELECT',
+          points: 10,
+          options: [
+            { text: 'A', isCorrect: true },
+            { text: 'B', isCorrect: false },
+          ],
+        },
+      ],
+    } as any)
+
+    const result = await getQuizAsJson('quiz-1')
+
+    expect(result).toEqual({
+      title: 'Quiz One',
+      description: undefined,
+      timeLimitSeconds: 300,
+      retakePolicy: 'UNLIMITED_BEST',
+      feedbackMode: 'END_ONLY',
+      questions: [
+        {
+          text: 'First?',
+          type: 'SINGLE_SELECT',
+          points: 10,
+          options: [
+            { text: 'A', isCorrect: true },
+            { text: 'B', isCorrect: false },
+          ],
+        },
+        {
+          text: 'Second?',
+          type: 'SINGLE_SELECT',
+          points: 20,
+          options: [{ text: 'C', isCorrect: true }],
+        },
+      ],
+    })
+    expect(prisma.quiz.findUnique).toHaveBeenCalledWith({
+      where: { id: 'quiz-1' },
+      include: { questions: { include: { options: true }, orderBy: { order: 'asc' } } },
     })
   })
 })
