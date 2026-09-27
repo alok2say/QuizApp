@@ -150,3 +150,19 @@ export async function getAttemptResult(attemptId: string, userId: string): Promi
         questions,
     }
 }
+
+export type AdminQuizListItem = { id: string; title: string; questionCount: number; createdAt: Date }
+
+export async function getAllQuizzesForAdmin(): Promise<AdminQuizListItem[]> {
+    const quizzes = await prisma.quiz.findMany({
+        include: { _count: { select: { questions: true } } },
+        orderBy: { createdAt: 'desc' },
+    })
+
+    return quizzes.map((quiz) => ({
+        id: quiz.id,
+        title: quiz.title,
+        questionCount: quiz._count.questions,
+        createdAt: quiz.createdAt,
+    }))
+}

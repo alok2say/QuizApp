@@ -8,7 +8,7 @@ vi.mock('@/lib/prisma', () => ({
 }))
 
 import { prisma } from '@/lib/prisma'
-import { getQuizzesWithStatus, getQuizForTaking, getAttemptResult } from './queries'
+import { getQuizzesWithStatus, getQuizForTaking, getAttemptResult, getAllQuizzesForAdmin } from './queries'
 
 describe('getQuizzesWithStatus', () => {
   beforeEach(() => {
@@ -243,6 +243,40 @@ describe('getAttemptResult', () => {
           ],
         },
       ],
+    })
+  })
+})
+
+describe('getAllQuizzesForAdmin', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('maps each quiz with its question count', async () => {
+    vi.mocked(prisma.quiz.findMany).mockResolvedValue([
+      {
+        id: 'quiz-1',
+        title: 'Quiz One',
+        createdAt: new Date('2026-09-01T00:00:00Z'),
+        _count: { questions: 3 },
+      },
+      {
+        id: 'quiz-2',
+        title: 'Quiz Two',
+        createdAt: new Date('2026-09-02T00:00:00Z'),
+        _count: { questions: 0 },
+      },
+    ] as any)
+
+    const result = await getAllQuizzesForAdmin()
+
+    expect(result).toEqual([
+      { id: 'quiz-1', title: 'Quiz One', questionCount: 3, createdAt: new Date('2026-09-01T00:00:00Z') },
+      { id: 'quiz-2', title: 'Quiz Two', questionCount: 0, createdAt: new Date('2026-09-02T00:00:00Z') },
+    ])
+    expect(prisma.quiz.findMany).toHaveBeenCalledWith({
+      include: { _count: { select: { questions: true } } },
+      orderBy: { createdAt: 'desc' },
     })
   })
 })
