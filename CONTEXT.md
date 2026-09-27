@@ -299,19 +299,55 @@ instead, to avoid the documented FK-violation backlog limitation.
 `SPEC.md`'s Admin Authoring section updated to reflect full
 implementation, including the download/upload addition.
 
+## LEADERBOARD PLAN: FULLY COMPLETE (2026-09-27, same session)
+
+Brainstormed, spec'd, planned, and all 4 tasks of
+`docs/superpowers/plans/2026-09-27-leaderboard.md` executed and
+committed in one session, right after Admin Authoring:
+
+- **Task 1** (`Quiz.leaderboardSize` migration
+  `20260927082130_add_leaderboard_size`, threaded through
+  `quizJsonSchema.ts`/`adminQuizzes.ts`/`getQuizAsJson`) — `76997d8`.
+  Hit a real gotcha: `npx prisma migrate dev` applied the DB migration
+  but left the generated Prisma Client stale (TS errors on the new
+  field) until `npx prisma generate` was run explicitly — worth
+  remembering for any future schema change.
+- **Task 2** (`getLeaderboard`, tiebreak chain score→completionSeconds
+  →submittedAt, `hasAttempted`/`ownRank` disambiguation) — `faee210`.
+- **Task 3** (leaderboard page,
+  `/quizzes/[quizId]/leaderboard/page.tsx`) — `ca2781c`. Manual
+  verification hit the exact FK-violation backlog limitation for real:
+  tried editing "Sample Quiz" (which has attempt history) to set
+  `leaderboardSize`, got the documented Prisma FK error. Switched to a
+  zero-attempt test quiz instead, per the plan's own guidance. Also
+  surfaced a related client-side gap (now logged in `SPEC.md`):
+  `QuizJsonEditor.tsx` assumes a JSON body on every error response,
+  but a raw `500` has none, so `res.json()` itself throws.
+  Test data for manual verification (3 scored users + 1 never-attempted)
+  was seeded via real signup/start/submit HTTP calls (not faked in the
+  DB directly), so `isLeaderboardEligible` was set by actual
+  `submitAttempt` logic.
+- **Task 4** (nav links on `/quizzes` and the result page) — `33b20d6`.
+
+Also hit and fixed a stray dev-server issue mid-task: the `next dev`
+process had been running since before the migration, so it held a
+stale Prisma Client in memory even after `prisma generate` — needed an
+explicit restart (kill port 3000, relaunch) before the new field
+showed up anywhere at runtime.
+
+`SPEC.md`'s Leaderboard section updated to reflect full implementation.
+
 ## Next steps
-1. Plan and execute **Leaderboard** (eligibility-flag-driven query,
-   top-N + own-rank) — depends on `isLeaderboardEligible`, already in
-   place since MCQ Core; not yet planned at all, write the plan file
-   first (writing-plans skill).
-2. Then **Home Placeholder** — small, may fold into another plan's
-   scope.
-3. `IMMEDIATE` feedback mode remains explicitly out of scope until a
+1. **Home Placeholder** — small, may fold into another plan's scope.
+   Last item on the original roadmap; not yet planned at all.
+2. `IMMEDIATE` feedback mode remains explicitly out of scope until a
    future plan targets it.
-4. Backlog (from Admin Authoring's design, not yet scheduled): protect
+3. Backlog (from Admin Authoring's design, not yet scheduled): protect
    quizzes with existing attempts from edit/delete (currently throws a
    raw 500), and/or move full-replace-on-save to an incremental
-   (diff-based) update.
+   (diff-based) update. The `QuizJsonEditor.tsx` client-side error-body
+   assumption (surfaced during Leaderboard testing) is coupled to
+   whichever of these gets built first.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is

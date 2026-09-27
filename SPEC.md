@@ -275,6 +275,16 @@ it:
   save currently mints entirely new `Question`/`Option` IDs even when
   the content didn't change.
 
+**Related client-side gap surfaced 2026-09-27 (also backlog, not
+blocking):** `QuizJsonEditor.tsx`'s error handling assumes any non-`ok`
+response has a JSON body (`const body = await res.json()`), but the raw
+`500` this FK violation produces has no body at all — `res.json()`
+itself throws an unhandled `SyntaxError` in the browser instead of
+showing a clean error message. Confirmed by actually triggering the FK
+violation during Leaderboard manual testing. Fix belongs alongside
+whichever of the two items above gets built first (a clean `4xx` from
+either one would carry a real body).
+
 ### Editor UI shape
 
 Both `/admin/quizzes/new` and `/admin/quizzes/[quizId]/edit` render the
@@ -315,8 +325,9 @@ leaderboard/admin UI elsewhere in this project.
 
 Per-quiz ranking (not global/cross-quiz — score comparisons across
 different quizzes with different `maxScore`s and difficulty aren't
-meaningful). Design locked 2026-09-27 (brainstorming session);
-implementation plan not yet written.
+meaningful). Design locked and fully implemented 2026-09-27 — all 4
+tasks of `docs/superpowers/plans/2026-09-27-leaderboard.md` complete
+and committed.
 
 ### Data model addition
 

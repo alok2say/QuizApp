@@ -124,7 +124,7 @@ New/modified files this plan touches:
   `quiz.leaderboardSize` directly off the Prisma model, not off either of
   these JSON-shape types.
 
-- [ ] **Step 1: Add the field and migrate**
+- [x] **Step 1: Add the field and migrate**
 
 Add `leaderboardSize` to the `Quiz` model in `prisma/schema.prisma`:
 
@@ -149,7 +149,7 @@ Run: `npx prisma migrate dev --name add_leaderboard_size`
 Expected: a new migration folder under `prisma/migrations/`, and the
 command finishes without error (it also regenerates the Prisma client).
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 In `src/lib/quiz/quizJsonSchema.test.ts`, add `leaderboardSize: 10` to
 the shared `validQuiz` fixture (so every existing test that asserts
@@ -207,7 +207,7 @@ In `src/lib/quiz/queries.test.ts`, update `getQuizAsJson`'s existing
 test: add `leaderboardSize: 10` to the mocked `prisma.quiz.findUnique`
 return value, and to the test's expected `result`.
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx vitest run src/lib/quiz/quizJsonSchema.test.ts src/lib/quiz/adminQuizzes.test.ts src/lib/quiz/queries.test.ts`
 Expected: FAIL — the new `quizJsonSchema` test fails because
@@ -215,7 +215,7 @@ Expected: FAIL — the new `quizJsonSchema` test fails because
 `queries` tests fail because their expectations now include
 `leaderboardSize` but the implementations don't produce/consume it yet.
 
-- [ ] **Step 4: Write minimal implementation**
+- [x] **Step 4: Write minimal implementation**
 
 In `src/lib/quiz/quizJsonSchema.ts`, add the field to the Zod schema and
 its default:
@@ -285,12 +285,12 @@ export type QuizJsonData = {
 leaderboardSize: quiz.leaderboardSize,
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/quiz/quizJsonSchema.test.ts src/lib/quiz/adminQuizzes.test.ts src/lib/quiz/queries.test.ts`
 Expected: PASS — all tests in all three files.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add prisma/schema.prisma prisma/migrations \
@@ -334,7 +334,7 @@ git commit -m "feat: add Quiz.leaderboardSize and thread through Admin Authoring
   ```
   Task 3's leaderboard page calls this directly (no API route).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Extend the `prisma` mock at the top of `src/lib/quiz/queries.test.ts` to
 add `attempt.findMany`:
@@ -530,12 +530,12 @@ describe('getLeaderboard', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: FAIL — `getLeaderboard` is not exported yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```typescript
 // append to src/lib/quiz/queries.ts
@@ -605,13 +605,13 @@ export async function getLeaderboard(quizId: string, userId: string): Promise<Le
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/quiz/queries.test.ts`
 Expected: PASS — all `getLeaderboard` tests, plus every pre-existing
 test in this file still passing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/quiz/queries.ts src/lib/quiz/queries.test.ts
@@ -630,7 +630,7 @@ git commit -m "feat: add getLeaderboard query"
   (Task 2).
 - Produces: nothing consumed by a later task in this plan.
 
-- [ ] **Step 1: Write the page**
+- [x] **Step 1: Write the page**
 
 ```typescript
 // src/app/quizzes/[quizId]/leaderboard/page.tsx
@@ -707,7 +707,7 @@ rank: #47" specifically, that requires `getLeaderboard` to also return
 the 1-indexed position within `entries`, which is out of scope for this
 plan (not in `SPEC.md`'s locked design).
 
-- [ ] **Step 2: Manually verify in the browser**
+- [x] **Step 2: Manually verify in the browser**
 
 Using an existing test quiz with a `leaderboardSize` you can see the
 effect of (e.g. edit a quiz's `leaderboardSize` down to `1` via the
@@ -721,7 +721,7 @@ in as a user who has never attempted that quiz and confirm the
 `/quizzes`. Separately, visit `/quizzes/some-fake-id/leaderboard` and
 confirm a `404`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add "src/app/quizzes/[quizId]/leaderboard/page.tsx"
@@ -742,7 +742,7 @@ git commit -m "feat: add leaderboard page"
 - Produces: nothing consumed elsewhere — this is the last task in the
   plan.
 
-- [ ] **Step 1: Add the link to the quiz list page**
+- [x] **Step 1: Add the link to the quiz list page**
 
 In `src/app/quizzes/page.tsx`, add a link inside each `<li>`, next to
 the existing time-limit line:
@@ -755,7 +755,7 @@ the existing time-limit line:
 </p>
 ```
 
-- [ ] **Step 2: Add the link to the result page**
+- [x] **Step 2: Add the link to the result page**
 
 In `src/app/quizzes/[quizId]/result/[attemptId]/page.tsx`, add a link
 below the score line:
@@ -768,14 +768,14 @@ below the score line:
 </p>
 ```
 
-- [ ] **Step 3: Manually verify in the browser**
+- [x] **Step 3: Manually verify in the browser**
 
 From `/quizzes`, confirm each quiz card now has a "Leaderboard" link
 that navigates to that quiz's leaderboard page. Submit an attempt on
 any quiz, and on its result page confirm the "View Leaderboard" link
 appears and navigates correctly.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/app/quizzes/page.tsx \
