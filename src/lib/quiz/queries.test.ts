@@ -305,6 +305,7 @@ describe('getQuizAsJson', () => {
       timeLimitSeconds: 300,
       retakePolicy: 'UNLIMITED_BEST',
       feedbackMode: 'END_ONLY',
+      leaderboardSize: 10,
       questions: [
         {
           text: 'Second?',
@@ -334,6 +335,7 @@ describe('getQuizAsJson', () => {
       timeLimitSeconds: 300,
       retakePolicy: 'UNLIMITED_BEST',
       feedbackMode: 'END_ONLY',
+      leaderboardSize: 10,
       questions: [
         {
           text: 'First?',

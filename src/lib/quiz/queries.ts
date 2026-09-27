@@ -173,6 +173,7 @@ export type QuizJsonData = {
     timeLimitSeconds: number
     retakePolicy: 'UNLIMITED_BEST' | 'UNLIMITED_LATEST' | 'SINGLE_ATTEMPT'
     feedbackMode: 'END_ONLY' | 'IMMEDIATE'
+    leaderboardSize: number
     questions: {
         text: string
         type: 'SINGLE_SELECT' | 'MULTI_SELECT'
@@ -197,6 +198,7 @@ export async function getQuizAsJson(quizId: string): Promise<QuizJsonData | null
         timeLimitSeconds: quiz.timeLimitSeconds,
         retakePolicy: quiz.retakePolicy,
         feedbackMode: quiz.feedbackMode,
+        leaderboardSize: quiz.leaderboardSize,
         // sort explicitly — Prisma's own orderBy only applies against a real DB, not this fn's tests
         questions: [...quiz.questions]
             .sort((a, b) => a.order - b.order)

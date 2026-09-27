@@ -12,6 +12,7 @@ export async function createQuizFromJson(data: QuizJsonInput): Promise<{ id: str
       retakePolicy: data.retakePolicy,
       feedbackMode: data.feedbackMode,
       maxScore,
+      leaderboardSize: data.leaderboardSize ?? 10,
       questions: {
         create: data.questions.map((question, index) => ({
           text: question.text,
@@ -60,6 +61,7 @@ export async function replaceQuizFromJson(
         retakePolicy: data.retakePolicy,
         feedbackMode: data.feedbackMode,
         maxScore,
+        leaderboardSize: data.leaderboardSize ?? 10,
       },
     })
 

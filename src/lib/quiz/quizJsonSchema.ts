@@ -18,6 +18,7 @@ const quizJsonSchema = z.object({
   timeLimitSeconds: z.number().int().positive(),
   retakePolicy: z.enum(['UNLIMITED_BEST', 'UNLIMITED_LATEST', 'SINGLE_ATTEMPT']),
   feedbackMode: z.literal('END_ONLY'),
+  leaderboardSize: z.number().int().positive().optional(),
   questions: z.array(questionSchema),
 })
 
@@ -67,6 +68,7 @@ export function validateQuizJson(input: unknown): ValidateQuizJsonResult {
 
   const withDefaults: QuizJsonInput = {
     ...data,
+    leaderboardSize: data.leaderboardSize ?? 10,
     questions: data.questions.map((question) => ({
       ...question,
       points: question.points ?? 10,

@@ -7,6 +7,7 @@ const validQuiz = {
   timeLimitSeconds: 300,
   retakePolicy: 'UNLIMITED_BEST',
   feedbackMode: 'END_ONLY',
+  leaderboardSize: 10,
   questions: [
     {
       text: 'What is the capital of France?',
@@ -38,6 +39,18 @@ describe('validateQuizJson', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.data.questions[0].points).toBe(10)
+    }
+  })
+
+  it('defaults a missing leaderboardSize to 10', () => {
+    const input: any = { ...validQuiz }
+    delete input.leaderboardSize
+
+    const result = validateQuizJson(input)
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.leaderboardSize).toBe(10)
     }
   })
 

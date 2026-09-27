@@ -18,6 +18,7 @@ const quizInput = {
   timeLimitSeconds: 300,
   retakePolicy: 'UNLIMITED_BEST' as const,
   feedbackMode: 'END_ONLY' as const,
+  leaderboardSize: 10,
   questions: [
     {
       text: 'What is the capital of France?',
@@ -59,6 +60,7 @@ describe('createQuizFromJson', () => {
         retakePolicy: 'UNLIMITED_BEST',
         feedbackMode: 'END_ONLY',
         maxScore: 20,
+        leaderboardSize: 10,
         questions: {
           create: [
             {
@@ -129,6 +131,7 @@ describe('replaceQuizFromJson', () => {
         retakePolicy: 'UNLIMITED_BEST',
         feedbackMode: 'END_ONLY',
         maxScore: 20,
+        leaderboardSize: 10,
       },
     })
     expect(prisma.question.create).toHaveBeenCalledWith({
