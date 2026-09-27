@@ -25,6 +25,9 @@ export default async function QuizzesPage() {
               <h2>{quiz.title}</h2>
               {quiz.description && <p>{quiz.description}</p>}
               <p>Time limit: {Math.round(quiz.timeLimitSeconds / 60)} min</p>
+              <p>
+                <a href={`/quizzes/${quiz.id}/leaderboard`}>Leaderboard</a>
+              </p>
 
               {!attempt && <StartQuizButton quizId={quiz.id} label="Start Quiz" />}
 

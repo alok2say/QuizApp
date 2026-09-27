@@ -28,6 +28,9 @@ export default async function ResultPage({
       <p>
         Score: {result.score} / {result.maxScore}
       </p>
+      <p>
+        <a href={`/quizzes/${quizId}/leaderboard`}>View Leaderboard</a>
+      </p>
 
       {result.questions.map((question) => (
         <fieldset key={question.id}>
