@@ -290,6 +290,18 @@ leaderboard/admin UI elsewhere in this project.
   immediately with no network call. If it parses, POST/PUT to the API
   route; a `400` renders the validation error list above the textarea
   without wiping what was typed. Success redirects to `/admin/quizzes`.
+- **Download JSON:** button saves the textarea's current content as a
+  `.json` file via a client-side `Blob` — no API route involved.
+  Filename is derived from the current content's `title` field if it
+  currently parses as valid JSON with a string `title`; otherwise falls
+  back to a generic name. Works on unsaved edits, not just what's
+  persisted server-side.
+- **Upload JSON:** button opens a file picker (`accept="application/json"`);
+  the selected file's text **fully replaces** the textarea's current
+  content (matching this editor's own full-replace save semantics — not
+  a merge). Since this can discard unsaved edits, it's gated behind a
+  `window.confirm()`, the same destructive-action pattern already used
+  by `DeleteQuizButton`.
 
 ### Not yet locked in this file
 
