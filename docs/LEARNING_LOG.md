@@ -301,4 +301,46 @@ Full suite: 15/15 passing across 5 files.
 **Project Foundation plan is now fully complete.** Next up: write and
 execute the MCQ Core plan.
 
+---
+
+## Home Placeholder (2026-10-18)
+
+Bounded change (no plan doc): short in-chat design approved, decision
+locked in `SPEC.md` "Home & Pages" first (`920e695`), then code
+(`dfdecd6`). Visual direction via the frontend-design skill, kept
+deliberately basic.
+
+- **Site title** — `metadata` in the root `layout.tsx` is the default
+  `<title>`/description for every page that doesn't set its own; App
+  Router generates `<head>` from it, so you never hand-write `<title>`.
+- **Server page + tiny client island** — `/` is an `async` server
+  component calling `getCurrentUser()`, so the right links are in the
+  first HTML (no "Log in" flash a client-side `useSession()` would cause).
+  Logging out needs a browser click handler, so it lives in a separate
+  `'use client'` `SignOutButton` calling `signOut({ callbackUrl: '/' })`
+  — same split as `StartQuizButton`/`DeleteQuizButton`. This is the
+  app's first logout entry point. Hiding "Manage quizzes" for non-admins
+  is UX only; the middleware is still the real guard.
+- **`next/font` per page** — `Bricolage_Grotesque` is imported in
+  `page.tsx`, not `layout.tsx`, so only Home gets it; fonts are
+  downloaded at build time and self-hosted (no runtime Google request).
+- **CSS module + custom properties** — `page.module.css` class names are
+  hashed per file, so Home styles can't leak into other pages. Color
+  tokens are declared once on `.page` and redefined under
+  `prefers-color-scheme: dark`, so dark mode is a value swap, not
+  duplicated rules. `.link` resets `<button>` defaults (`font: inherit`,
+  `border: 0`, `background: none`) so "Log out" matches the `<a>` links.
+- **Lint caught `<a>` vs `<Link>`** — `@next/next/no-html-link-for-pages`
+  rejected `<a href="/quizzes">`; switched to `next/link`. `<Link>` does
+  client-side navigation; dynamic pages aren't kept in the client router
+  cache by default, so session-dependent links still render fresh.
+  Another case where `eslint` found what `vitest`/`tsc` didn't.
+- **Verification** — `tsc`, `eslint` (changed files) and `vitest`
+  (91/91) clean. Logged-out / `USER` / `ADMIN` views checked by `curl`
+  with real NextAuth sessions (CSRF token → credentials callback →
+  cookie jar); logout click verified in the browser. Discovered
+  `quiztest.manual@example.com` is actually `ADMIN`; created throwaway
+  `USER` `home.user.1792312378@example.com` / `TestPass123!` for the
+  user view.
+
 <!-- Continue appending one entry per step as we go. -->

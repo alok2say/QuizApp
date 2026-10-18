@@ -337,12 +337,29 @@ showed up anywhere at runtime.
 
 `SPEC.md`'s Leaderboard section updated to reflect full implementation.
 
+## HOME PLACEHOLDER: COMPLETE (2026-10-18) — original roadmap done
+
+Handled as a bounded change (in-chat design, no plan doc). Spec locked
+in `SPEC.md` "Home & Pages" (`920e695`, also restores the missing
+route table), code in `dfdecd6`: session-aware `/` (logged out: Log in
+/ Sign up; `USER`: Browse quizzes / Log out; `ADMIN`: + Manage
+quizzes), dashed "Books and events" placeholder, new `SignOutButton`
+(first logout in the app), site title **DemoQuizApp**. Details and
+"why" in `docs/LEARNING_LOG.md`. Note: `quiztest.manual@example.com`
+is `ADMIN`; throwaway `USER` is `home.user.1792312378@example.com` /
+`TestPass123!`. Dev server from 2026-09-27 (PID 70345) still running
+on :3000.
+
 ## Next steps
-1. **Home Placeholder** — small, may fold into another plan's scope.
-   Last item on the original roadmap; not yet planned at all.
-2. `IMMEDIATE` feedback mode remains explicitly out of scope until a
+1. Lint debt: 53 `no-explicit-any` in test mocks + 2
+   `react-hooks/set-state-in-effect` in `QuizTakeForm.tsx` (fix those
+   two for real). Make `vitest` + `tsc` + `eslint` the end-of-plan gate.
+2. Navigation gaps (candidate small task): no shared header/back-to-Home
+   link, login↔signup don't link each other, post-login always lands on
+   `/` instead of the originally requested page.
+3. `IMMEDIATE` feedback mode remains explicitly out of scope until a
    future plan targets it.
-3. Backlog (from Admin Authoring's design, not yet scheduled): protect
+4. Backlog (from Admin Authoring's design, not yet scheduled): protect
    quizzes with existing attempts from edit/delete (currently throws a
    raw 500), and/or move full-replace-on-save to an incremental
    (diff-based) update. The `QuizJsonEditor.tsx` client-side error-body
