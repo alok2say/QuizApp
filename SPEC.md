@@ -317,9 +317,31 @@ leaderboard/admin UI elsewhere in this project.
 
 ### Not yet locked in this file
 
-- Home placeholder page — not yet planned.
 - `IMMEDIATE` feedback mode — explicitly out of scope until a future plan
   targets it (see "Feedback mode scope" above).
+
+## Home & Pages
+
+### Pages & routes
+| Route | Access | Purpose |
+|---|---|---|
+| `/` | public | Home placeholder (below) |
+| `/login`, `/signup` | public | Credentials auth |
+| `/quizzes`, `/quizzes/[quizId]/*` | logged in | Take quizzes, results, leaderboard |
+| `/admin/quizzes*` | `ADMIN` | JSON quiz authoring |
+
+### Home placeholder (`/`)
+Server component; reads `getCurrentUser()` and renders session-aware links:
+- Logged out: "Log in" (primary), "Sign up".
+- `USER`: "Browse quizzes" (primary), "Log out".
+- `ADMIN`: as `USER`, plus "Manage quizzes" (`/admin/quizzes`).
+
+Below the links, a dashed-outline "Books and events" box marks where
+real content will go — no data model or API for books/events yet.
+"Log out" is a small client component (`SignOutButton`) calling
+`signOut({ callbackUrl: '/' })` — the app's first logout entry point.
+Site title (`layout.tsx` metadata) is **DemoQuizApp**. Styling is
+intentionally minimal; real Home design deferred.
 
 ## Leaderboard
 
