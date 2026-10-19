@@ -144,6 +144,16 @@ unsubmitted → "Resume Quiz"; submitted → score shown plus "Retake Quiz"
 `POST /api/quizzes/[quizId]/start` and branching on the response
 (success / 409-resume / 409-view-result / other error).
 
+**Visual design (2026-10-19, minimal):** ruled list (no cards), max
+~44rem, left-aligned, small "DemoQuizApp" link back to `/`. Each row has
+an MCQ-style answer bubble encoding status — empty ○ not started,
+half ◐ in progress, filled ● submitted — with the status also given as
+text for screen readers. Start/Resume use the filled primary button;
+Retake/View Result use a quieter outline style. Button labels are
+sentence case ("Start quiz", "Resume quiz", "Retake quiz", "View
+result"). Score renders as "Scored N" (no max — `QuizListItem` doesn't
+carry `maxScore`). Empty list shows "No quizzes yet. Check back soon."
+
 ### MCQ Core plan: fully implemented
 
 All 7 tasks of `docs/superpowers/plans/2026-08-22-mcq-core.md` are
@@ -342,6 +352,13 @@ real content will go — no data model or API for books/events yet.
 `signOut({ callbackUrl: '/' })` — the app's first logout entry point.
 Site title (`layout.tsx` metadata) is **DemoQuizApp**. Styling is
 intentionally minimal; real Home design deferred.
+
+### Shared visual tokens
+Color tokens (`--ink`, `--paper`, `--muted`, `--answer`, `--on-answer`,
+`--rule`, with dark-mode values) live on `:root` in `globals.css`; the
+Bricolage Grotesque font is loaded once in `layout.tsx` as
+`--font-sans` and applied to `body`. Page CSS modules consume these
+variables rather than redefining them.
 
 ## Leaderboard
 
