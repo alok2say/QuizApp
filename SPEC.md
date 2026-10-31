@@ -146,7 +146,9 @@ to the take page) — this is the one query allowed to reveal the answer
 key, since the attempt is locked by then. Returns each question's
 `isCorrect`/`pointsAwarded` alongside every option's `isCorrect` and
 `wasSelected`, plus `quizId` and `retakePolicy` (added 2026-10-31 so the
-page can offer "Retake quiz" only when the policy allows). Rendered by
+page can offer "Retake quiz" only when the policy allows) and each
+question's `type` (for round vs square marks). Questions are sorted by
+`order` in code, matching the take page's numbering. Rendered by
 `src/app/quizzes/[quizId]/result/[attemptId]/page.tsx` (server
 component; reuses the `StartQuizButton` client island for retake).
 
@@ -412,6 +414,11 @@ top N) renders below as "Your best: S / M in m:ss, outside the top N"
 page mislabelled the score as "Your rank"). Empty board: "No one has
 finished this quiz yet."; not attempted: "You haven't taken this quiz
 yet." — both with a "Take the quiz" `StartQuizButton`.
+
+Implemented in `c8675a7` (2026-10-31), verified by screenshots in light/
+dark and at 360px. Side fix: `html, body` used create-next-app's
+`overflow-x: hidden`, which makes them scroll containers and silently
+breaks `position: sticky`; switched to `overflow-x: clip`.
 
 ### Shared site header (designed 2026-10-31)
 `SiteHeader` (`src/app/SiteHeader.tsx` + `SiteHeader.module.css`) is a

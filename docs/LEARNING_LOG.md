@@ -502,4 +502,42 @@ Design in `SPEC.md` (`4bc53b5`), code in `1e51cf2`.
   active gave no 403.
 - Caveat: this relies on alok2say staying logged in to `gh`.
 
+## Take, result, leaderboard visuals (2026-10-31)
+
+Design in `SPEC.md` (`076ce04`), queries `964bb09` + `16c7aa0`, pages
+`c8675a7`. Visual direction via the frontend-design skill: one paper
+exam — filled in, marked, posted on the board.
+
+- **Restyle real inputs, don't replace them** — each option is still a
+  native radio/checkbox inside a `<label>`, made invisible (not
+  `display: none`, which would drop it from keyboard focus) and
+  followed by a `.mark` span. `input:checked + .mark` and
+  `input:focus-visible + .mark` style the mark from the input's state,
+  so keyboard, screen readers, and form semantics keep working with no
+  extra JS.
+- **Never colour alone** — right/wrong is also a shape (✓, ✗, ring),
+  with screen-reader text ("your answer, correct answer") in an
+  `srOnly` span, since the glyphs are `aria-hidden`.
+- **Shared CSS modules** — `answerSheet.module.css` (marks, question
+  rows) and `controls.module.css` (buttons) are imported by several
+  pages; `/quizzes` dropped its own copy of the button styles. CSS
+  modules compose by importing the same module in each component.
+- **Data before pixels** — designing the result page exposed three
+  data gaps, each fixed test-first in the query rather than worked
+  around in the UI: `retakePolicy`/`quizId` (to offer Retake),
+  question `type` (round vs square marks), and sorting by `order`
+  (otherwise "question 2" on the result page might be question 1 on
+  the take page — same mocked-`orderBy` lesson as Admin Authoring).
+- **`overflow-x: hidden` breaks sticky** — the timer bar's
+  `position: sticky` did nothing. Cause: `html, body { overflow-x:
+  hidden }` from the scaffold turns them into scroll containers, and a
+  sticky element sticks to its nearest scroll container. `overflow-x:
+  clip` hides overflow without creating one. Only found by scrolling a
+  screenshot — no test or lint would catch it.
+- **Verification** — `vitest` 96/96, `tsc`, `eslint .` clean.
+  Playwright screenshots: take (answered + focus ring, sub-60s red
+  timer via fake clock, scrolled sticky bar), result (light/dark,
+  mobile), leaderboard (own row, other user's "not taken yet" view,
+  mobile); no horizontal overflow at 360px; no console errors.
+
 <!-- Continue appending one entry per step as we go. -->

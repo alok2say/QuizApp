@@ -366,6 +366,15 @@ on :3000.
   steps directly (not hands-on) — one-off, not a change to
   [[feedback-hands-on-execution]].
 
+## TAKE / RESULT / LEADERBOARD VISUALS: COMPLETE (2026-10-31)
+
+Answer-sheet design across all three pages — design `076ce04`, code
+`964bb09`, `16c7aa0`, `c8675a7`. `getAttemptResult` now also returns
+`quizId`, `retakePolicy`, per-question `type`, and sorts by `order`.
+New `formatDuration` (`src/lib/format.ts`). `overflow-x: clip` on
+`html, body` (was `hidden`, broke sticky). Every user-facing page
+except login/signup and admin now has the designed look.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after
