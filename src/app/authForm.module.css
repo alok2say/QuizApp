@@ -19,13 +19,13 @@
 .intro {
   margin-top: 0.5rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .notice {
   margin-top: 1.5rem;
   padding-left: 0.75rem;
-  border-left: 4px solid var(--right);
+  border-left: 4px solid var(--color-success);
   line-height: 1.5;
 }
 
@@ -46,29 +46,29 @@
 .input {
   padding: 0.5rem 0;
   border: 0;
-  border-bottom: 2px solid var(--rule);
+  border-bottom: 2px solid var(--color-border);
   border-radius: 0;
   background: none;
   font: inherit;
   font-weight: 400;
   font-size: 1.125rem;
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .input:focus {
   outline: none;
-  border-bottom-color: var(--answer);
+  border-bottom-color: var(--color-accent);
 }
 
 .help {
   font-size: 0.875rem;
   font-weight: 400;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .error {
   line-height: 1.5;
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .form button {
@@ -77,16 +77,16 @@
 
 .switch {
   margin-top: 2rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .switch a {
-  color: var(--ink);
+  color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
 
 .switch a:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }

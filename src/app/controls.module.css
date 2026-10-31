@@ -11,15 +11,15 @@
 }
 
 .primary {
-  border: 2px solid var(--answer);
-  background: var(--answer);
-  color: var(--on-answer);
+  border: 2px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 .secondary {
-  border: 2px solid var(--rule);
+  border: 2px solid var(--color-border);
   background: none;
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .primary:disabled,
@@ -30,6 +30,6 @@
 
 .primary:focus-visible,
 .secondary:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }

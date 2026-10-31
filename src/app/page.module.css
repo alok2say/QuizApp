@@ -19,7 +19,7 @@
   margin-top: 1rem;
   font-size: 1.125rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .actions {
@@ -33,15 +33,15 @@
 .primary {
   padding: 0.75rem 1.25rem;
   border-radius: 0.5rem;
-  background: var(--answer);
-  color: var(--on-answer);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   font-weight: 600;
 }
 
 .link {
   display: inline-block;
   margin-top: 0.75rem;
-  color: var(--ink);
+  color: var(--color-text);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
@@ -49,14 +49,14 @@
 
 .primary:focus-visible,
 .link:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 .books {
   margin-top: 3.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--color-border);
 }
 
 .books h2,
@@ -69,13 +69,13 @@
 .placeholder p {
   margin-top: 0.5rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .placeholder {
   margin-top: 2rem;
   padding: 1.5rem;
-  border: 2px dashed var(--rule);
+  border: 2px dashed var(--color-border);
   border-radius: 0.75rem;
 }
 

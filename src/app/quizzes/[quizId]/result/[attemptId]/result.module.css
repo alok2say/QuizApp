@@ -27,7 +27,7 @@
 
 .outOf {
   font-weight: 500;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .summary {
@@ -50,17 +50,17 @@
 }
 
 .summaryRight {
-  color: var(--right);
+  color: var(--color-success);
 }
 
 .summaryWrong {
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .summaryRight:focus-visible,
 .summaryWrong:focus-visible,
 .link:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
@@ -78,7 +78,7 @@
 }
 
 .link {
-  color: var(--ink);
+  color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -97,5 +97,5 @@
 .points {
   flex: none;
   font-variant-numeric: tabular-nums;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }

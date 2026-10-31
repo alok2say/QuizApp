@@ -3,7 +3,7 @@
 
 .questions {
   list-style: none;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--color-border);
 }
 
 .question {
@@ -11,14 +11,14 @@
   grid-template-columns: 2rem 1fr;
   column-gap: 0.75rem;
   padding: 1.75rem 0;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .number {
   font-size: 1.25rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--muted);
+  color: var(--color-text-muted);
   line-height: 1.3;
 }
 
@@ -31,7 +31,7 @@
 .hint {
   margin-top: 0.25rem;
   font-size: 0.9375rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .options {
@@ -55,11 +55,11 @@
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border: 2px solid var(--answer);
+  border: 2px solid var(--color-accent);
   border-radius: 50%;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--answer);
+  color: var(--color-accent);
 }
 
 .square {
@@ -67,8 +67,8 @@
 }
 
 .filled {
-  background: var(--answer);
-  color: var(--on-answer);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 /* Take page: real inputs, visually replaced by .mark */
@@ -84,34 +84,34 @@
 }
 
 .input:checked + .mark {
-  background: var(--answer);
-  color: var(--on-answer);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 .input:focus-visible + .mark {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 /* Result page: correct options get a green ring, wrong picks red pen */
 .correct {
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--right);
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-success);
 }
 
 .wrong {
-  border-color: var(--mark);
-  background: var(--mark);
-  color: var(--paper);
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-bg);
 }
 
 .tick {
   font-weight: 700;
-  color: var(--right);
+  color: var(--color-success);
 }
 
 .cross {
   font-weight: 700;
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .srOnly {

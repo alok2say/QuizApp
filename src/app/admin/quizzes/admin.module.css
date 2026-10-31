@@ -31,7 +31,7 @@
 .list {
   margin-top: 2.5rem;
   list-style: none;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--color-border);
 }
 
 .row {
@@ -41,7 +41,7 @@
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
   padding: 1.25rem 0;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .quizTitle {
@@ -53,7 +53,7 @@
 .meta {
   margin-top: 0.25rem;
   font-size: 0.9375rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .rowActions {
@@ -74,11 +74,11 @@
 }
 
 .textLink {
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .danger {
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .danger:disabled {
@@ -90,19 +90,19 @@
 .danger:focus-visible,
 .help summary:focus-visible,
 .editor:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 .rowError {
   flex-basis: 100%;
   font-size: 0.875rem;
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .empty {
   margin-top: 2.5rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .help {
@@ -118,7 +118,7 @@
 .help ul {
   margin-top: 0.75rem;
   padding-left: 1.25rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .help code,
@@ -127,7 +127,7 @@
 }
 
 .help code {
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .editor {
@@ -136,25 +136,25 @@
   min-height: 60vh;
   margin-top: 1.5rem;
   padding: 1rem;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   background: none;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--ink);
+  color: var(--color-text);
   resize: vertical;
 }
 
 .errors {
   margin-top: 1rem;
   padding-left: 0.75rem;
-  border-left: 4px solid var(--mark);
+  border-left: 4px solid var(--color-danger);
   line-height: 1.5;
 }
 
 .errors p {
   font-weight: 600;
-  color: var(--mark);
+  color: var(--color-danger);
 }
 
 .errors ul {

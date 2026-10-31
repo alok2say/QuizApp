@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
+import "@/styles/tokens.css";
 import "./globals.css";
 import { Providers } from "./providers";
 import { SiteHeader } from "./SiteHeader";

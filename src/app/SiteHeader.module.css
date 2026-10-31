@@ -1,6 +1,6 @@
 .header {
   padding: 0 16px;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .inner {
@@ -31,27 +31,27 @@
   border: 0;
   background: none;
   font: inherit;
-  color: var(--muted);
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
 .link:hover {
-  color: var(--ink);
+  color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
 
 /* Current section: darker text plus an answer-blue underline (no weight change, so nothing shifts) */
 .link[aria-current='page'] {
-  color: var(--ink);
+  color: var(--color-text);
   text-decoration: underline;
-  text-decoration-color: var(--answer);
+  text-decoration-color: var(--color-accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.35em;
 }
 
 .brand:focus-visible,
 .link:focus-visible {
-  outline: 2px solid var(--answer);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
