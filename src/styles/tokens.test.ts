@@ -15,8 +15,6 @@ const read = (file: string) => readFileSync(file, 'utf8')
 const PENDING_RAW_VALUES: string[] = [
   'src/app/admin/quizzes/admin.module.css',
   'src/app/controls.module.css',
-  'src/app/library/[slug]/viewer.module.css',
-  'src/app/library/library.module.css',
   'src/app/quizzes/[quizId]/leaderboard/leaderboard.module.css',
   'src/app/quizzes/[quizId]/result/[attemptId]/result.module.css',
   'src/app/quizzes/[quizId]/take/[attemptId]/take.module.css',
