@@ -1,0 +1,48 @@
+.section {
+  margin-top: var(--space-12);
+  padding-top: var(--space-6);
+  border-top: var(--border-thin) solid var(--color-border);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: var(--space-6);
+}
+
+.swatches {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--width-default) / 3), 1fr));
+  gap: var(--space-4);
+  list-style: none;
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chip {
+  flex: none;
+  width: var(--space-10);
+  height: var(--space-10);
+  border: var(--border-thin) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.token {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Shows the sample top bar inside a box, not edge to edge */
+.frame {
+  margin-top: var(--space-4);
+  border: var(--border-thin) solid var(--color-border);
+  border-radius: var(--radius-md);
+}

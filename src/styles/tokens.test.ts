@@ -10,12 +10,6 @@ const cssFiles = (readdirSync('src', { recursive: true }) as string[])
   .sort()
 const read = (file: string) => readFileSync(file, 'utf8')
 
-// Files not yet moved off raw values. Each migration task removes its
-// files; the last test fails if a listed file is already clean.
-const PENDING_RAW_VALUES: string[] = [
-  'src/app/controls.module.css',
-]
-
 // next/font defines this one on <html>
 const EXTERNAL_VARS = new Set(['--font-sans'])
 
@@ -57,13 +51,8 @@ describe('design tokens', () => {
 
   test('no raw values outside tokens.css', () => {
     const offenders = cssFiles
-      .filter((file) => file !== TOKENS && !PENDING_RAW_VALUES.includes(file))
+      .filter((file) => file !== TOKENS)
       .flatMap(rawValueLines)
     expect(offenders).toEqual([])
-  })
-
-  test('pending files still have raw values', () => {
-    const alreadyClean = PENDING_RAW_VALUES.filter((file) => rawValueLines(file).length === 0)
-    expect(alreadyClean).toEqual([])
   })
 })
