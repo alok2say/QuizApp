@@ -461,4 +461,23 @@ Design in `SPEC.md` (`4bc53b5`), code in `1e51cf2`.
   unknown)`), so `delete` is allowed without a cast.
 - Result: `eslint .` clean repo-wide; `tsc` and `vitest` 94/94.
 
+## GitHub remote: `origin` → alok2say/QuizApp (2026-10-31)
+
+- **Remote = a named URL.** `git remote add origin <url>` only saves
+  the URL under the name `origin`; nothing is sent. Running `push`
+  before `remote add` fails with "'origin' does not appear to be a git
+  repository", because the name doesn't exist yet.
+- **Create the GitHub repo empty.** With no README, license or
+  .gitignore on GitHub, the first push needs no merge.
+- **`git push -u origin main`** uploads `main` and sets it to track
+  `origin/main` (`-u`), so later a plain `git push` or `git pull` works.
+- **403 "denied to alranjan_expedia"** means GitHub was reached but git
+  signed in as the wrong account. `gh auth login` (as alok2say) plus
+  `gh auth setup-git` make git use gh's login, and gh sends the
+  *active* account for every github.com repo. Use `gh auth switch` to go
+  between personal and Expedia work.
+- **Pre-push check:** `git check-ignore .env .env.local` confirmed no
+  secrets were pushed.
+- Verified: `git status -sb` shows `## main...origin/main`.
+
 <!-- Continue appending one entry per step as we go. -->
