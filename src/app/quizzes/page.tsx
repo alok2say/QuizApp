@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/lib/session'
 import { getQuizzesWithStatus } from '@/lib/quiz/queries'
 import { StartQuizButton } from './StartQuizButton'
 import styles from './page.module.css'
-import controls from './controls.module.css'
+import controls from '@/app/controls.module.css'
 
 export default async function QuizzesPage() {
   const user = await getCurrentUser()

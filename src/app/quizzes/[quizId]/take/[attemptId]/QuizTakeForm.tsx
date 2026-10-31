@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { TakeableQuestion } from '@/lib/quiz/queries'
 import { formatDuration } from '@/lib/format'
 import sheet from '../../../answerSheet.module.css'
-import controls from '../../../controls.module.css'
+import controls from '@/app/controls.module.css'
 import styles from './take.module.css'
 
 type Props = {

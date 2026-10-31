@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { getQuizAsJson } from '@/lib/quiz/queries'
+import styles from '../../admin.module.css'
 import { QuizJsonEditor } from '../../QuizJsonEditor'
 
 export default async function EditQuizPage({
@@ -24,13 +25,15 @@ export default async function EditQuizPage({
   }
 
   return (
-    <main>
-      <h1>Edit Quiz</h1>
-      <QuizJsonEditor
-        initialJson={JSON.stringify(quizJson, null, 2)}
-        submitUrl={`/api/admin/quizzes/${quizId}`}
-        method="PUT"
-      />
-    </main>
+    <div className={styles.page}>
+      <main className={`${styles.main} ${styles.wide}`}>
+        <h1 className={styles.title}>Edit &ldquo;{quizJson.title}&rdquo;</h1>
+        <QuizJsonEditor
+          initialJson={JSON.stringify(quizJson, null, 2)}
+          submitUrl={`/api/admin/quizzes/${quizId}`}
+          method="PUT"
+        />
+      </main>
+    </div>
   )
 }

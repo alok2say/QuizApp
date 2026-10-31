@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/session'
 import { getLeaderboard } from '@/lib/quiz/queries'
 import { formatDuration } from '@/lib/format'
 import { StartQuizButton } from '../../StartQuizButton'
-import controls from '../../controls.module.css'
+import controls from '@/app/controls.module.css'
 import styles from './leaderboard.module.css'
 
 function timeLabel(seconds: number | null) {

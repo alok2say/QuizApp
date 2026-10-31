@@ -1,5 +1,6 @@
 import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
+import styles from '../admin.module.css'
 import { QuizJsonEditor } from '../QuizJsonEditor'
 
 // starter template — gives the admin a working example instead of a blank box
@@ -36,9 +37,11 @@ export default async function NewQuizPage() {
   }
 
   return (
-    <main>
-      <h1>New Quiz</h1>
-      <QuizJsonEditor initialJson={TEMPLATE} submitUrl="/api/admin/quizzes" method="POST" />
-    </main>
+    <div className={styles.page}>
+      <main className={`${styles.main} ${styles.wide}`}>
+        <h1 className={styles.title}>New quiz</h1>
+        <QuizJsonEditor initialJson={TEMPLATE} submitUrl="/api/admin/quizzes" method="POST" />
+      </main>
+    </div>
   )
 }

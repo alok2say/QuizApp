@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/lib/session'
 import { getAttemptResult } from '@/lib/quiz/queries'
 import { StartQuizButton } from '../../../StartQuizButton'
 import sheet from '../../../answerSheet.module.css'
-import controls from '../../../controls.module.css'
+import controls from '@/app/controls.module.css'
 import styles from './result.module.css'
 
 export default async function ResultPage({

@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { readErrorBody } from '@/lib/errorBody'
+import styles from './admin.module.css'
 
 export function DeleteQuizButton({ quizId }: { quizId: string }) {
   const router = useRouter()
@@ -26,16 +28,16 @@ export function DeleteQuizButton({ quizId }: { quizId: string }) {
     }
 
     setPending(false)
-    const body = await res.json()
-    setError(body.error ?? 'Could not delete the quiz.')
+    const body = await readErrorBody(res)
+    setError(body?.error ?? `Couldn't delete the quiz (server error ${res.status}).`)
   }
 
   return (
     <div>
-      <button onClick={handleClick} disabled={pending}>
-        {pending ? 'Deleting...' : 'Delete'}
+      <button type="button" className={styles.danger} onClick={handleClick} disabled={pending}>
+        {pending ? 'Deleting…' : 'Delete'}
       </button>
-      {error && <p role="alert">{error}</p>}
+      {error && <p className={styles.rowError} role="alert">{error}</p>}
     </div>
   )
 }

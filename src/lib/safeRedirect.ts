@@ -5,3 +5,8 @@ export function safeCallbackUrl(value: string | null): string {
   if (value.startsWith('//') || value.startsWith('/\\')) return '/'
   return value
 }
+
+// Appends ?callbackUrl= to a login/signup link unless it's just Home.
+export function withCallbackUrl(path: string, callbackUrl: string): string {
+  return callbackUrl === '/' ? path : `${path}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+}

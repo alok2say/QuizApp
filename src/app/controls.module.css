@@ -1,4 +1,4 @@
-/* Buttons shared by the quiz list, result, and leaderboard pages */
+/* Buttons shared across pages */
 .primary,
 .secondary {
   display: inline-block;
