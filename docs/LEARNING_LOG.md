@@ -723,4 +723,32 @@ on branch `feature/pdf-library`.
     The snapshot script aborts non-GET API calls so capturing never
     writes to the database.
 
+## Token budget: deny rules + CLAUDE.md as a map (2026-11-01)
+
+- **Goal:** the LLM should pull only the code a task needs, not hold
+  the whole codebase in context. Source (`src/`, `prisma/`) is only
+  about 210 KB, roughly 50k tokens. The real waste was elsewhere:
+  `.snapshots/` (33 MB), `public/pdfs/` (5.3 MB), `package-lock.json`
+  (358 KB).
+- **`.claude/settings.json` deny rules:** `Read(./path/**)` entries block
+  Claude's Read and search tools from those paths. Covered: secrets
+  (`.env`, `.env.local`), PDFs, snapshots, the lockfile, build output.
+  Claude Code has no `.claudeignore`, so deny rules are how you block
+  files.
+  - Caveat: deny rules don't stop a shell `cat`. They prevent
+    accidental reads; they aren't a security boundary.
+  - Verified right away: a Read of `package-lock.json` came back "denied
+    by your permission settings".
+- **`CLAUDE.md` = map, not content:** it loads into *every* session, so
+  it stays short (43 lines, about 600 tokens): stack, commands, the
+  layered code map, conventions that can't be worked out from the code.
+  - The big docs (`SPEC.md`, `CONTEXT.md`, this log, about 106 KB
+    together) are listed as plain paths, not `@`-imports. `@` would load
+    them every session; a plain path means Claude reads one only when a
+    task needs it.
+  - `@AGENTS.md` stays the first line, since `next dev` regenerates that
+    file.
+- Next: Serena onboarding for symbol-level reads (`.serena/` is already
+  configured); the understand-anything knowledge graph stays optional.
+
 <!-- Continue appending one entry per step as we go. -->

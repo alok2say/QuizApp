@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./public/pdfs/**)",
+      "Read(./.snapshots/**)",
+      "Read(./package-lock.json)",
+      "Read(./tsconfig.tsbuildinfo)",
+      "Read(./.next/**)",
+      "Read(./node_modules/**)"
+    ]
+  }
+}
