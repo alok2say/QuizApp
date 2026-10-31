@@ -384,12 +384,32 @@ Duplicates removed once the header exists: `/quizzes` drops its own
 quizzes" logged in, "Log in" logged out) and drops "Manage quizzes",
 "Log out", and "Sign up" (all now in the header).
 
-Out of scope: post-login return to the originally requested page
-(`callbackUrl`), active-link highlighting, hiding the header during a
+Out of scope: active-link highlighting, hiding the header during a
 quiz attempt (answers are cached and attempts resumable, so leaving is
 safe). Implemented in `7f03983`; verified in the browser (logged out /
 `USER` / `ADMIN`, header updates on login and logout without reload,
 dark mode, 360px width).
+
+### Post-login return (designed 2026-10-31)
+When middleware redirects an unauthorized request to `/login`, it adds
+`?callbackUrl=<original pathname + search>`. After a successful
+`signIn`, the login page reads `callbackUrl` from
+`window.location.search` (inside the submit handler — no
+`useSearchParams`/Suspense needed) and navigates there, then
+`router.refresh()`. Default and fallback: `/`.
+
+Open-redirect guard: `safeCallbackUrl()` (`src/lib/safeRedirect.ts`)
+accepts only same-site relative paths — must start with `/`, must not
+start with `//` or `/\` (browsers treat both as another host);
+anything else (absolute URLs, empty, missing) becomes `/`.
+
+Known, accepted: a logged-in `USER` sent from `/admin/*` to `/login`
+gets `callbackUrl=/admin/...`; logging in again as `USER` just lands
+back on `/login` via middleware (no automatic loop — each round needs a
+manual login). Signup → login doesn't carry `callbackUrl` (out of
+scope). The page-level `redirect('/login')` fallbacks in protected
+pages don't add it either — middleware always runs first for those
+routes.
 
 ## Leaderboard
 
