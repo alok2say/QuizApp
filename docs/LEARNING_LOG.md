@@ -594,4 +594,45 @@ Design in `SPEC.md` (`136f76c`), code in `6307535` + `a162757`.
   checked the active link on `/`, login, signup, `/quizzes` (via
   client-side click), leaderboard, admin list (client click) and new.
 
+## PDF library (2026-10-31)
+
+Brainstormed → `SPEC.md` "PDF Library" (`6ff238b`) → plan
+`docs/superpowers/plans/2026-10-31-pdf-library.md` (`0bc1782`) → 3 tasks
+on branch `feature/pdf-library`.
+
+- **Catalog as a seam (TDD)** — pages only call `getDocuments()` /
+  `getDocument(slug)`. Today they read a typed array; when PDFs come
+  from a server, only those two functions change. Tests also check that
+  every catalog file exists on disk, so a typo fails `vitest` instead
+  of showing a blank viewer.
+- **`ssr: false` lives in a client file** — the viewer uses WebAssembly
+  and browser APIs, so it must never render on the server. Next 16 only
+  allows `dynamic(..., { ssr: false })` inside a `'use client'` module,
+  so `PdfViewerLoader.tsx` exists just to hold it; the page stays a
+  server component.
+- **Self-hosted wasm via `postinstall`** — the library fetches
+  `pdfium.wasm` (7.7 MB) from jsdelivr by default. A tiny script copies
+  it from `node_modules` into `public/pdfium/` on every `npm install`
+  (git-ignored, so it always matches the installed version).
+- **Root-relative URLs don't work in `blob:` workers** — with
+  `wasmUrl: '/pdfium/pdfium.wasm'` the viewer hung on "Loading
+  document…" and no wasm request ever appeared. The engine's workers are
+  created from `blob:` URLs, which have no path to resolve `/...`
+  against. Building an absolute URL from `location.origin` fixed it.
+  Found by tracing worker and request events in Playwright, not by
+  guessing.
+- **Percentage height needs a definite parent** — `height: 100%` on the
+  viewer collapsed to ~20px because its frame only had `flex: 1` +
+  `min-height`, which isn't a definite height. `position: relative` on
+  the frame + `position: absolute; inset: 0` on the viewer gives it one.
+- **`key={doc.slug}`** — re-mounts the viewer when moving between
+  documents, so it never keeps showing the previous PDF.
+- **Registry detour** — `npm install` hit `E401` from the Artifactory
+  registry in `~/.npmrc` (expired credentials); the user chose to
+  install these two packages from the public npm registry. npm wrote
+  `^2.1.0`, pinned back to exact `2.1.0`.
+- **Verification** — `vitest` 108/108, `tsc`, `eslint .`; Chromium:
+  render, search, zoom, paging, client-nav switching, 404s, no CDN
+  requests, dark, 360px.
+
 <!-- Continue appending one entry per step as we go. -->

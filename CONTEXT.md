@@ -385,6 +385,18 @@ client half of the error-body backlog item. Shared buttons now in
 `src/app/controls.module.css`. Known: commit `6307535` alone doesn't
 build (staged controls move rode along); fine at `a162757`.
 
+## PDF LIBRARY: IMPLEMENTED ON BRANCH (2026-10-31)
+
+Plan `docs/superpowers/plans/2026-10-31-pdf-library.md`, executed
+natively on `feature/pdf-library` (not yet merged/pushed). `/library`
+(list) + `/library/[slug]` (EmbedPDF 2.1.0 viewer, self-hosted
+`pdfium.wasm` via `postinstall`), header "Library" link, Home "Books"
+section. Catalog in `src/lib/library/catalog.ts` is the seam for
+server-downloaded PDFs. Deferred by the user: opening a PDF from the
+reader's own computer. Note: `@embedpdf/*` were installed from
+registry.npmjs.org because Artifactory returned E401 — re-auth
+Artifactory before the next install.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after

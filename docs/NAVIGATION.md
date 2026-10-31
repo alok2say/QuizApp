@@ -1,6 +1,6 @@
 # Pages & Navigation
 
-Snapshot as of 2026-10-31 (after commit `a162757`, auth/admin redesign). Describes what's in
+Snapshot as of 2026-10-31 (after commit `6601527`, PDF library). Describes what's in
 the code today, not the target design — see `SPEC.md` "Pages & Routes"
 for that.
 
@@ -9,7 +9,7 @@ for that.
 `src/middleware.ts` runs on `/quizzes/:path*` and `/admin/:path*` and
 checks the JWT role via `isAuthorizedForPath` (`src/lib/authorization.ts`):
 
-- **Public:** `/`, `/login`, `/signup`
+- **Public:** `/`, `/login`, `/signup`, `/library`, `/library/[slug]` (not in the middleware matcher)
 - **Logged in (`USER` or `ADMIN`):** everything under `/quizzes`
 - **`ADMIN` only:** everything under `/admin`
 
@@ -23,6 +23,8 @@ second check.
 | Page | URL | Access | Purpose |
 |---|---|---|---|
 | Home | `/` | Public | Title, intro, role-aware actions, "Books and events" placeholder |
+| Library | `/library` | Public | PDFs shipped with the app: title, description, page count, Read |
+| Document | `/library/[slug]` | Public | In-app PDF viewer (search, zoom, thumbnails); unknown slug → 404 |
 | Login | `/login` | Public | Email + password sign-in |
 | Signup | `/signup` | Public | Create account |
 | Quiz list | `/quizzes` | Logged in | All quizzes with your status (○ not started / ◐ in progress / ● submitted) and Start / Resume / Retake |
@@ -48,8 +50,11 @@ second check.
 
 ```
  Shared header on every page (layout.tsx → SiteHeader):
-   DemoQuizApp → /        logged out: Log in · Sign up
-                          logged in:  Quizzes · Admin (ADMIN only) · Log out
+   DemoQuizApp → /        logged out: Library · Log in · Sign up
+                          logged in:  Library · Quizzes · Admin (ADMIN only) · Log out
+
+ /library ──"Read"──► /library/[slug] ──"Library"──► /library
+ Home "Browse the library" ──► /library
 
  Home /  ── "Browse quizzes" (logged in) or "Log in" (logged out)
 

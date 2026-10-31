@@ -671,9 +671,22 @@ slug so switching documents re-initializes the viewer.
 (~7.7 MB) from jsdelivr at runtime. Instead it is copied from
 `node_modules/@embedpdf/pdfium/dist/pdfium.wasm` to
 `public/pdfium/pdfium.wasm` by an npm `postinstall` script (git-ignored,
-so it always matches the installed version) and passed as `wasmUrl:
-'/pdfium/pdfium.wasm'`. Fallback fonts for PDFs without embedded fonts
+so it always matches the installed version) and passed as an **absolute**
+`wasmUrl` (`new URL('/pdfium/pdfium.wasm', location.origin)`) — the
+engine runs in `blob:` workers, where a root-relative URL can't resolve. Fallback fonts for PDFs without embedded fonts
 may still load from jsdelivr — accepted for now.
 
 Visuals follow the app: ruled list on `/library` (44rem column), the
 viewer page uses the full content width.
+
+Implemented on branch `feature/pdf-library` (`dc13c14`, `b56275e`,
+`6601527`; plan `docs/superpowers/plans/2026-10-31-pdf-library.md`).
+Verified in Chromium: both PDFs render (8 and 22 pages), search
+("myocardial" → 16 results), zoom in/out, page navigation, switching
+documents via client navigation, `/library/nope` and
+`/library/..%2FSPEC.md` → 404, wasm served from `/pdfium/pdfium.wasm`
+with no jsdelivr requests, dark theme, 360px with no horizontal
+overflow. The viewer is sized with `position: absolute; inset: 0` inside
+a `position: relative` frame (a percentage height collapsed in the
+min-height flex chain). Packages were installed from the public npm
+registry because the Artifactory credentials had expired (user's call).
