@@ -1,0 +1,34 @@
+.link {
+  text-decoration: underline;
+  text-underline-offset: var(--underline-offset);
+}
+
+.default {
+  color: var(--color-text);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.danger {
+  color: var(--color-danger);
+}
+
+.button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}

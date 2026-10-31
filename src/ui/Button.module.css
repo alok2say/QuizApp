@@ -1,0 +1,33 @@
+.button {
+  display: inline-block;
+  /* the border sits inside the space-3 / space-5 box */
+  padding: calc(var(--space-3) - var(--border-medium)) calc(var(--space-5) - var(--border-medium));
+  border: var(--border-medium) solid;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.secondary {
+  border-color: var(--color-border);
+  background: none;
+  color: var(--color-text);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
