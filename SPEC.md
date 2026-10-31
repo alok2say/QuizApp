@@ -623,3 +623,57 @@ Renders the `top` table (rank, name, score, completion time), then:
 `/quizzes` and to the result page
 (`/quizzes/[quizId]/result/[attemptId]`) — the two natural jump-off
 points.
+
+## PDF Library (designed 2026-10-31)
+
+Read PDFs inside the app. **This iteration: only PDFs shipped with the
+app** (files in `public/pdfs/`, served by Next). Server-downloaded PDFs
+come later; opening a file from the reader's own computer was
+considered and explicitly **deferred** by the user.
+
+### Routes & access
+| Route | Shows |
+|---|---|
+| `/library` | Ruled list of documents: title, one-line description, page count, "Read" link |
+| `/library/[slug]` | Title, "Library" back link, full-height viewer below the site header |
+
+Public (no login), like `/` — reading needs no account; can be moved
+behind middleware later. Unknown slug → `notFound()`. Header gets a
+"Library" `NavLink` (shown logged in and logged out, active on
+`/library/*`). Home's "Books and events" placeholder becomes a "Books"
+section linking to `/library`; "Events" stays a placeholder.
+
+### Catalog (seam for later server downloads)
+`src/lib/library/catalog.ts` holds a typed list — no DB yet:
+`LibraryDocument = { slug, title, description, pageCount, src }`.
+Pages read only through `getDocuments()` and `getDocument(slug)`; when
+server downloads arrive, only these change (to a DB/API) and `src`
+becomes a server URL. `pageCount` is entered by hand for now. Lookup is
+exact-match on `slug` (no path handling), so unknown or crafted slugs
+return `null`.
+
+Starter content (user-approved, from the earlier PdfViewer1 project):
+`Cardiology-Chap-2.pdf` (8 pages, 0.5 MB) and `cardio-algo.pdf`
+(22 pages, 4.8 MB).
+
+### Viewer
+`@embedpdf/react-pdf-viewer` **2.1.0** (MIT; PDFium compiled to
+WebAssembly; built-in search, zoom, thumbnails, page navigation), same
+library and version as the reference project. Browser-only, so a
+`'use client'` wrapper loads it with `next/dynamic(..., { ssr: false })`
+(Next 16 allows `ssr: false` only inside Client Components).
+Config: `src` from the catalog; `disabledCategories: ['annotation',
+'redaction', 'panel-comment']` (as in the reference); `theme:
+{ preference: 'system' }` so it follows the app's light/dark; keyed by
+slug so switching documents re-initializes the viewer.
+
+**Self-hosted WASM:** by default the library fetches `pdfium.wasm`
+(~7.7 MB) from jsdelivr at runtime. Instead it is copied from
+`node_modules/@embedpdf/pdfium/dist/pdfium.wasm` to
+`public/pdfium/pdfium.wasm` by an npm `postinstall` script (git-ignored,
+so it always matches the installed version) and passed as `wasmUrl:
+'/pdfium/pdfium.wasm'`. Fallback fonts for PDFs without embedded fonts
+may still load from jsdelivr — accepted for now.
+
+Visuals follow the app: ruled list on `/library` (44rem column), the
+viewer page uses the full content width.
