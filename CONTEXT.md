@@ -367,8 +367,9 @@ on :3000.
   [[feedback-hands-on-execution]].
 
 ## Next steps
-1. Lint debt: 53 `no-explicit-any` in test mocks remain (cosmetic).
-   The 2 `set-state-in-effect` errors in `QuizTakeForm.tsx` are fixed
+1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
+   `no-explicit-any` in test mocks were fixed in the commit after
+   `1e51cf2` (`as never` for partial Prisma fixtures). The 2 `set-state-in-effect` errors in `QuizTakeForm.tsx` are fixed
    (`1e51cf2`), along with a real timer bug they hid (answer clicks
    restarted the countdown). Make `vitest` + `tsc` + `eslint` the
    end-of-plan gate.

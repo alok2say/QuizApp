@@ -447,4 +447,18 @@ Design in `SPEC.md` (`4bc53b5`), code in `1e51cf2`.
   5 minutes auto-submitted and landed on the result page; no console
   errors or hydration warnings.
 
+## Test mocks: `as any` → `as never` (2026-10-31)
+
+- Mocks like `mockResolvedValue({ id: 'quiz-1' } as any)` return a
+  partial Prisma row. `Partial<Quiz>` doesn't fit — the mock expects the
+  full return type (often with joined relations). `as never` is the
+  narrow escape hatch: `never` is assignable to every type, so it
+  compiles, but unlike `any` it can't leak loose typing into the rest
+  of the test (you can't call methods on it or pass it around untyped).
+- Where a real type was easy, used it instead: the `$transaction` mock
+  is typed via `typeof prismaMock`, and quiz-JSON "missing field" inputs
+  are `Record<string, unknown>` (matches `validateQuizJson(input:
+  unknown)`), so `delete` is allowed without a cast.
+- Result: `eslint .` clean repo-wide; `tsc` and `vitest` 94/94.
+
 <!-- Continue appending one entry per step as we go. -->
