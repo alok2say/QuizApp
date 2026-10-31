@@ -4,9 +4,9 @@ import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } fro
 import { useRouter } from 'next/navigation'
 import type { TakeableQuestion } from '@/lib/quiz/queries'
 import { formatDuration } from '@/lib/format'
-import sheet from '../../../answerSheet.module.css'
-import controls from '@/app/controls.module.css'
-import styles from './take.module.css'
+import { Button } from '@/ui'
+import sheet from './answerSheet.module.css'
+import styles from './TakeView.module.css'
 
 type Props = {
   quizId: string
@@ -182,9 +182,9 @@ function AttemptForm({ quizId, attemptId, quizTitle, questions, remainingSeconds
               </span>
             )}
           </p>
-          <button type="button" className={controls.primary} onClick={submit} disabled={submitting}>
+          <Button onClick={submit} disabled={submitting}>
             {submitting ? 'Submitting…' : 'Submit answers'}
-          </button>
+          </Button>
         </div>
       </main>
     </div>

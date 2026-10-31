@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { getQuizForTaking } from '@/lib/quiz/queries'
-import { QuizTakeForm } from './QuizTakeForm'
+import { QuizTakeForm } from '@/features/attempt/QuizTakeForm'
 
 export default async function TakeQuizPage({
   params,
