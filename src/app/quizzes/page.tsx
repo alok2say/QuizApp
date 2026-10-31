@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/session'
 import { getQuizzesWithStatus } from '@/lib/quiz/queries'
 import { StartQuizButton } from './StartQuizButton'
 import styles from './page.module.css'
+import controls from './controls.module.css'
 
 export default async function QuizzesPage() {
   const user = await getCurrentUser()
@@ -54,18 +55,18 @@ export default async function QuizzesPage() {
 
                   <div className={styles.action}>
                     {!attempt && (
-                      <StartQuizButton quizId={quiz.id} label="Start quiz" className={styles.primary} />
+                      <StartQuizButton quizId={quiz.id} label="Start quiz" className={controls.primary} />
                     )}
 
                     {attempt && !submitted && (
-                      <StartQuizButton quizId={quiz.id} label="Resume quiz" className={styles.primary} />
+                      <StartQuizButton quizId={quiz.id} label="Resume quiz" className={controls.primary} />
                     )}
 
                     {attempt && submitted && (canRetake ? (
-                      <StartQuizButton quizId={quiz.id} label="Retake quiz" className={styles.secondary} />
+                      <StartQuizButton quizId={quiz.id} label="Retake quiz" className={controls.secondary} />
                     ) : (
                       <Link
-                        className={styles.secondary}
+                        className={controls.secondary}
                         href={`/quizzes/${quiz.id}/result/${attempt.id}`}
                       >
                         View result

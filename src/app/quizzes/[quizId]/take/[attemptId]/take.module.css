@@ -1,0 +1,79 @@
+.page {
+  flex: 1;
+}
+
+/* Title + timer stay in view while scrolling through questions */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(44rem, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 1.25rem 0 1rem;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+.title {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.timer {
+  flex: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.lowTime {
+  color: var(--mark);
+}
+
+.main {
+  width: min(44rem, calc(100% - 32px));
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.main > ol {
+  border-top: 0;
+}
+
+.fieldset {
+  min-width: 0;
+  border: 0;
+}
+
+.loading {
+  margin-top: 2rem;
+  color: var(--muted);
+}
+
+.footer {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.unanswered {
+  font-size: 0.9375rem;
+  color: var(--muted);
+}

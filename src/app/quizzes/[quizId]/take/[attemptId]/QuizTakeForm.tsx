@@ -3,6 +3,10 @@
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import type { TakeableQuestion } from '@/lib/quiz/queries'
+import { formatDuration } from '@/lib/format'
+import sheet from '../../../answerSheet.module.css'
+import controls from '../../../controls.module.css'
+import styles from './take.module.css'
 
 type Props = {
   quizId: string
@@ -36,10 +40,14 @@ export function QuizTakeForm(props: Props) {
 
   if (!hydrated) {
     return (
-      <main>
-        <h1>{props.quizTitle}</h1>
-        <p>Loading…</p>
-      </main>
+      <div className={styles.page}>
+        <div className={styles.bar}>
+          <h1 className={styles.title}>{props.quizTitle}</h1>
+        </div>
+        <main className={styles.main}>
+          <p className={styles.loading}>Loading your answers…</p>
+        </main>
+      </div>
     )
   }
 
@@ -115,31 +123,70 @@ function AttemptForm({ quizId, attemptId, quizTitle, questions, remainingSeconds
     localStorage.setItem(storageKey(attemptId), JSON.stringify(next))
   }
 
+  const answeredCount = questions.filter((q) => (answers[q.id] ?? []).length > 0).length
+  const unansweredCount = questions.length - answeredCount
+
   return (
-    <main>
-      <h1>{quizTitle}</h1>
-      <p>Time left: {secondsLeft}s</p>
+    <div className={styles.page}>
+      <div className={styles.bar}>
+        <h1 className={styles.title}>{quizTitle}</h1>
+        <p
+          className={`${styles.timer} ${secondsLeft < 60 ? styles.lowTime : ''}`}
+          aria-label={`Time left ${formatDuration(secondsLeft)}`}
+        >
+          {formatDuration(secondsLeft)}
+        </p>
+      </div>
 
-      {questions.map((question) => (
-        <fieldset key={question.id}>
-          <legend>{question.text}</legend>
-          {question.options.map((option) => (
-            <label key={option.id}>
-              <input
-                type={question.type === 'SINGLE_SELECT' ? 'radio' : 'checkbox'}
-                name={question.id}
-                checked={(answers[question.id] ?? []).includes(option.id)}
-                onChange={() => toggleOption(question, option.id)}
-              />
-              {option.text}
-            </label>
-          ))}
-        </fieldset>
-      ))}
+      <main className={styles.main}>
+        <ol className={sheet.questions}>
+          {questions.map((question, index) => {
+            const multi = question.type === 'MULTI_SELECT'
 
-      <button onClick={submit} disabled={submitting}>
-        {submitting ? 'Submitting...' : 'Submit Quiz'}
-      </button>
-    </main>
+            return (
+              <li key={question.id} className={sheet.question}>
+                <span className={sheet.number}>{index + 1}</span>
+                <fieldset className={styles.fieldset}>
+                  <legend className={sheet.prompt}>{question.text}</legend>
+                  {multi && <p className={sheet.hint}>Pick all that apply</p>}
+
+                  <div className={sheet.options}>
+                    {question.options.map((option, optionIndex) => (
+                      <label key={option.id} className={`${sheet.option} ${sheet.choice}`}>
+                        <input
+                          className={sheet.input}
+                          type={multi ? 'checkbox' : 'radio'}
+                          name={question.id}
+                          checked={(answers[question.id] ?? []).includes(option.id)}
+                          onChange={() => toggleOption(question, option.id)}
+                        />
+                        <span className={`${sheet.mark} ${multi ? sheet.square : ''}`} aria-hidden="true">
+                          {String.fromCharCode(65 + optionIndex)}
+                        </span>
+                        {option.text}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              </li>
+            )
+          })}
+        </ol>
+
+        <div className={styles.footer}>
+          <p className={styles.progress}>
+            {answeredCount} of {questions.length} answered
+            {unansweredCount > 0 && (
+              <span className={styles.unanswered}>
+                {unansweredCount} {unansweredCount === 1 ? 'question' : 'questions'} unanswered
+              </span>
+            )}
+          </p>
+          <button type="button" className={controls.primary} onClick={submit} disabled={submitting}>
+            {submitting ? 'Submitting…' : 'Submit answers'}
+          </button>
+        </div>
+      </main>
+    </div>
   )
 }

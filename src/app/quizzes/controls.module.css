@@ -1,0 +1,35 @@
+/* Buttons shared by the quiz list, result, and leaderboard pages */
+.primary,
+.secondary {
+  display: inline-block;
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.primary {
+  border: 2px solid var(--answer);
+  background: var(--answer);
+  color: var(--on-answer);
+}
+
+.secondary {
+  border: 2px solid var(--rule);
+  background: none;
+  color: var(--ink);
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid var(--answer);
+  outline-offset: 3px;
+}

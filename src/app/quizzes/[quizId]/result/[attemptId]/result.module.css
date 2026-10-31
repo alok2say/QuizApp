@@ -1,0 +1,101 @@
+.page {
+  flex: 1;
+  padding: 3rem 16px 4rem;
+}
+
+.main {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* The score is the one big moment on this page */
+.score {
+  margin-top: 0.5rem;
+  font-size: clamp(4rem, 16vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.outOf {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.summary {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.summaryRight,
+.summaryWrong {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summaryRight {
+  color: var(--right);
+}
+
+.summaryWrong {
+  color: var(--mark);
+}
+
+.summaryRight:focus-visible,
+.summaryWrong:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--answer);
+  outline-offset: 3px;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+.actions p[role='alert'] {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.questions {
+  margin-top: 3rem;
+}
+
+.questionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.points {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
