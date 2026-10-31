@@ -91,5 +91,8 @@ Closed by `be5d37a`: post-login now returns to the requested page.
 Closed by `a162757`: login ↔ signup cross-links keep `callbackUrl`;
 signup → `/login?created=1` (+ `callbackUrl`) → original page.
 
-Still open:
-1. No active-link highlighting in the header.
+Closed later on 2026-10-31: the header highlights the current section
+(`aria-current="page"`; Quizzes covers all `/quizzes/*`, Admin all
+`/admin/quizzes/*`).
+
+No known navigation gaps remain.

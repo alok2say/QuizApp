@@ -392,8 +392,8 @@ build (staged controls move rode along); fine at `a162757`.
    (`1e51cf2`), along with a real timer bug they hid (answer clicks
    restarted the countdown). Make `vitest` + `tsc` + `eslint` the
    end-of-plan gate.
-2. Remaining navigation gap: active-link highlighting. (Post-login
-   return done: `be5d37a`; signup ↔ login keep `callbackUrl`: `a162757`;
+2. Navigation gaps: all closed (active-link highlighting done
+   2026-10-31 via `NavLink`/`isActivePath`; post-login return done: `be5d37a`; signup ↔ login keep `callbackUrl`: `a162757`;
    `safeCallbackUrl()` in `src/lib/safeRedirect.ts`.) Also Next
    16 deprecates `middleware.ts` → `proxy.ts` (codemod:
    `npx @next/codemod@canary middleware-to-proxy .`).

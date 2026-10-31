@@ -576,4 +576,22 @@ Design in `SPEC.md` (`136f76c`), code in `6307535` + `a162757`.
   signup → login → original page flow in Chromium (created
   `design.check.1793436504@example.com` / `TestPass123!` in the dev DB).
 
+## Active link in the header (2026-10-31)
+
+- **Why a client component** — the header is a server component, but
+  the layout doesn't re-render on client navigation, so it can't know
+  the current URL after a `<Link>` click. `usePathname()` in a tiny
+  `'use client'` `NavLink` re-renders on every navigation; the server
+  header just renders `NavLink`s.
+- **`aria-current="page"`** — the accessible way to mark the current
+  link; screen readers announce it, and the CSS styles off the same
+  attribute (`.link[aria-current='page']`) so visuals and semantics
+  can't drift apart.
+- **Prefix matching (TDD)** — `isActivePath` matches the exact path or
+  `href + '/'…`, so `/quizzes/x/take/y` lights "Quizzes" but a sibling
+  like `/quizzes-archive` wouldn't.
+- **Verification** — `vitest` 103/103, `tsc`, `eslint .`; Chromium
+  checked the active link on `/`, login, signup, `/quizzes` (via
+  client-side click), leaderboard, admin list (client click) and new.
+
 <!-- Continue appending one entry per step as we go. -->

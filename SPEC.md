@@ -488,7 +488,13 @@ Duplicates removed once the header exists: `/quizzes` drops its own
 quizzes" logged in, "Log in" logged out) and drops "Manage quizzes",
 "Log out", and "Sign up" (all now in the header).
 
-Out of scope: active-link highlighting, hiding the header during a
+Active section (added 2026-10-31): header links are a client
+`NavLink` that sets `aria-current="page"` when the path equals the
+link's href or is nested under it (`isActivePath`,
+`src/lib/activePath.ts`) — ink text + 2px `--answer` underline, no
+weight change. The wordmark isn't highlighted.
+
+Out of scope: hiding the header during a
 quiz attempt (answers are cached and attempts resumable, so leaving is
 safe). Implemented in `7f03983`; verified in the browser (logged out /
 `USER` / `ADMIN`, header updates on login and logout without reload,
