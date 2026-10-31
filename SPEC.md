@@ -145,9 +145,10 @@ timer bug):**
 to the take page) — this is the one query allowed to reveal the answer
 key, since the attempt is locked by then. Returns each question's
 `isCorrect`/`pointsAwarded` alongside every option's `isCorrect` and
-`wasSelected`. Rendered by
-`src/app/quizzes/[quizId]/result/[attemptId]/page.tsx` (server-only, no
-client component needed).
+`wasSelected`, plus `quizId` and `retakePolicy` (added 2026-10-31 so the
+page can offer "Retake quiz" only when the policy allows). Rendered by
+`src/app/quizzes/[quizId]/result/[attemptId]/page.tsx` (server
+component; reuses the `StartQuizButton` client island for retake).
 
 ### Quiz list page contract
 
@@ -376,6 +377,41 @@ Color tokens (`--ink`, `--paper`, `--muted`, `--answer`, `--on-answer`,
 Bricolage Grotesque font is loaded once in `layout.tsx` as
 `--font-sans` and applied to `body`. Page CSS modules consume these
 variables rather than redefining them.
+
+### Visual design: take, result, leaderboard (designed 2026-10-31)
+Concept: one paper exam — filled in (take), marked (result), posted on
+the class board (leaderboard). Continues `/quizzes`: same tokens,
+Bricolage, ruled lists (no cards/shadows), left-aligned, max ~44rem,
+tabular figures for scores/times. Two new tokens with dark values:
+`--right` (green tick) and `--mark` (red pen). Correct/wrong is never
+colour-only — always a shape too (✓ / ✗ / ring). Question numbers and
+option letters (A, B, C…) are shown because they are a real sequence.
+Shared answer-sheet bubble styles live in
+`src/app/quizzes/answerSheet.module.css`.
+
+**Take** — options are real `<input>`s visually restyled as lettered
+answer-sheet marks: round for `SINGLE_SELECT`, square for
+`MULTI_SELECT` (+ "Pick all that apply"), filled `--answer` when
+chosen, visible keyboard focus. A sticky bar holds the quiz title and an
+`m:ss` timer that turns `--mark` under 60s. Footer: "N of M answered",
+a non-blocking "K questions unanswered" note, and "Submit answers"
+("Submitting…" while pending). Timing/caching logic unchanged.
+
+**Result** — large "score / max", then one mark per question (● right,
+✗ wrong) linking to `#q-N`; "Retake quiz" (only if `retakePolicy !==
+SINGLE_ATTEMPT`) and "See leaderboard". Each question: number, text,
+"awarded / points"; options as marks — your picks filled, correct
+options get a `--right` ring + ✓, wrong picks a `--mark` ✗.
+
+**Leaderboard** — heading "<quiz> leaderboard", one-line rule
+explanation ("Best attempt per person. Ties go to the faster time."),
+ruled rows: rank, name, score/max, time `m:ss`. The viewer's own row
+shows "You" with an `--answer` left bar. `ownRank` (viewer outside the
+top N) renders below as "Your best: S / M in m:ss, outside the top N"
+— `ownRank` carries no rank number, so none is shown (previously the
+page mislabelled the score as "Your rank"). Empty board: "No one has
+finished this quiz yet."; not attempted: "You haven't taken this quiz
+yet." — both with a "Take the quiz" `StartQuizButton`.
 
 ### Shared site header (designed 2026-10-31)
 `SiteHeader` (`src/app/SiteHeader.tsx` + `SiteHeader.module.css`) is a
