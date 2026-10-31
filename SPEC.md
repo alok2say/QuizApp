@@ -456,6 +456,14 @@ JSON body. If parsing fails they show a status-based message, e.g.
 "Couldn't save the quiz (server error 500). Your edits are still
 here."
 
+Implemented in `a162757` (helper `readErrorBody` in `6307535`),
+verified in the browser: wrong-password error, signup → login with
+"Account created" → back to the original `callbackUrl`, validation
+error list, a simulated body-less `500` on save (route intercepted, not
+a real DB failure), light/dark, 360px. Validation and JSON-syntax
+errors get the "Fix these before saving:" heading; server failures are
+shown as a single message without it.
+
 ### Shared site header (designed 2026-10-31)
 `SiteHeader` (`src/app/SiteHeader.tsx` + `SiteHeader.module.css`) is a
 server component rendered in `layout.tsx` above `{children}`, so it

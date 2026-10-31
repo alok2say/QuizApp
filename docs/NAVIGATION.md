@@ -1,6 +1,6 @@
 # Pages & Navigation
 
-Snapshot as of 2026-10-31 (after commit `be5d37a`, post-login return). Describes what's in
+Snapshot as of 2026-10-31 (after commit `a162757`, auth/admin redesign). Describes what's in
 the code today, not the target design — see `SPEC.md` "Pages & Routes"
 for that.
 
@@ -53,7 +53,7 @@ second check.
 
  Home /  ── "Browse quizzes" (logged in) or "Log in" (logged out)
 
- /signup ──success──► /login ──success──► callbackUrl if present and safe, else /
+ /signup ──success──► /login?created=1 ──success──► callbackUrl if present and safe, else /
                                             (header refreshes)
 
  /quizzes ──Start/Resume/Retake──► /take/[attemptId] ──submit or timer expiry──► /result/[attemptId]
@@ -88,6 +88,8 @@ leaderboard with no route to `/quizzes` (now via header "Quizzes").
 
 Closed by `be5d37a`: post-login now returns to the requested page.
 
+Closed by `a162757`: login ↔ signup cross-links keep `callbackUrl`;
+signup → `/login?created=1` (+ `callbackUrl`) → original page.
+
 Still open:
 1. No active-link highlighting in the header.
-2. Signup → login doesn't carry `callbackUrl`.

@@ -540,4 +540,40 @@ exam — filled in, marked, posted on the board.
   mobile), leaderboard (own row, other user's "not taken yet" view,
   mobile); no horizontal overflow at 360px; no console errors.
 
+## Login, signup, admin visuals (2026-10-31)
+
+Design in `SPEC.md` (`136f76c`), code in `6307535` + `a162757`.
+
+- **Server page + client form** — `/login` and `/signup` were whole
+  `'use client'` pages. To render links and a notice from the URL
+  (`callbackUrl`, `created=1`) without `useSearchParams` + `<Suspense>`,
+  each `page.tsx` is now a server component that awaits `searchParams`,
+  sanitizes `callbackUrl`, and passes plain props to `LoginForm` /
+  `SignupForm`. Same split as the rest of the app.
+- **`readErrorBody` (TDD)** — `res.json()` throws on an empty or HTML
+  body, which is exactly what an unhandled server error returns. One
+  helper returns the parsed body or `null`, and each caller supplies a
+  status-based fallback message. Tested with real `Response` objects.
+- **Errors that tell you what to do** — validation errors are things
+  the admin can fix, so they get "Fix these before saving:"; a server
+  failure isn't, so it's a separate message that says the edits are
+  safe.
+- **Write-in fields** — inputs have only a bottom border (like an exam
+  sheet's name line); `border-radius: 0` and `background: none` stop
+  browser defaults from rounding/filling them, and focus switches the
+  line to `--answer` instead of an outline.
+- **Test-tool artifact, not a bug** — a hydration warning showed up
+  only in runs that took screenshots: Playwright injects
+  `caret-color: transparent` into inputs to hide the cursor, and here
+  it landed before React hydrated. The same pages loaded without
+  screenshots had no warning.
+- **Commit slip** — a staged `git mv` (controls module) rode along in
+  the helper commit while its import updates landed in the next one,
+  so `6307535` alone doesn't build. Lesson: `git status` before every
+  commit, or commit with explicit paths only after checking nothing
+  else is staged.
+- **Verification** — `vitest` 101/101, `tsc`, `eslint .` clean; full
+  signup → login → original page flow in Chromium (created
+  `design.check.1793436504@example.com` / `TestPass123!` in the dev DB).
+
 <!-- Continue appending one entry per step as we go. -->

@@ -375,6 +375,16 @@ New `formatDuration` (`src/lib/format.ts`). `overflow-x: clip` on
 `html, body` (was `hidden`, broke sticky). Every user-facing page
 except login/signup and admin now has the designed look.
 
+## LOGIN / SIGNUP / ADMIN VISUALS: COMPLETE (2026-10-31)
+
+Design `136f76c`, code `6307535` + `a162757`. Every page now has the
+designed look. Login/signup are server pages + client forms
+(`LoginForm`, `SignupForm`); cross-links keep `callbackUrl`; signup →
+`/login?created=1`. `readErrorBody` (`src/lib/errorBody.ts`) closes the
+client half of the error-body backlog item. Shared buttons now in
+`src/app/controls.module.css`. Known: commit `6307535` alone doesn't
+build (staged controls move rode along); fine at `a162757`.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after
@@ -382,8 +392,8 @@ except login/signup and admin now has the designed look.
    (`1e51cf2`), along with a real timer bug they hid (answer clicks
    restarted the countdown). Make `vitest` + `tsc` + `eslint` the
    end-of-plan gate.
-2. Remaining navigation gaps: active-link highlighting; signup → login
-   doesn't carry `callbackUrl`. (Post-login return done: `be5d37a`,
+2. Remaining navigation gap: active-link highlighting. (Post-login
+   return done: `be5d37a`; signup ↔ login keep `callbackUrl`: `a162757`;
    `safeCallbackUrl()` in `src/lib/safeRedirect.ts`.) Also Next
    16 deprecates `middleware.ts` → `proxy.ts` (codemod:
    `npx @next/codemod@canary middleware-to-proxy .`).
@@ -406,8 +416,8 @@ except login/signup and admin now has the designed look.
    - Delete: (a) block with `409` (recommended, no data loss); (b)
      delete quiz + attempts + answers in one transaction behind a UI
      confirm (irreversible).
-   - Either way, `QuizJsonEditor.tsx` must stop assuming every error
-     response has a JSON body.
+   - Client error-body handling is done (`readErrorBody`, `a162757`);
+     the server side (clean `409`) is what remains.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
