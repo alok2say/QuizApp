@@ -1,0 +1,37 @@
+/* li.row beats ListRow's own .row: this list is a 3-column grid */
+li.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-4);
+}
+
+/* Answer-sheet bubble: empty = not started, half = in progress, full = done */
+.bubble {
+  width: var(--space-5);
+  height: var(--space-5);
+  margin-top: var(--space-1);
+  border: var(--border-medium) solid var(--color-accent);
+  border-radius: var(--radius-round);
+}
+
+.inProgress {
+  background: linear-gradient(90deg, var(--color-accent) 50%, transparent 50%);
+}
+
+.done {
+  background: var(--color-accent);
+}
+
+.action p[role='alert'] {
+  max-width: 14rem; /* token-exempt: error wraps under the button */
+}
+
+@media (max-width: 34rem) { /* token-exempt: media queries can't use custom properties */
+  li.row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .action {
+    grid-column: 2;
+  }
+}

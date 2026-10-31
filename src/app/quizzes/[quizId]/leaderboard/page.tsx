@@ -2,8 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { getLeaderboard } from '@/lib/quiz/queries'
 import { formatDuration } from '@/lib/format'
-import { StartQuizButton } from '../../StartQuizButton'
-import controls from '@/app/controls.module.css'
+import { StartQuizButton } from '@/features/quizzes/StartQuizButton'
 import styles from './leaderboard.module.css'
 
 function timeLabel(seconds: number | null) {
@@ -78,7 +77,7 @@ export default async function LeaderboardPage({
         {!result.hasAttempted && (
           <div className={styles.cta}>
             {!empty && <p className={styles.message}>You haven&apos;t taken this quiz yet.</p>}
-            <StartQuizButton quizId={quizId} label="Take the quiz" className={controls.primary} />
+            <StartQuizButton quizId={quizId} label="Take the quiz" />
           </div>
         )}
       </main>

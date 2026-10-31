@@ -2,9 +2,8 @@ import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { getAttemptResult } from '@/lib/quiz/queries'
-import { StartQuizButton } from '../../../StartQuizButton'
+import { StartQuizButton } from '@/features/quizzes/StartQuizButton'
 import sheet from '../../../answerSheet.module.css'
-import controls from '@/app/controls.module.css'
 import styles from './result.module.css'
 
 export default async function ResultPage({
@@ -54,7 +53,7 @@ export default async function ResultPage({
 
         <div className={styles.actions}>
           {canRetake && (
-            <StartQuizButton quizId={result.quizId} label="Retake quiz" className={controls.primary} />
+            <StartQuizButton quizId={result.quizId} label="Retake quiz" />
           )}
           <Link className={styles.link} href={`/quizzes/${quizId}/leaderboard`}>See leaderboard</Link>
         </div>

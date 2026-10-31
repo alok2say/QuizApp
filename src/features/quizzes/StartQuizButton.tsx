@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Button, ErrorMessage } from '@/ui'
 
 export function StartQuizButton({
   quizId,
   label,
-  className,
+  variant = 'primary',
 }: {
   quizId: string
   label: string
-  className?: string
+  variant?: 'primary' | 'secondary'
 }) {
   const router = useRouter()
   const [pending, setPending] = useState(false)
@@ -43,10 +44,10 @@ export function StartQuizButton({
 
   return (
     <div>
-      <button type="button" className={className} onClick={handleClick} disabled={pending}>
+      <Button variant={variant} onClick={handleClick} disabled={pending}>
         {pending ? 'Starting...' : label}
-      </button>
-      {error && <p role="alert">{error}</p>}
+      </Button>
+      {error && <ErrorMessage size="small">{error}</ErrorMessage>}
     </div>
   )
 }

@@ -19,7 +19,6 @@ const PENDING_RAW_VALUES: string[] = [
   'src/app/quizzes/[quizId]/result/[attemptId]/result.module.css',
   'src/app/quizzes/[quizId]/take/[attemptId]/take.module.css',
   'src/app/quizzes/answerSheet.module.css',
-  'src/app/quizzes/page.module.css',
 ]
 
 // next/font defines this one on <html>
