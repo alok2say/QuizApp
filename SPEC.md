@@ -121,6 +121,23 @@ the clock. Rendered by
 `QuizTakeForm.tsx` (client: radio for `SINGLE_SELECT`, checkbox for
 `MULTI_SELECT`, 1-second countdown that auto-submits at 0).
 
+**Client timing & cache rules (revised 2026-10-31, fixes lint debt +
+timer bug):**
+- The countdown is deadline-based: `deadline = Date.now() +
+  remainingSeconds * 1000` is fixed once on mount; an interval derives
+  `secondsLeft` from the clock, so it doesn't drift and isn't reset by
+  answer changes (previously every answer change restarted the 1s
+  timeout, slowing the clock for fast clickers). At 0 it auto-submits
+  via `useEffectEvent`, so the interval always calls the latest submit.
+- Cached answers are read once from `localStorage` in a lazy `useState`
+  initializer, and written in the option-change handler (no
+  load/save effects, so nothing can overwrite the cache with `{}`
+  before it's read). To keep server and client HTML identical, the
+  exported `QuizTakeForm` renders a "Loading…" shell until hydrated
+  (`useSyncExternalStore`, no effect), then mounts the real form.
+- The latest answers are mirrored in a ref updated in the handler, so
+  `submit` reads current answers without being rebuilt per change.
+
 ### Result page contract
 
 `getAttemptResult(attemptId, userId)` (`src/lib/quiz/queries.ts`) guards
