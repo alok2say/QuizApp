@@ -387,7 +387,7 @@ quizzes" logged in, "Log in" logged out) and drops "Manage quizzes",
 Out of scope: post-login return to the originally requested page
 (`callbackUrl`), active-link highlighting, hiding the header during a
 quiz attempt (answers are cached and attempts resumable, so leaving is
-safe). Verified manually in the browser (logged out / `USER` /
+safe). To be verified manually in the browser (logged out / `USER` /
 `ADMIN`, header updates on login and logout, dark mode, narrow width).
 
 ## Leaderboard
