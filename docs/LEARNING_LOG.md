@@ -751,4 +751,39 @@ on branch `feature/pdf-library`.
 - Next: Serena onboarding for symbol-level reads (`.serena/` is already
   configured); the understand-anything knowledge graph stays optional.
 
+## Serena onboarding: symbol-level reads + project memories (2026-11-01)
+
+- **What Serena is:** an open-source (MIT, `oraios/serena`) MCP server
+  that runs locally and drives the TypeScript language server. It gives
+  the LLM IDE-style tools:
+  - `get_symbols_overview` lists the symbols in a file;
+  - `find_symbol` with `include_body` returns just one function;
+  - `find_referencing_symbols` finds real callers, not grep noise;
+  - `replace_symbol_body` edits a function by name.
+
+  Reading one 20-line function instead of a 300-line file is the token
+  saving.
+- **Why it beat the alternatives:** for about 50k tokens of source,
+  built-in Grep/Read plus Serena gives most of the win, with nothing
+  extra to build.
+  - A knowledge graph (understand-anything) has a big up-front token
+    cost.
+  - Vector search sends code to an external embedding service.
+  - Repomix packs the whole repo into one file, which is the opposite
+    of saving tokens.
+- **Onboarding** wrote five dense notes to `.serena/memories/`:
+  - `core`: the entry point, linking to the other four with `mem:`
+    references;
+  - `tech_stack`, `suggested_commands`, `conventions`, `task_completion`.
+
+  Later sessions read these notes instead of rediscovering the project.
+  The style rule is to save only stable, non-obvious facts, no task
+  notes.
+- **Gathered via Serena itself:** single symbols (`StartAttemptResult`,
+  the start route's `POST`, `readErrorBody`) plus config files, with no
+  whole source files read.
+- **Stays local:** `.serena/` is gitignored, so the memories aren't
+  pushed. `serena memories check` (validates references) isn't on PATH,
+  so the `mem:` links were checked by hand.
+
 <!-- Continue appending one entry per step as we go. -->
