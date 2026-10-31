@@ -98,7 +98,15 @@ export type AnsweredQuestion = {
 }
 
 export type AttemptResult =
-    | { ok: true; quizTitle: string; score: number; maxScore: number; questions: AnsweredQuestion[] }
+    | {
+        ok: true
+        quizId: string
+        quizTitle: string
+        retakePolicy: 'UNLIMITED_BEST' | 'UNLIMITED_LATEST' | 'SINGLE_ATTEMPT'
+        score: number
+        maxScore: number
+        questions: AnsweredQuestion[]
+    }
     | { ok: false; status: 403 | 404 | 409; error: string }
 
 export async function getAttemptResult(attemptId: string, userId: string): Promise<AttemptResult> {
@@ -123,7 +131,9 @@ export async function getAttemptResult(attemptId: string, userId: string): Promi
     const answersByQuestion = new Map(attempt.answers.map((a) => [a.questionId, a]))
     const maxScore = attempt.quiz.questions.reduce((sum, q) => sum + q.points, 0)
 
-    const questions = attempt.quiz.questions.map((question) => {
+    const sortedQuestions = [...attempt.quiz.questions].sort((a, b) => a.order - b.order)
+
+    const questions = sortedQuestions.map((question) => {
         const answer = answersByQuestion.get(question.id)
         const selected = new Set(answer?.selectedOptionIds ?? [])
 
@@ -144,7 +154,9 @@ export async function getAttemptResult(attemptId: string, userId: string): Promi
 
     return {
         ok: true,
+        quizId: attempt.quiz.id,
         quizTitle: attempt.quiz.title,
+        retakePolicy: attempt.quiz.retakePolicy,
         score: attempt.score,
         maxScore,
         questions,

@@ -207,18 +207,28 @@ describe('getAttemptResult', () => {
     expect(result).toEqual({ ok: false, status: 409, error: 'This attempt has not been submitted yet.' })
   })
 
-  it('builds a per-question breakdown revealing correctness and selections', async () => {
+  it('builds a per-question breakdown in question order, with quiz id and retake policy', async () => {
     vi.mocked(prisma.attempt.findUnique).mockResolvedValue({
       id: 'attempt-1',
       userId: 'user-1',
       submittedAt: new Date(),
       score: 10,
       quiz: {
+        id: 'quiz-1',
         title: 'Quiz One',
+        retakePolicy: 'UNLIMITED_BEST',
         questions: [
+          {
+            id: 'q2',
+            text: 'Second?',
+            order: 2,
+            points: 5,
+            options: [{ id: 'c', text: 'C', isCorrect: true }],
+          },
           {
             id: 'q1',
             text: 'First?',
+            order: 1,
             points: 10,
             options: [
               { id: 'a', text: 'A', isCorrect: true },
@@ -234,9 +244,11 @@ describe('getAttemptResult', () => {
 
     expect(result).toEqual({
       ok: true,
+      quizId: 'quiz-1',
       quizTitle: 'Quiz One',
+      retakePolicy: 'UNLIMITED_BEST',
       score: 10,
-      maxScore: 10,
+      maxScore: 15,
       questions: [
         {
           id: 'q1',
@@ -248,6 +260,14 @@ describe('getAttemptResult', () => {
             { id: 'a', text: 'A', isCorrect: true, wasSelected: true },
             { id: 'b', text: 'B', isCorrect: false, wasSelected: false },
           ],
+        },
+        {
+          id: 'q2',
+          text: 'Second?',
+          isCorrect: false,
+          pointsAwarded: 0,
+          points: 5,
+          options: [{ id: 'c', text: 'C', isCorrect: true, wasSelected: false }],
         },
       ],
     })
