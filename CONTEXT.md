@@ -386,6 +386,19 @@ on :3000.
    (diff-based) update. The `QuizJsonEditor.tsx` client-side error-body
    assumption (surfaced during Leaderboard testing) is coupled to
    whichever of these gets built first.
+   **Discussed 2026-10-31, parked by the user to pick up later — no
+   decision made.** Options on the table:
+   - Edit: (a) metadata-only — if questions/options are unchanged,
+     update title/description/time limit/retake policy/
+     `leaderboardSize` in place, else `409` with a clear message
+     (assistant's recommendation; fixes the real "set
+     `leaderboardSize` on Sample Quiz" case); (b) block all edits with
+     `409`; (c) full incremental diff.
+   - Delete: (a) block with `409` (recommended, no data loss); (b)
+     delete quiz + attempts + answers in one transaction behind a UI
+     confirm (irreversible).
+   - Either way, `QuizJsonEditor.tsx` must stop assuming every error
+     response has a JSON body.
 
 Side questions already answered this session (don't need to re-explain
 unless asked again): Next.js's dev server is separate from Vite — Vite is
