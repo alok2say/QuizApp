@@ -413,4 +413,38 @@ Design in `SPEC.md` (`4536cbc`), code in `be5d37a`.
   in from a blocked leaderboard URL and landed back on it; `https://`
   and `//` callbacks and a bare `/login` all landed on `/`.
 
+## QuizTakeForm: timer bug + `set-state-in-effect` lint (2026-10-31)
+
+Design in `SPEC.md` (`4bc53b5`), code in `1e51cf2`.
+
+- **The hidden timer bug** — `submit` was a `useMemo` depending on
+  `answers`, and the countdown effect depended on `submit`. Each answer
+  click → new `submit` → effect cleanup cleared the pending 1s timeout
+  → a fresh 1s wait. Fast clickers got a slower clock. Lint only
+  pointed at the symptom (`submit()` setting state inside the effect).
+- **Deadline, not ticks** — store `deadline = Date.now() + remaining`
+  once (lazy `useState`), and let an interval *derive* `secondsLeft`
+  from the clock. Counting ticks drifts and can be paused; a deadline
+  can't. Setting state inside an interval *callback* is fine — the lint
+  rule targets synchronous setState in the effect body.
+- **`useEffectEvent` (React 19.2)** — lets the interval call the
+  *latest* `submit` without listing it as a dependency, so the interval
+  is created once and never restarted.
+- **Effect-free `localStorage` cache** — the old pair of effects ran in
+  the same commit: "load" only *scheduled* `setAnswers(cached)`, then
+  "save" immediately wrote `{}` over the cache. Now answers are read in
+  a lazy `useState` initializer and written in the click handler — the
+  event that caused the change.
+- **Hydration gate** — a lazy initializer reading `localStorage` would
+  give the server (no storage) different HTML than the client.
+  `useSyncExternalStore(subscribe, () => true, () => false)` returns
+  `false` during SSR/hydration and `true` after, with no effect, so a
+  "Loading…" shell renders first and the real form mounts client-only.
+- **Verification** — `eslint` 0 errors on the file (was 2), `tsc`,
+  `vitest` 94/94. Headless Chromium with Playwright's fake clock
+  (`page.clock`): 20 clicks across 10 simulated seconds → exactly
+  300s → 290s; reload kept all 11 checked answers; fast-forwarding past
+  5 minutes auto-submitted and landed on the result page; no console
+  errors or hydration warnings.
+
 <!-- Continue appending one entry per step as we go. -->

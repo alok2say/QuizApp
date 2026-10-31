@@ -367,9 +367,11 @@ on :3000.
   [[feedback-hands-on-execution]].
 
 ## Next steps
-1. Lint debt: 53 `no-explicit-any` in test mocks + 2
-   `react-hooks/set-state-in-effect` in `QuizTakeForm.tsx` (fix those
-   two for real). Make `vitest` + `tsc` + `eslint` the end-of-plan gate.
+1. Lint debt: 53 `no-explicit-any` in test mocks remain (cosmetic).
+   The 2 `set-state-in-effect` errors in `QuizTakeForm.tsx` are fixed
+   (`1e51cf2`), along with a real timer bug they hid (answer clicks
+   restarted the countdown). Make `vitest` + `tsc` + `eslint` the
+   end-of-plan gate.
 2. Remaining navigation gaps: active-link highlighting; signup → login
    doesn't carry `callbackUrl`. (Post-login return done: `be5d37a`,
    `safeCallbackUrl()` in `src/lib/safeRedirect.ts`.) Also Next
