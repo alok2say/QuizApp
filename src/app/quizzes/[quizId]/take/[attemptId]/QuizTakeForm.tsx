@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import type { TakeableQuestion } from '@/lib/quiz/queries'
 
@@ -18,72 +18,101 @@ function storageKey(attemptId: string) {
   return `quiz-attempt-${attemptId}`
 }
 
-export function QuizTakeForm({ quizId, attemptId, quizTitle, questions, remainingSeconds }: Props) {
+function readCachedAnswers(attemptId: string): AnswersMap {
+  try {
+    const cached = localStorage.getItem(storageKey(attemptId))
+    return cached ? JSON.parse(cached) : {}
+  } catch {
+    return {}
+  }
+}
+
+const subscribeNever = () => () => {}
+
+// Cached answers live in localStorage, which the server can't read. Render a
+// shell until hydrated so server and client HTML match, then mount the form.
+export function QuizTakeForm(props: Props) {
+  const hydrated = useSyncExternalStore(subscribeNever, () => true, () => false)
+
+  if (!hydrated) {
+    return (
+      <main>
+        <h1>{props.quizTitle}</h1>
+        <p>Loading…</p>
+      </main>
+    )
+  }
+
+  return <AttemptForm {...props} />
+}
+
+function AttemptForm({ quizId, attemptId, quizTitle, questions, remainingSeconds }: Props) {
   const router = useRouter()
-  const [answers, setAnswers] = useState<AnswersMap>({})
+  const [answers, setAnswers] = useState<AnswersMap>(() => readCachedAnswers(attemptId))
+  const [deadline] = useState(() => Date.now() + remainingSeconds * 1000)
   const [secondsLeft, setSecondsLeft] = useState(remainingSeconds)
   const [submitting, setSubmitting] = useState(false)
+  const answersRef = useRef(answers)
   const submittedRef = useRef(false)
 
-  useEffect(() => {
-    const cached = localStorage.getItem(storageKey(attemptId))
-    if (cached) setAnswers(JSON.parse(cached))
-  }, [attemptId])
+  async function submit() {
+    if (submittedRef.current) return
+    submittedRef.current = true
+    setSubmitting(true)
 
-  useEffect(() => {
-    localStorage.setItem(storageKey(attemptId), JSON.stringify(answers))
-  }, [answers, attemptId])
-
-  const submit = useMemo(
-    () => async () => {
-      if (submittedRef.current) return
-      submittedRef.current = true
-      setSubmitting(true)
-
-      const payload = {
-        answers: questions.map((q) => ({
-          questionId: q.id,
-          selectedOptionIds: answers[q.id] ?? [],
-        })),
-      }
-
-      const res = await fetch(`/api/attempts/${attemptId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      if (res.ok) {
-        localStorage.removeItem(storageKey(attemptId))
-        router.push(`/quizzes/${quizId}/result/${attemptId}`)
-      } else {
-        setSubmitting(false)
-        submittedRef.current = false
-      }
-    },
-    [answers, attemptId, quizId, questions, router],
-  )
-
-  useEffect(() => {
-    if (secondsLeft <= 0) {
-      submit()
-      return
+    const payload = {
+      answers: questions.map((q) => ({
+        questionId: q.id,
+        selectedOptionIds: answersRef.current[q.id] ?? [],
+      })),
     }
-    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000)
-    return () => clearTimeout(timer)
-  }, [secondsLeft, submit])
+
+    const res = await fetch(`/api/attempts/${attemptId}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (res.ok) {
+      localStorage.removeItem(storageKey(attemptId))
+      router.push(`/quizzes/${quizId}/result/${attemptId}`)
+    } else {
+      setSubmitting(false)
+      submittedRef.current = false
+    }
+  }
+
+  const onTimeUp = useEffectEvent(() => {
+    submit()
+  })
+
+  // Derive time left from a fixed deadline so the clock can't drift or be
+  // reset by re-renders.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const left = Math.max(Math.ceil((deadline - Date.now()) / 1000), 0)
+      setSecondsLeft(left)
+      if (left === 0) {
+        clearInterval(timer)
+        onTimeUp()
+      }
+    }, 250)
+    return () => clearInterval(timer)
+  }, [deadline])
 
   function toggleOption(question: TakeableQuestion, optionId: string) {
-    setAnswers((prev) => {
-      const current = prev[question.id] ?? []
-      if (question.type === 'SINGLE_SELECT') {
-        return { ...prev, [question.id]: [optionId] }
-      }
-      const next = current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId]
-      return { ...prev, [question.id]: next }
-    })
+    const current = answers[question.id] ?? []
+    const selected =
+      question.type === 'SINGLE_SELECT'
+        ? [optionId]
+        : current.includes(optionId)
+          ? current.filter((id) => id !== optionId)
+          : [...current, optionId]
+    const next = { ...answers, [question.id]: selected }
+
+    setAnswers(next)
+    answersRef.current = next
+    localStorage.setItem(storageKey(attemptId), JSON.stringify(next))
   }
 
   return (
