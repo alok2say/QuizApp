@@ -1,6 +1,6 @@
 # Pages & Navigation
 
-Snapshot as of 2026-10-31 (after commit `2ded98f`). Describes what's in
+Snapshot as of 2026-10-31 (after commit `7f03983`, shared site header). Describes what's in
 the code today, not the target design — see `SPEC.md` "Pages & Routes"
 for that.
 
@@ -46,25 +46,24 @@ second check.
 ## Navigation map
 
 ```
-                 ┌──────── Home  / ────────┐
-   logged out:   │ Log in        Sign up   │   logged in: Browse quizzes · Log out
-                 └───┬────────────┬────────┘   admin also: Manage quizzes
-                     │            │
-                  /login ◄─────── /signup        (signup success → /login)
-                     │
-                     └─ login success → /   (always Home, not the originally requested page)
+ Shared header on every page (layout.tsx → SiteHeader):
+   DemoQuizApp → /        logged out: Log in · Sign up
+                          logged in:  Quizzes · Admin (ADMIN only) · Log out
+
+ Home /  ── "Browse quizzes" (logged in) or "Log in" (logged out)
+
+ /signup ──success──► /login ──success──► /   (always Home; header refreshes)
 
  /quizzes ──Start/Resume/Retake──► /take/[attemptId] ──submit or timer expiry──► /result/[attemptId]
     │  ▲                                                                            │
     │  └── "Take it now" (leaderboard, if not yet attempted)                        │
     ├──"Leaderboard"──► /quizzes/[id]/leaderboard ◄───────"View Leaderboard"────────┘
-    ├──"View result" (SINGLE_ATTEMPT quizzes)──► /result/[attemptId]
-    └──"DemoQuizApp"──► /
+    └──"View result" (SINGLE_ATTEMPT quizzes)──► /result/[attemptId]
 
  /admin/quizzes ──"New Quiz"──► /admin/quizzes/new ──save──► /admin/quizzes
        └────────"Edit"────────► /admin/quizzes/[id]/edit ──save──► /admin/quizzes
 
- Log out (Home) → /
+ Log out (header) → /
 ```
 
 ### Automatic redirects
@@ -79,14 +78,11 @@ second check.
 
 ## Known navigation gaps
 
-1. No shared header — only `/quizzes` links back to Home. Result,
-   leaderboard, take, and admin pages have no way back except the
-   browser.
-2. Result and leaderboard pages don't link back to `/quizzes`.
-3. Login and signup don't link to each other.
-4. Post-login always lands on `/` instead of the originally requested
-   page (no `callbackUrl` handling).
-5. Admin pages have no link to Home or the user-facing quiz list.
+Closed by the shared header (`7f03983`): no way back to Home from most
+pages, login/signup not linked, admin pages with no way out, result/
+leaderboard with no route to `/quizzes` (now via header "Quizzes").
 
-Likely fix: a shared header in `layout.tsx` (Home · Quizzes · Admin for
-admins only · Log out), plus `callbackUrl` support on login.
+Still open:
+1. Post-login always lands on `/` instead of the originally requested
+   page (no `callbackUrl` handling).
+2. No active-link highlighting in the header.

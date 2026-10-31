@@ -350,13 +350,30 @@ is `ADMIN`; throwaway `USER` is `home.user.1792312378@example.com` /
 `TestPass123!`. Dev server from 2026-09-27 (PID 70345) still running
 on :3000.
 
+## QUIZZES VISUALS + SHARED SITE HEADER: COMPLETE (2026-10-31)
+
+- `/quizzes` restyle (answer-bubble status, shared `:root` tokens and
+  font in `globals.css`/`layout.tsx`) — design `b9f16a0`, code `2ded98f`.
+- Shared `SiteHeader` in `layout.tsx` (wordmark → `/`; Quizzes / Admin
+  for `ADMIN` / Log out, or Log in / Sign up) — design `5044510`, code
+  `7f03983`. Login now calls `router.refresh()` so the persistent
+  layout picks up the session. Verified via `curl` per role and
+  headless Chromium (Python Playwright at
+  `~/Library/Python/3.13/bin/playwright`, browsers already installed).
+- `docs/NAVIGATION.md` is the page/route/navigation reference — keep it
+  current when navigation changes.
+- This session the user asked the assistant to execute the header
+  steps directly (not hands-on) — one-off, not a change to
+  [[feedback-hands-on-execution]].
+
 ## Next steps
 1. Lint debt: 53 `no-explicit-any` in test mocks + 2
    `react-hooks/set-state-in-effect` in `QuizTakeForm.tsx` (fix those
    two for real). Make `vitest` + `tsc` + `eslint` the end-of-plan gate.
-2. Navigation gaps (candidate small task): no shared header/back-to-Home
-   link, login↔signup don't link each other, post-login always lands on
-   `/` instead of the originally requested page.
+2. Remaining navigation gaps: post-login return to the originally
+   requested page (`callbackUrl`), active-link highlighting. Also Next
+   16 deprecates `middleware.ts` → `proxy.ts` (codemod:
+   `npx @next/codemod@canary middleware-to-proxy .`).
 3. `IMMEDIATE` feedback mode remains explicitly out of scope until a
    future plan targets it.
 4. Backlog (from Admin Authoring's design, not yet scheduled): protect

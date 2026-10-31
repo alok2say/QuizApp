@@ -343,4 +343,51 @@ deliberately basic.
   `USER` `home.user.1792312378@example.com` / `TestPass123!` for the
   user view.
 
+## Quizzes page visuals + shared tokens (2026-10-19 → 2026-10-31)
+
+Design locked in `SPEC.md` (`b9f16a0`), code in `2ded98f`.
+
+- **Tokens moved up to `:root`** — Home originally declared its colors
+  on `.page`. A second page needing the same palette is the signal to
+  hoist them into `globals.css` (and the font into `layout.tsx` as
+  `--font-sans`), so every CSS module just reads `var(--ink)` etc.
+  instead of each page redefining them.
+- **Status as an answer bubble** — ○ / ◐ / ● reuses the MCQ metaphor;
+  the bubble has `role="img"` + `aria-label` so the status isn't
+  colour-only for screen readers.
+- **`className` prop on `StartQuizButton`** — lets the server page
+  choose primary vs secondary styling without the client component
+  knowing about page styles. Added `type="button"` too (a bare
+  `<button>` defaults to `type="submit"`).
+
+## Shared site header (2026-10-31)
+
+Bounded change: in-chat design, locked in `SPEC.md` (`5044510`), code
+in `7f03983`.
+
+- **Header lives in `layout.tsx`** — the root layout wraps every page,
+  so one `<SiteHeader />` there closes most navigation gaps at once
+  (see `docs/NAVIGATION.md`). It's an `async` server component calling
+  `getCurrentUser()`, same reason as Home: correct links in the first
+  HTML, no logged-out flash. `SignOutButton` is reused as the client
+  island inside it.
+- **Layouts persist across client navigation** — App Router doesn't
+  re-render a layout when you `router.push()` between pages under it;
+  only the page segment changes. So after `signIn(..., { redirect:
+  false })` the header would still say "Log in". `router.refresh()`
+  re-requests the server components for the current route (layout
+  included) without a full reload or losing client state. Logout
+  didn't need this: `signOut({ callbackUrl })` does a full page load.
+- **Removing duplicates** — once the header has Log out / Admin /
+  Sign up, the same links on Home and the wordmark on `/quizzes` were
+  redundant; Home keeps only its single primary call to action.
+- **Verification** — `tsc`, `eslint`, `vitest` (91/91) clean. Header
+  per role checked via `curl` with real sessions (logged out, `USER`,
+  `ADMIN`; `USER` still gets `307` on `/admin/quizzes`). Then headless
+  Chromium (Python Playwright) filled the real login form and confirmed
+  the header switched to "Quizzes Admin Log out" *without* a reload —
+  i.e. `router.refresh()` works — and back to "Log in Sign up" after
+  clicking Log out, in light and dark mode; no horizontal overflow at
+  360px width.
+
 <!-- Continue appending one entry per step as we go. -->
