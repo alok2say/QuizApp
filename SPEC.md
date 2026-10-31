@@ -718,3 +718,78 @@ DemoQuizApp's `postinstall`/`predev`/`prebuild` copy script, its test,
 removed. Engine/worker teardown, error and timeout handling now live in
 the package. Verified on dev and production builds: both PDFs render,
 search, zoom, 404s, dark, 360px, no jsdelivr wasm request.
+
+## Design System Structure (designed 2026-11-01)
+
+Goal: a new visual design is applied by editing tokens and `src/ui/`
+components, not every page. This work changes structure only — the
+visible design stays the same (checked with before/after screenshots).
+
+### Layers
+- `src/app/` — routes only: auth checks, data loading, `redirect` /
+  `notFound`, then render one View with props. **No CSS module imports**
+  (enforced by ESLint `no-restricted-imports` on `src/app/**`).
+  `layout.tsx` imports `globals.css` and loads the user for the header.
+- `src/features/<area>/` — Views and the client components with
+  behaviour (forms, buttons that call APIs), per area: `site`, `home`,
+  `auth`, `library`, `quizzes`, `attempt` (take, result, leaderboard),
+  `admin`, `design`. Compose `@/ui` components. May keep a CSS module
+  only for screen-specific pieces (answer-sheet marks, quiz-row status
+  bubble, take-page sticky bar, result score, leaderboard table, PDF
+  frame, JSON editor) — and those use tokens only.
+- `src/ui/` — the design system: presentational components with no data
+  access and no API calls, exported from `src/ui/index.ts`. The only
+  place general-purpose styling lives.
+- `src/styles/tokens.css` — every visual value. `globals.css` keeps the
+  reset and base element styles, using tokens.
+
+### Tokens
+- Color (semantic, light + dark): `--color-text` (was `--ink`),
+  `--color-bg` (`--paper`), `--color-text-muted` (`--muted`),
+  `--color-accent` (`--answer`), `--color-on-accent` (`--on-answer`),
+  `--color-border` (`--rule`), `--color-success` (`--right`),
+  `--color-danger` (`--mark`). Old names are removed, not aliased.
+- Spacing: `--space-unit: 0.25rem`; steps `--space-N =
+  calc(var(--space-unit) * N)` for the values the app uses (0.5, 1, 2,
+  2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18). Changing
+  `--space-unit` retunes density everywhere.
+- Type: font families `--font-body` (Bricolage via next/font
+  `--font-sans`), `--font-mono`; sizes `--text-sm` .875rem,
+  `--text-meta` .9375rem, `--text-body` 1rem, `--text-lead` 1.0625rem,
+  `--text-lead-lg` 1.125rem, `--text-item` 1.25rem, `--text-stat`
+  1.5rem, and fluid titles `--text-title-display`, `-page`, `-cover`,
+  `-sub`, `-bar`, `--text-score` (today's clamp() values); weights
+  400/500/600/700/800; line heights 1 / 1.05 / 1.15 / 1.3 / 1.4 / 1.5 /
+  1.6; tracking -0.02em / -0.03em / -0.04em.
+- Shape: radii .375rem / .5rem / .75rem / 50%; borders 1px / 2px / 4px;
+  focus ring `2px solid var(--color-accent)`, offset 3px; underline
+  offsets .2em / .35em.
+- Layout: widths narrow 24rem, medium 36rem, default 44rem, wide 56rem;
+  gutter 16px; page top padding default 3rem, cover 12vh, hero 15vh.
+
+### `src/ui/` components
+`Page` (width, top), `PageHeader` (title, intro, size, action),
+`Heading`, `VisuallyHidden`, `Button` / `ButtonLink` (primary,
+secondary), `TextLink`, `TextButton` (default, danger), `Form`,
+`Field`, `Input`, `ErrorMessage`, `Notice` (success, accent, danger),
+`List` / `ListRow`, `Description`, `Meta`, `EmptyState`, `Actions`,
+`TopBar`, `NavLink`, `NavButton`. Components carry their own vertical
+rhythm (e.g. `List` has the section top margin) so Views don't
+hand-tune spacing.
+
+### Guardrails
+- Vitest: every `var(--…)` used in any CSS file is defined in
+  `tokens.css` (or is the next/font `--font-sans`).
+- Vitest: no raw values in CSS modules or `globals.css` — no hex/`rgb`/
+  `hsl` colors and no number with `rem`/`em`/`px`/`vh`/`vw`. A line
+  can opt out with `/* token-exempt: <reason> */` for intrinsic sizes
+  (e.g. editor `min-height: 60vh`).
+- `/design` — a catalog page (not linked from the header) rendering
+  every `ui/` component and variant, plus the color swatches.
+- `scripts/visual-snapshots.py` — captures every page (light/dark,
+  1280px/360px) and compares two runs pixel by pixel; the tool for
+  checking any future redesign.
+
+### Out of scope
+New visual design, a theme switcher, a CSS framework, publishing `ui/`
+as a package.
