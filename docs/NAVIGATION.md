@@ -34,6 +34,7 @@ second check.
 | Admin quiz list | `/admin/quizzes` | Admin | All quizzes with Edit / Delete |
 | New quiz | `/admin/quizzes/new` | Admin | JSON editor (download / upload) |
 | Edit quiz | `/admin/quizzes/[quizId]/edit` | Admin | Same editor, pre-filled with the quiz's JSON |
+| Design system | `/design` | Public, not linked | Every `@/ui` component and color token, for checking a design change (see `docs/DESIGN_SYSTEM.md`) |
 
 ### API routes (called by pages, not navigated to)
 

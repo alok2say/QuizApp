@@ -793,3 +793,16 @@ hand-tune spacing.
 ### Out of scope
 New visual design, a theme switcher, a CSS framework, publishing `ui/`
 as a package.
+
+### Implementation notes (2026-11-01)
+Implemented on branch `design-system-structure` (`cbe7230`..HEAD), plan
+`docs/superpowers/plans/2026-11-01-design-system-structure.md`, guide
+`docs/DESIGN_SYSTEM.md`. Decisions made during the build:
+- `Notice` has `as?: 'p' | 'div'`; `Meta` has `tabular`; `Form` carries
+  the auth form's top margin.
+- `StartQuizButton` takes `variant` (not `className`) and shows its
+  error as `ErrorMessage size="small"`, now danger-colored (was ink).
+- `isActivePath` accepts a `null` pathname.
+- Snapshot results vs. the pre-work baseline: identical except the
+  Home section `h2` line-height (2px) and the quiz bubble margin
+  (0.2rem → 0.25rem).

@@ -685,4 +685,42 @@ on branch `feature/pdf-library`.
 - **`vendor/` removed** — the lockfile now records the GitHub Packages
   URL and integrity instead of a `file:` path.
 
+## Design system structure (2026-11-01)
+
+- **What:** split the app into routes (`src/app`, data and auth only),
+  Views (`src/features/<area>`), shared components (`src/ui`) and
+  tokens (`src/styles/tokens.css`).
+- **Why:** before this, 12 CSS modules each had their own copy of the
+  same title, page, link and input styles, so a redesign meant editing
+  about 25 files. Now colors, spacing and type are changed in
+  `tokens.css`, the look of buttons and fields in one `ui/` file each,
+  and pages don't carry styling of their own.
+- **Semantic color names** (`--color-accent`, not `--answer`): a token
+  is named for its job, not today's use, so a new design can reuse it
+  without the name lying.
+- **`--space-unit`:** every spacing step is `calc(unit * N)`, so one
+  value retunes the whole app's density.
+- **Guardrails, not good intentions:**
+  - a test fails on any raw color or size outside `tokens.css`;
+  - an exception list ("ratchet") shrank as each page moved, and a
+    second test failed if a file on that list was already clean, so the
+    list couldn't go stale;
+  - ESLint blocks CSS imports in routes.
+- **Screenshot proof:** `scripts/visual-snapshots.py` captured 60
+  screenshots before the work and compared after every task.
+  - Pixel-identical except two planned sub-pixel-ish shifts: the Home
+    section headings' line-height, and the quiz bubble's 0.05rem.
+  - A dry run with only two token edits (teal accent,
+    `--space-unit: 0.3rem`) changed all 60 screenshots, which proves the
+    tokens reach everything.
+- **Gotchas met:**
+  - `usePathname()` is `null` outside the App Router (in tests), so
+    `isActivePath` now accepts null.
+  - The leaderboard's old `.board td` padding silently beat
+    `.score, .time` padding-left. Specificity has to be copied
+    faithfully, or a "pure refactor" shifts pixels.
+  - While a take page's time has run out, opening it auto-submits.
+    The snapshot script aborts non-GET API calls so capturing never
+    writes to the database.
+
 <!-- Continue appending one entry per step as we go. -->

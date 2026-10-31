@@ -414,6 +414,19 @@ private, linked to private repo `alok2say/pdf-reader-element`): set
 To update: bump the library version (0.1.0 can't be republished),
 `npm publish`, then `npm install @alok2say/pdf-reader@<new>` here.
 
+## DESIGN SYSTEM STRUCTURE: COMPLETE ON BRANCH `design-system-structure` (2026-11-01)
+
+Routes → `src/features/<area>` Views → `src/ui` components →
+`src/styles/tokens.css`. Redesign guide: `docs/DESIGN_SYSTEM.md`;
+catalog page `/design` (unlinked). Guards: `src/styles/tokens.test.ts`
+(undefined vars, dark-mode parity, no raw values) and ESLint (no CSS
+modules in `src/app`). Snapshot tool `scripts/visual-snapshots.py`
+(env vars in the guide; the dev test account
+`quiztest.manual@example.com` is ADMIN, so it covers admin pages).
+Visible change: none, except a 2px Home section-heading shift, a 0.05rem
+quiz-bubble shift, and error text under Start/Delete buttons is now
+danger-colored.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after
