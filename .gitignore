@@ -41,3 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .serena/
+
+# PDFium wasm, copied from node_modules by postinstall
+/public/pdfium/
