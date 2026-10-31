@@ -12,4 +12,8 @@ describe('isActivePath', () => {
     expect(isActivePath('/quizzes-archive', '/quizzes')).toBe(false)
     expect(isActivePath('/', '/quizzes')).toBe(false)
   })
+
+  it('treats an unknown pathname (outside a router) as not active', () => {
+    expect(isActivePath(null, '/quizzes')).toBe(false)
+  })
 })
