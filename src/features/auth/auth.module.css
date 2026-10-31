@@ -1,0 +1,5 @@
+/* "New here? Create an account" under the form */
+.switch {
+  margin-top: var(--space-8);
+  color: var(--color-text-muted);
+}

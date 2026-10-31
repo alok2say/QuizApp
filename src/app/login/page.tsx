@@ -1,5 +1,5 @@
 import { safeCallbackUrl } from '@/lib/safeRedirect'
-import { LoginForm } from './LoginForm'
+import { LoginForm } from '@/features/auth/LoginForm'
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   const { callbackUrl, created } = await searchParams
