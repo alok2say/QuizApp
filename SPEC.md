@@ -360,6 +360,36 @@ Bricolage Grotesque font is loaded once in `layout.tsx` as
 `--font-sans` and applied to `body`. Page CSS modules consume these
 variables rather than redefining them.
 
+### Shared site header (designed 2026-10-31)
+`SiteHeader` (`src/app/SiteHeader.tsx` + `SiteHeader.module.css`) is a
+server component rendered in `layout.tsx` above `{children}`, so it
+appears on every page (including login/signup, take-quiz, admin). It
+reads `getCurrentUser()` server-side — no client-side session fetch, no
+logged-out flash.
+- Left: "DemoQuizApp" wordmark linking to `/` (serves as the Home link).
+- Right, logged in: "Quizzes" (`/quizzes`), "Admin" (`/admin/quizzes`,
+  `ADMIN` only), "Log out" (reuses `SignOutButton`).
+- Right, logged out: "Log in", "Sign up".
+- Styling: shared tokens, bottom border `--rule`, inner content max
+  ~44rem centered, 16px side gutters, wraps on narrow screens, not
+  sticky; focus ring `--answer`.
+
+Because App Router layouts don't re-render on client-side navigation,
+the login page calls `router.refresh()` after a successful `signIn`
+so the header picks up the new session. Logout already does a full
+reload via `signOut({ callbackUrl: '/' })`.
+
+Duplicates removed once the header exists: `/quizzes` drops its own
+"DemoQuizApp" link; Home keeps only its primary action ("Browse
+quizzes" logged in, "Log in" logged out) and drops "Manage quizzes",
+"Log out", and "Sign up" (all now in the header).
+
+Out of scope: post-login return to the originally requested page
+(`callbackUrl`), active-link highlighting, hiding the header during a
+quiz attempt (answers are cached and attempts resumable, so leaving is
+safe). Verified manually in the browser (logged out / `USER` /
+`ADMIN`, header updates on login and logout, dark mode, narrow width).
+
 ## Leaderboard
 
 Per-quiz ranking (not global/cross-quiz — score comparisons across
