@@ -31,7 +31,7 @@ describe('POST /api/signup', () => {
   })
 
   it('rejects a duplicate email', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'existing' } as any)
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'existing' } as never)
     const res = await POST(makeRequest({ email: 'taken@example.com', password: 'longenough1' }))
     expect(res.status).toBe(400)
     const body = await res.json()
@@ -44,7 +44,7 @@ describe('POST /api/signup', () => {
       id: 'new-user',
       email: 'new@example.com',
       name: null,
-    } as any)
+    } as never)
 
     const res = await POST(makeRequest({ email: 'new@example.com', password: 'longenough1' }))
     expect(res.status).toBe(201)

@@ -31,9 +31,9 @@ describe('startAttempt', () => {
     vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
       id: 'quiz-1',
       retakePolicy: 'SINGLE_ATTEMPT',
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([])
-    vi.mocked(prisma.attempt.create).mockResolvedValue({ id: 'attempt-1' } as any)
+    vi.mocked(prisma.attempt.create).mockResolvedValue({ id: 'attempt-1' } as never)
 
     const result = await startAttempt('quiz-1', 'user-1')
 
@@ -47,10 +47,10 @@ describe('startAttempt', () => {
     vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
       id: 'quiz-1',
       retakePolicy: 'SINGLE_ATTEMPT',
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', submittedAt: null },
-    ] as any)
+    ] as never)
 
     const result = await startAttempt('quiz-1', 'user-1')
 
@@ -68,10 +68,10 @@ describe('startAttempt', () => {
     vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
       id: 'quiz-1',
       retakePolicy: 'SINGLE_ATTEMPT',
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', submittedAt: new Date() },
-    ] as any)
+    ] as never)
 
     const result = await startAttempt('quiz-1', 'user-1')
 
@@ -88,11 +88,11 @@ describe('startAttempt', () => {
     vi.mocked(prisma.quiz.findUnique).mockResolvedValue({
       id: 'quiz-1',
       retakePolicy: 'UNLIMITED_BEST',
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', submittedAt: new Date() },
-    ] as any)
-    vi.mocked(prisma.attempt.create).mockResolvedValue({ id: 'attempt-2' } as any)
+    ] as never)
+    vi.mocked(prisma.attempt.create).mockResolvedValue({ id: 'attempt-2' } as never)
 
     const result = await startAttempt('quiz-1', 'user-1')
 
@@ -141,7 +141,7 @@ describe('submitAttempt', () => {
       submittedAt: null,
       startedAt: new Date(),
       quiz: quizWithQuestions,
-    } as any)
+    } as never)
     const result = await submitAttempt('attempt-1', 'user-1', [])
     expect(result).toEqual({ ok: false, status: 403, error: 'Forbidden.' })
   })
@@ -153,7 +153,7 @@ describe('submitAttempt', () => {
       submittedAt: new Date(),
       startedAt: new Date(),
       quiz: quizWithQuestions,
-    } as any)
+    } as never)
     const result = await submitAttempt('attempt-1', 'user-1', [])
     expect(result).toEqual({ ok: false, status: 409, error: 'Attempt already submitted.' })
   })
@@ -166,11 +166,11 @@ describe('submitAttempt', () => {
       submittedAt: null,
       startedAt: new Date('2026-08-22T10:00:00Z'),
       quiz: quizWithQuestions,
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', score: 0, submittedAt: null },
-    ] as any)
-    vi.mocked(prisma.attempt.update).mockResolvedValue({} as any)
+    ] as never)
+    vi.mocked(prisma.attempt.update).mockResolvedValue({} as never)
 
     const result = await submitAttempt('attempt-1', 'user-1', [
       { questionId: 'q1', selectedOptionIds: ['a'] },
@@ -203,10 +203,10 @@ describe('submitAttempt', () => {
       submittedAt: null,
       startedAt: new Date(),
       quiz: quizWithQuestions,
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', score: 0, submittedAt: null },
-    ] as any)
+    ] as never)
 
     const result = await submitAttempt('attempt-1', 'user-1', [
       { questionId: 'q1', selectedOptionIds: ['a'] },
@@ -224,11 +224,11 @@ describe('submitAttempt', () => {
       submittedAt: null,
       startedAt: new Date(),
       quiz: bestQuiz,
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       { id: 'attempt-1', score: 5, submittedAt: new Date('2026-08-20T00:00:00Z') },
       { id: 'attempt-2', score: 0, submittedAt: null },
-    ] as any)
+    ] as never)
 
     await submitAttempt('attempt-2', 'user-1', [
       { questionId: 'q1', selectedOptionIds: ['a'] },

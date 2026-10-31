@@ -28,11 +28,9 @@ describe('validateQuizJson', () => {
   })
 
   it('defaults a missing points to 10', () => {
-    const input = {
-      ...validQuiz,
-      questions: [{ ...validQuiz.questions[0], points: undefined }],
-    }
-    delete (input.questions[0] as any).points
+    const question: Record<string, unknown> = { ...validQuiz.questions[0] }
+    delete question.points
+    const input = { ...validQuiz, questions: [question] }
 
     const result = validateQuizJson(input)
 
@@ -43,7 +41,7 @@ describe('validateQuizJson', () => {
   })
 
   it('defaults a missing leaderboardSize to 10', () => {
-    const input: any = { ...validQuiz }
+    const input: Record<string, unknown> = { ...validQuiz }
     delete input.leaderboardSize
 
     const result = validateQuizJson(input)

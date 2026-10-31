@@ -40,7 +40,7 @@ describe('getQuizzesWithStatus', () => {
         retakePolicy: 'UNLIMITED_BEST',
         attempts: [],
       },
-    ] as any)
+    ] as never)
 
     const result = await getQuizzesWithStatus('user-1')
 
@@ -93,7 +93,7 @@ describe('getQuizForTaking', () => {
       submittedAt: null,
       startedAt: new Date(),
       quiz: { title: 'Q', timeLimitSeconds: 60, questions: [] },
-    } as any)
+    } as never)
     const result = await getQuizForTaking('quiz-1', 'attempt-1', 'user-1')
     expect(result).toEqual({ ok: false, status: 403, error: 'Forbidden.' })
   })
@@ -106,7 +106,7 @@ describe('getQuizForTaking', () => {
       submittedAt: new Date(),
       startedAt: new Date(),
       quiz: { title: 'Q', timeLimitSeconds: 60, questions: [] },
-    } as any)
+    } as never)
     const result = await getQuizForTaking('quiz-1', 'attempt-1', 'user-1')
     expect(result).toEqual({ ok: false, status: 409, error: 'This attempt was already submitted.' })
   })
@@ -141,7 +141,7 @@ describe('getQuizForTaking', () => {
           },
         ],
       },
-    } as any)
+    } as never)
 
     const result = await getQuizForTaking('quiz-1', 'attempt-1', 'user-1')
 
@@ -189,7 +189,7 @@ describe('getAttemptResult', () => {
       score: 0,
       quiz: { title: 'Q', questions: [] },
       answers: [],
-    } as any)
+    } as never)
     const result = await getAttemptResult('attempt-1', 'user-1')
     expect(result).toEqual({ ok: false, status: 403, error: 'Forbidden.' })
   })
@@ -202,7 +202,7 @@ describe('getAttemptResult', () => {
       score: 0,
       quiz: { title: 'Q', questions: [] },
       answers: [],
-    } as any)
+    } as never)
     const result = await getAttemptResult('attempt-1', 'user-1')
     expect(result).toEqual({ ok: false, status: 409, error: 'This attempt has not been submitted yet.' })
   })
@@ -228,7 +228,7 @@ describe('getAttemptResult', () => {
         ],
       },
       answers: [{ questionId: 'q1', selectedOptionIds: ['a'], isCorrect: true, pointsAwarded: 10 }],
-    } as any)
+    } as never)
 
     const result = await getAttemptResult('attempt-1', 'user-1')
 
@@ -273,7 +273,7 @@ describe('getAllQuizzesForAdmin', () => {
         createdAt: new Date('2026-09-02T00:00:00Z'),
         _count: { questions: 0 },
       },
-    ] as any)
+    ] as never)
 
     const result = await getAllQuizzesForAdmin()
 
@@ -326,7 +326,7 @@ describe('getQuizAsJson', () => {
           ],
         },
       ],
-    } as any)
+    } as never)
 
     const result = await getQuizAsJson('quiz-1')
 
@@ -400,14 +400,14 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 10,
       questions: [{ points: 10 }, { points: 20 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 20, completionSeconds: 100, submittedAt: new Date('2026-09-01T00:00:00Z'), name: 'Alice' }),
       eligibleAttempt({ userId: 'user-b', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-02T00:00:00Z'), name: 'Bob' }),
       // ties user-c and user-d on both score and completionSeconds — submittedAt must break it
       eligibleAttempt({ userId: 'user-c', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-03T00:00:00Z'), name: 'Carol' }),
       eligibleAttempt({ userId: 'user-d', score: 30, completionSeconds: 50, submittedAt: new Date('2026-09-01T12:00:00Z'), name: 'Dave' }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-a')
 
@@ -431,11 +431,11 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 10,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 10, name: 'Alice' }),
       eligibleAttempt({ userId: 'user-b', score: 5, name: null, email: 'bob.smith@example.com' }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-a')
 
@@ -451,11 +451,11 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 1,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 10 }),
       eligibleAttempt({ userId: 'user-b', score: 5 }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-a')
 
@@ -470,7 +470,7 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 10,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     const result2 = await getLeaderboard('quiz-1', 'user-a')
     expect(result2.ok).toBe(true)
     if (result2.ok) {
@@ -483,11 +483,11 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 1,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 10 }),
       eligibleAttempt({ userId: 'user-b', score: 5 }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-b')
 
@@ -503,10 +503,10 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 10,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 10 }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-a')
 
@@ -522,10 +522,10 @@ describe('getLeaderboard', () => {
       title: 'Quiz One',
       leaderboardSize: 10,
       questions: [{ points: 10 }],
-    } as any)
+    } as never)
     vi.mocked(prisma.attempt.findMany).mockResolvedValue([
       eligibleAttempt({ userId: 'user-a', score: 10 }),
-    ] as any)
+    ] as never)
 
     const result = await getLeaderboard('quiz-1', 'user-never-attempted')
 

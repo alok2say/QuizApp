@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/prisma', () => {
-  const prismaMock: any = {
+  const prismaMock = {
     quiz: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
     question: { deleteMany: vi.fn(), create: vi.fn() },
+    $transaction: vi.fn(),
   }
-  prismaMock.$transaction = vi.fn((fn: any) => fn(prismaMock))
+  prismaMock.$transaction.mockImplementation((fn: (tx: typeof prismaMock) => unknown) => fn(prismaMock))
   return { prisma: prismaMock }
 })
 
@@ -47,7 +48,7 @@ describe('createQuizFromJson', () => {
   })
 
   it('creates the quiz with nested questions/options and a computed maxScore', async () => {
-    vi.mocked(prisma.quiz.create).mockResolvedValue({ id: 'quiz-1' } as any)
+    vi.mocked(prisma.quiz.create).mockResolvedValue({ id: 'quiz-1' } as never)
 
     const result = await createQuizFromJson(quizInput)
 
@@ -94,7 +95,7 @@ describe('createQuizFromJson', () => {
   })
 
   it('stores null when description is omitted', async () => {
-    vi.mocked(prisma.quiz.create).mockResolvedValue({ id: 'quiz-1' } as any)
+    vi.mocked(prisma.quiz.create).mockResolvedValue({ id: 'quiz-1' } as never)
 
     await createQuizFromJson({ ...quizInput, description: undefined })
 
@@ -116,7 +117,7 @@ describe('replaceQuizFromJson', () => {
   })
 
   it('deletes existing questions, updates metadata, and creates the new questions/options', async () => {
-    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({ id: 'quiz-1' } as any)
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({ id: 'quiz-1' } as never)
 
     const result = await replaceQuizFromJson('quiz-1', quizInput)
 
@@ -179,7 +180,7 @@ describe('deleteQuizById', () => {
   })
 
   it('deletes the quiz when it exists', async () => {
-    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({ id: 'quiz-1' } as any)
+    vi.mocked(prisma.quiz.findUnique).mockResolvedValue({ id: 'quiz-1' } as never)
 
     const result = await deleteQuizById('quiz-1')
 

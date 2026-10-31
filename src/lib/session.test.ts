@@ -16,7 +16,7 @@ describe('getCurrentUser', () => {
   it('returns the session user when logged in', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-1', role: 'USER' },
-    } as any)
+    } as never)
     expect(await getCurrentUser()).toEqual({ id: 'user-1', role: 'USER' })
   })
 })

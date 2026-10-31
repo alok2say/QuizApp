@@ -28,7 +28,7 @@ describe('verifyCredentials', () => {
       email: 'user@example.com',
       passwordHash: 'hashed',
       role: 'USER',
-    } as any)
+    } as never)
     vi.mocked(verifyPassword).mockResolvedValue(false)
     const result = await verifyCredentials('user@example.com', 'wrong')
     expect(result).toBeNull()
@@ -40,7 +40,7 @@ describe('verifyCredentials', () => {
       email: 'user@example.com',
       passwordHash: 'hashed',
       role: 'ADMIN',
-    } as any)
+    } as never)
     vi.mocked(verifyPassword).mockResolvedValue(true)
     const result = await verifyCredentials('user@example.com', 'correct')
     expect(result).toEqual({ id: 'u1', email: 'user@example.com', role: 'ADMIN' })
