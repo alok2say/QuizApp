@@ -1,26 +1,6 @@
 .page {
-  --ink: #1b2340;
-  --paper: #f6f8fc;
-  --muted: #5b6478;
-  --answer: #2f5bea;
-  --on-answer: #ffffff;
-  --rule: #b8c0d4;
-
   flex: 1;
   padding: 15vh 16px 4rem;
-  background: var(--paper);
-  color: var(--ink);
-}
-
-@media (prefers-color-scheme: dark) {
-  .page {
-    --ink: #e6e9f2;
-    --paper: #161c2c;
-    --muted: #9aa3b8;
-    --answer: #8aa6ff;
-    --on-answer: #121a33;
-    --rule: #445069;
-  }
 }
 
 .main {

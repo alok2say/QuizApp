@@ -3,7 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export function StartQuizButton({ quizId, label }: { quizId: string; label: string }) {
+export function StartQuizButton({
+  quizId,
+  label,
+  className,
+}: {
+  quizId: string
+  label: string
+  className?: string
+}) {
   const router = useRouter()
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +43,7 @@ export function StartQuizButton({ quizId, label }: { quizId: string; label: stri
 
   return (
     <div>
-      <button onClick={handleClick} disabled={pending}>
+      <button type="button" className={className} onClick={handleClick} disabled={pending}>
         {pending ? 'Starting...' : label}
       </button>
       {error && <p role="alert">{error}</p>}
