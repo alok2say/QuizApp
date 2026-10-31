@@ -480,4 +480,26 @@ Design in `SPEC.md` (`4bc53b5`), code in `1e51cf2`.
   secrets were pushed.
 - Verified: `git status -sb` shows `## main...origin/main`.
 
+## Per-repo GitHub identity: no more `gh auth switch` (2026-10-31)
+
+- **Commit email ≠ login.** `user.email` only labels commits, and
+  GitHub links a commit to whichever account owns that email.
+  `git config --local user.email 2642816+alok2say@users.noreply.github.com`
+  overrides the global Expedia email for this repo only. The noreply
+  format `<id>+<login>@users.noreply.github.com` always links to the
+  account and hides your real email. Commits already pushed keep the old
+  email.
+- **Credential helpers stack:** git reads system, then global, then
+  local config, and an empty value (`""`) clears the list so far. So in
+  `.git/config`:
+  1. `credential.https://github.com.helper ""` drops the global
+     `gh auth git-credential`, which sends the *active* account.
+  2. `--add` a helper that answers only `get` with
+     `username=alok2say` and `gh auth token --user alok2say`. Without
+     `--add`, git would replace the empty value instead of adding after it.
+- **Check without pushing:** `git credential fill` showed
+  `username=alok2say`, and `git push --dry-run` with `alranjan_expedia`
+  active gave no 403.
+- Caveat: this relies on alok2say staying logged in to `gh`.
+
 <!-- Continue appending one entry per step as we go. -->
