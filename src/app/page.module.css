@@ -38,19 +38,7 @@
   font-weight: 600;
 }
 
-.link {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: var(--ink);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.primary:focus-visible,
-.link:focus-visible {
+.primary:focus-visible {
   outline: 2px solid var(--answer);
   outline-offset: 3px;
 }

@@ -16,8 +16,6 @@ export default async function QuizzesPage() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Link className={styles.home} href="/">DemoQuizApp</Link>
-
         <h1 className={styles.title}>Quizzes</h1>
         <p className={styles.intro}>Pick one to start, or pick up where you left off.</p>
 

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/session'
-import { SignOutButton } from './SignOutButton'
 import styles from './page.module.css'
 
 export default async function Home() {
@@ -14,18 +13,9 @@ export default async function Home() {
 
         <nav className={styles.actions} aria-label="Main">
           {user ? (
-            <>
-              <Link className={styles.primary} href="/quizzes">Browse quizzes</Link>
-              {user.role === 'ADMIN' && (
-                <Link className={styles.link} href="/admin/quizzes">Manage quizzes</Link>
-              )}
-              <SignOutButton className={styles.link} />
-            </>
+            <Link className={styles.primary} href="/quizzes">Browse quizzes</Link>
           ) : (
-            <>
-              <Link className={styles.primary} href="/login">Log in</Link>
-              <Link className={styles.link} href="/signup">Sign up</Link>
-            </>
+            <Link className={styles.primary} href="/login">Log in</Link>
           )}
         </nav>
 

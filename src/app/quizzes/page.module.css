@@ -8,13 +8,7 @@
   margin: 0 auto;
 }
 
-.home {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
 .title {
-  margin-top: 2.5rem;
   font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 700;
   line-height: 1.05;
@@ -124,7 +118,6 @@
   cursor: progress;
 }
 
-.home:focus-visible,
 .meta a:focus-visible,
 .primary:focus-visible,
 .secondary:focus-visible {
