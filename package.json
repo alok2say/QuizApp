@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@alok2say/pdf-reader": "file:vendor/alok2say-pdf-reader-0.1.0.tgz",
+    "@alok2say/pdf-reader": "0.1.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcrypt": "^6.0.0",

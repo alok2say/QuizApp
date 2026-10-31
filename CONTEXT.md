@@ -405,12 +405,14 @@ document opened (engine worker is freed); now documented in the
 New sibling repo `~/AlokPersonalRepo/pdf-reader-element` (local only, no
 GitHub remote yet; target registry GitHub Packages): `<pdf-reader>` Web
 Component + React adapter, wraps EmbedPDF 2.1.0, ships `pdfium.wasm`.
-DemoQuizApp branch `feature/use-pdf-reader-package` vendors
-`vendor/alok2say-pdf-reader-0.1.0.tgz` and uses
-`@alok2say/pdf-reader/react` on `/library/[slug]`; the wasm copy
-machinery is gone (Turbopack ships the package's wasm). To update:
-rebuild + `npm pack` in the library, copy the tarball into `vendor/`,
-reinstall (lockfile integrity changes).
+DemoQuizApp uses `@alok2say/pdf-reader/react` on `/library/[slug]`;
+the wasm copy machinery is gone (Turbopack ships the package's wasm).
+**Now installed from GitHub Packages** (`@alok2say/pdf-reader@0.1.0`,
+private, linked to private repo `alok2say/pdf-reader-element`): set
+`NODE_AUTH_TOKEN` (alok2say token with `read:packages`, e.g.
+`NODE_AUTH_TOKEN=$(gh auth token --user alok2say)`) before `npm install`.
+To update: bump the library version (0.1.0 can't be republished),
+`npm publish`, then `npm install @alok2say/pdf-reader@<new>` here.
 
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53

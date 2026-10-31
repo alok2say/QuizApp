@@ -703,9 +703,13 @@ production build: 3 started, 1 freed per open).
 ### Viewer now comes from `@alok2say/pdf-reader` (2026-10-31)
 The in-app `PdfViewer`/`PdfViewerLoader` were replaced by the standalone
 package `@alok2say/pdf-reader` 0.1.0 (repo
-`~/AlokPersonalRepo/pdf-reader-element`), installed from the vendored
-tarball `vendor/alok2say-pdf-reader-0.1.0.tgz` (`file:` dependency) until
-it is published to GitHub Packages. `/library/[slug]` renders
+`~/AlokPersonalRepo/pdf-reader-element`, private GitHub repo
+`alok2say/pdf-reader-element`), installed from **GitHub Packages**
+(private, published 2026-10-31) — no longer a vendored tarball. A
+committed `.npmrc` maps the `@alok2say` scope to
+`https://npm.pkg.github.com` and reads the token from `NODE_AUTH_TOKEN`
+(GitHub token with `read:packages`; never committed). Installing
+without it fails with `E401`; `npm run dev`/`build` don't need it. `/library/[slug]` renders
 `<PdfReader key={doc.slug} src={doc.src} />` from
 `@alok2say/pdf-reader/react` inside the same frame. Turbopack picks up
 the package's bundled `pdfium.wasm` itself (`/_next/static/media/…`), so

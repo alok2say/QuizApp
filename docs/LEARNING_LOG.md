@@ -668,4 +668,21 @@ on branch `feature/pdf-library`.
   zoom, 404s, dark, 360px, no CDN wasm request, on `next dev` and
   `next start`.
 
+## Installing `@alok2say/pdf-reader` from GitHub Packages (2026-10-31)
+
+- **Scoped registry in `.npmrc`** — only `@alok2say/*` goes to
+  `npm.pkg.github.com`; everything else still uses the normal registry.
+  The auth line is `//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}`,
+  so the file is safe to commit: the token lives in an environment
+  variable.
+- **Testing auth honestly** — the first "install without a token"
+  succeeded, but only because npm served the tarball from its local
+  cache (same integrity hash as the vendored copy). Re-tested with an
+  empty cache: no token → `E401`, token → 3.8 MB tarball. Day-to-day
+  commands (`npm run dev`) don't need the token.
+- **Versions are immutable** — GitHub Packages won't accept 0.1.0 again;
+  every library change now means a version bump and `npm publish`.
+- **`vendor/` removed** — the lockfile now records the GitHub Packages
+  URL and integrity instead of a `file:` path.
+
 <!-- Continue appending one entry per step as we go. -->
