@@ -19,9 +19,15 @@ export default async function Home() {
           )}
         </nav>
 
-        <section className={styles.placeholder} aria-labelledby="books-events">
-          <h2 id="books-events">Books and events</h2>
-          <p>Reading lists and meetups will show up here.</p>
+        <section className={styles.books} aria-labelledby="books">
+          <h2 id="books">Books</h2>
+          <p>Read the documents in the library.</p>
+          <Link className={styles.link} href="/library">Browse the library</Link>
+        </section>
+
+        <section className={styles.placeholder} aria-labelledby="events">
+          <h2 id="events">Events</h2>
+          <p>Meetups will show up here.</p>
         </section>
       </main>
     </div>

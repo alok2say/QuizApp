@@ -15,6 +15,7 @@ export async function SiteHeader() {
         <nav className={styles.nav} aria-label="Site">
           {user ? (
             <>
+              <NavLink className={styles.link} href="/library">Library</NavLink>
               <NavLink className={styles.link} href="/quizzes">Quizzes</NavLink>
               {user.role === 'ADMIN' && (
                 <NavLink className={styles.link} href="/admin/quizzes">Admin</NavLink>
@@ -23,6 +24,7 @@ export async function SiteHeader() {
             </>
           ) : (
             <>
+              <NavLink className={styles.link} href="/library">Library</NavLink>
               <NavLink className={styles.link} href="/login">Log in</NavLink>
               <NavLink className={styles.link} href="/signup">Sign up</NavLink>
             </>
