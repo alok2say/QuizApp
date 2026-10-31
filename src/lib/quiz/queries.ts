@@ -91,6 +91,7 @@ export async function getQuizForTaking(
 export type AnsweredQuestion = {
     id: string
     text: string
+    type: 'SINGLE_SELECT' | 'MULTI_SELECT'
     isCorrect: boolean
     pointsAwarded: number
     points: number
@@ -140,6 +141,7 @@ export async function getAttemptResult(attemptId: string, userId: string): Promi
         return {
             id: question.id,
             text: question.text,
+            type: question.type,
             isCorrect: answer?.isCorrect ?? false,
             pointsAwarded: answer?.pointsAwarded ?? 0,
             points: question.points,

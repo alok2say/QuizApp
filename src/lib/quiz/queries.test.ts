@@ -222,6 +222,7 @@ describe('getAttemptResult', () => {
             id: 'q2',
             text: 'Second?',
             order: 2,
+            type: 'MULTI_SELECT',
             points: 5,
             options: [{ id: 'c', text: 'C', isCorrect: true }],
           },
@@ -229,6 +230,7 @@ describe('getAttemptResult', () => {
             id: 'q1',
             text: 'First?',
             order: 1,
+            type: 'SINGLE_SELECT',
             points: 10,
             options: [
               { id: 'a', text: 'A', isCorrect: true },
@@ -253,6 +255,7 @@ describe('getAttemptResult', () => {
         {
           id: 'q1',
           text: 'First?',
+          type: 'SINGLE_SELECT',
           isCorrect: true,
           pointsAwarded: 10,
           points: 10,
@@ -264,6 +267,7 @@ describe('getAttemptResult', () => {
         {
           id: 'q2',
           text: 'Second?',
+          type: 'MULTI_SELECT',
           isCorrect: false,
           pointsAwarded: 0,
           points: 5,
