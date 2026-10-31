@@ -420,6 +420,42 @@ dark and at 360px. Side fix: `html, body` used create-next-app's
 `overflow-x: hidden`, which makes them scroll containers and silently
 breaks `position: sticky`; switched to `overflow-x: clip`.
 
+### Visual design: login, signup, admin (designed 2026-10-31)
+Same exam-paper language and tokens. Buttons shared app-wide via
+`src/app/controls.module.css` (moved up from `src/app/quizzes/`).
+
+**Login / signup ("cover sheet")** — narrow left-aligned column
+(~24rem). Fields are write-in lines (bottom rule only, turns `--answer`
+on focus), labels always visible above. Errors in `--mark` below the
+form. Each page is a server component reading `searchParams` and
+passing props to a client form (`LoginForm` / `SignupForm`):
+- Cross-links "New here? Create an account" / "Already have an
+  account? Log in" carry `callbackUrl` (sanitized with
+  `safeCallbackUrl`), so signup → login → original page works.
+- Successful signup goes to `/login?created=1` (+ `callbackUrl` when
+  not `/`); login then shows "Account created. Log in to start."
+- Login error copy: "That email and password don't match. Try again or
+  create an account."
+
+**Admin quiz list** — "Manage quizzes" + "New quiz" primary button;
+ruled rows: title, "N questions, added D Mon YYYY", Edit link, Delete as
+a quiet `--mark` text button (existing confirm kept). Empty: "No
+quizzes yet. Create the first one."
+
+**New / edit editor** — wider column (~56rem). Heading "New quiz" /
+`Edit "<title>"`. A `<details>` "What goes in the JSON" lists the
+fields. Monospace textarea, full width, ~60vh. Errors as a `--mark`
+list headed "Fix these before saving:". Actions: "Save quiz" (primary),
+"Download JSON", "Upload JSON" (secondary), "Cancel" link to
+`/admin/quizzes`.
+
+**Error-body robustness** (client half of the parked backlog item —
+does not decide edit/delete-with-attempts behavior): the editor, the
+Delete button, and signup no longer assume every error response has a
+JSON body. If parsing fails they show a status-based message, e.g.
+"Couldn't save the quiz (server error 500). Your edits are still
+here."
+
 ### Shared site header (designed 2026-10-31)
 `SiteHeader` (`src/app/SiteHeader.tsx` + `SiteHeader.module.css`) is a
 server component rendered in `layout.tsx` above `{children}`, so it
