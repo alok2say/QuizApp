@@ -41,6 +41,15 @@
   text-underline-offset: 0.2em;
 }
 
+/* Current section: darker text plus an answer-blue underline (no weight change, so nothing shifts) */
+.link[aria-current='page'] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--answer);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.35em;
+}
+
 .brand:focus-visible,
 .link:focus-visible {
   outline: 2px solid var(--answer);

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/session'
 import { SignOutButton } from './SignOutButton'
+import { NavLink } from './NavLink'
 import styles from './SiteHeader.module.css'
 
 export async function SiteHeader() {
@@ -14,16 +15,16 @@ export async function SiteHeader() {
         <nav className={styles.nav} aria-label="Site">
           {user ? (
             <>
-              <Link className={styles.link} href="/quizzes">Quizzes</Link>
+              <NavLink className={styles.link} href="/quizzes">Quizzes</NavLink>
               {user.role === 'ADMIN' && (
-                <Link className={styles.link} href="/admin/quizzes">Admin</Link>
+                <NavLink className={styles.link} href="/admin/quizzes">Admin</NavLink>
               )}
               <SignOutButton className={styles.link} />
             </>
           ) : (
             <>
-              <Link className={styles.link} href="/login">Log in</Link>
-              <Link className={styles.link} href="/signup">Sign up</Link>
+              <NavLink className={styles.link} href="/login">Log in</NavLink>
+              <NavLink className={styles.link} href="/signup">Sign up</NavLink>
             </>
           )}
         </nav>
