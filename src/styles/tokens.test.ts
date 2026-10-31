@@ -13,7 +13,6 @@ const read = (file: string) => readFileSync(file, 'utf8')
 // Files not yet moved off raw values. Each migration task removes its
 // files; the last test fails if a listed file is already clean.
 const PENDING_RAW_VALUES: string[] = [
-  'src/app/admin/quizzes/admin.module.css',
   'src/app/controls.module.css',
 ]
 

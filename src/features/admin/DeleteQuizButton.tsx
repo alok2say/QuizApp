@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { readErrorBody } from '@/lib/errorBody'
-import styles from './admin.module.css'
+import { ErrorMessage, TextButton } from '@/ui'
 
 export function DeleteQuizButton({ quizId }: { quizId: string }) {
   const router = useRouter()
@@ -34,10 +34,10 @@ export function DeleteQuizButton({ quizId }: { quizId: string }) {
 
   return (
     <div>
-      <button type="button" className={styles.danger} onClick={handleClick} disabled={pending}>
+      <TextButton tone="danger" onClick={handleClick} disabled={pending}>
         {pending ? 'Deleting…' : 'Delete'}
-      </button>
-      {error && <p className={styles.rowError} role="alert">{error}</p>}
+      </TextButton>
+      {error && <ErrorMessage size="small">{error}</ErrorMessage>}
     </div>
   )
 }

@@ -1,0 +1,5 @@
+.rowActions {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+}

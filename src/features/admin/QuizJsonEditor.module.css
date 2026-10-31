@@ -1,0 +1,49 @@
+.help {
+  margin-top: var(--space-6);
+  line-height: var(--leading-loose);
+}
+
+.help summary {
+  cursor: pointer;
+  font-weight: var(--weight-semibold);
+}
+
+.help ul {
+  margin-top: var(--space-3);
+  padding-left: var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.help code,
+.editor {
+  font-family: var(--font-mono);
+}
+
+.help code {
+  color: var(--color-text);
+}
+
+.editor {
+  display: block;
+  width: 100%;
+  min-height: 60vh; /* token-exempt: editor fills most of the window */
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: var(--border-thin) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: none;
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+  color: var(--color-text);
+  resize: vertical;
+}
+
+.help summary:focus-visible,
+.editor:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.cancel {
+  margin-left: auto;
+}

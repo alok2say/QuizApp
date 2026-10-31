@@ -1,11 +1,10 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { readErrorBody } from '@/lib/errorBody'
-import controls from '@/app/controls.module.css'
-import styles from './admin.module.css'
+import { Actions, Button, Notice, TextLink } from '@/ui'
+import styles from './QuizJsonEditor.module.css'
 
 type Props = {
   initialJson: string
@@ -122,28 +121,28 @@ export function QuizJsonEditor({ initialJson, submitUrl, method }: Props) {
         onChange={(event) => setText(event.target.value)}
       />
       {errors.length > 0 && (
-        <div className={styles.errors} role="alert">
+        <Notice as="div" tone="danger" role="alert">
           <p>Fix these before saving:</p>
           <ul>
             {errors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
           </ul>
-        </div>
+        </Notice>
       )}
       {serverError && (
-        <p className={styles.errors} role="alert">{serverError}</p>
+        <Notice tone="danger" role="alert">{serverError}</Notice>
       )}
-      <div className={styles.actions}>
-        <button type="button" className={controls.primary} onClick={handleSubmit} disabled={submitting}>
+      <Actions gap="tight">
+        <Button onClick={handleSubmit} disabled={submitting}>
           {submitting ? 'Saving…' : 'Save quiz'}
-        </button>
-        <button type="button" className={controls.secondary} onClick={handleDownload}>
+        </Button>
+        <Button variant="secondary" onClick={handleDownload}>
           Download JSON
-        </button>
-        <button type="button" className={controls.secondary} onClick={() => fileInputRef.current?.click()}>
+        </Button>
+        <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
           Upload JSON
-        </button>
+        </Button>
         <input
           ref={fileInputRef}
           type="file"
@@ -151,8 +150,10 @@ export function QuizJsonEditor({ initialJson, submitUrl, method }: Props) {
           onChange={handleFileSelected}
           hidden
         />
-        <Link className={`${styles.textLink} ${styles.cancel}`} href="/admin/quizzes">Cancel</Link>
-      </div>
+        <span className={styles.cancel}>
+          <TextLink href="/admin/quizzes">Cancel</TextLink>
+        </span>
+      </Actions>
     </div>
   )
 }
