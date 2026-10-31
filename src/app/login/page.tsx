@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { safeCallbackUrl } from '@/lib/safeRedirect'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,7 +30,8 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/')
+    const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl')
+    router.push(safeCallbackUrl(callbackUrl))
     router.refresh()
   }
 
