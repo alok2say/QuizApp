@@ -1,0 +1,22 @@
+.actions {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.spacingLoose {
+  margin-top: var(--space-8);
+}
+
+.gapTight {
+  gap: var(--space-3);
+}
+
+.gapDefault {
+  gap: var(--space-4) var(--space-6);
+}
+
+.gapLoose {
+  gap: var(--space-6);
+}

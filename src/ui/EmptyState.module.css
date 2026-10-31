@@ -1,0 +1,4 @@
+.empty {
+  margin-top: var(--space-10);
+  color: var(--color-text-muted);
+}
