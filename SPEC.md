@@ -690,3 +690,12 @@ overflow. The viewer is sized with `position: absolute; inset: 0` inside
 a `position: relative` frame (a percentage height collapsed in the
 min-height flex chain). Packages were installed from the public npm
 registry because the Artifactory credentials had expired (user's call).
+
+Final review fixes: `predev`/`prebuild` also run the wasm copy, with a
+test that fails if the wasm or those hooks are missing (otherwise the
+viewer hangs on "Loading" with no error). `PdfViewer` destroys the
+plugin registry and PDFium engine on unmount — the library's React
+wrapper only clears its DOM. **Known limitation:** the library's
+2-worker image-encoder pool isn't reachable through its public API, so
+2 small workers remain per document opened in a tab (measured on a
+production build: 3 started, 1 freed per open).

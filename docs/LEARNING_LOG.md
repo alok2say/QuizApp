@@ -634,5 +634,15 @@ on branch `feature/pdf-library`.
 - **Verification** — `vitest` 108/108, `tsc`, `eslint .`; Chromium:
   render, search, zoom, paging, client-nav switching, 404s, no CDN
   requests, dark, 360px.
+- **Final review caught two things the browser checks didn't** — (1) if
+  `postinstall` is skipped the wasm 404s and the worker compiles the
+  404 page, so the viewer just spins forever; `predev`/`prebuild` now
+  copy it too and a test guards it. (2) Every document opened leaked
+  its PDFium worker: the wrapper's cleanup only clears `innerHTML`.
+  Measured by counting live workers in Playwright, and **on a
+  production build** — dev's StrictMode double-mounts effects and
+  doubled the numbers. Destroying the registry + engine on unmount
+  frees the big worker; 2 small encoder workers per open remain because
+  the library doesn't expose them (logged as a known limitation).
 
 <!-- Continue appending one entry per step as we go. -->

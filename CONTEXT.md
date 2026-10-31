@@ -396,6 +396,8 @@ server-downloaded PDFs. Deferred by the user: opening a PDF from the
 reader's own computer. Note: `@embedpdf/*` were installed from
 registry.npmjs.org because Artifactory returned E401 — re-auth
 Artifactory before the next install.
+Known limitation: 2 library-owned encoder workers stay alive per
+document opened (engine worker is freed); see SPEC "PDF Library".
 
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
