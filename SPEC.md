@@ -699,3 +699,18 @@ wrapper only clears its DOM. **Known limitation:** the library's
 2-worker image-encoder pool isn't reachable through its public API, so
 2 small workers remain per document opened in a tab (measured on a
 production build: 3 started, 1 freed per open).
+
+### Viewer now comes from `@alok2say/pdf-reader` (2026-10-31)
+The in-app `PdfViewer`/`PdfViewerLoader` were replaced by the standalone
+package `@alok2say/pdf-reader` 0.1.0 (repo
+`~/AlokPersonalRepo/pdf-reader-element`), installed from the vendored
+tarball `vendor/alok2say-pdf-reader-0.1.0.tgz` (`file:` dependency) until
+it is published to GitHub Packages. `/library/[slug]` renders
+`<PdfReader key={doc.slug} src={doc.src} />` from
+`@alok2say/pdf-reader/react` inside the same frame. Turbopack picks up
+the package's bundled `pdfium.wasm` itself (`/_next/static/media/…`), so
+DemoQuizApp's `postinstall`/`predev`/`prebuild` copy script, its test,
+`/public/pdfium/`, and the direct `@embedpdf/*` dependencies were
+removed. Engine/worker teardown, error and timeout handling now live in
+the package. Verified on dev and production builds: both PDFs render,
+search, zoom, 404s, dark, 360px, no jsdelivr wasm request.

@@ -645,4 +645,27 @@ on branch `feature/pdf-library`.
   frees the big worker; 2 small encoder workers per open remain because
   the library doesn't expose them (logged as a known limitation).
 
+## Switching to the `@alok2say/pdf-reader` package (2026-10-31)
+
+- **First real consumer finds the real bug** — the package's own tests
+  passed, but under Next the reader hit its 30 s timeout. Tracing showed
+  Turbopack had correctly emitted the wasm
+  (`/_next/static/media/pdfium.<hash>.wasm`) but rewrote
+  `new URL('./pdfium.wasm', import.meta.url).href` into a *root-relative*
+  string — and EmbedPDF's `blob:` workers can't resolve those (the same
+  lesson as the original viewer). Fixed in the package (always resolve
+  against `document.baseURI`), test-first, repacked.
+- **The timeout earned its keep** — instead of an endless spinner the
+  page showed "This PDF is taking too long to open.", which pointed
+  straight at engine startup.
+- **Vendored tarball** — `file:vendor/…tgz` works on any fresh clone;
+  re-copy and reinstall after each library change (npm records the
+  tarball's integrity hash in the lockfile).
+- **Less code here** — the wasm copy script, its hooks and test, and the
+  direct EmbedPDF dependencies all went away: the bundler handles the
+  asset because the package uses the literal `new URL(...)` pattern.
+- **Checked dev *and* production** — both PDFs, search (16 results),
+  zoom, 404s, dark, 360px, no CDN wasm request, on `next dev` and
+  `next start`.
+
 <!-- Continue appending one entry per step as we go. -->

@@ -397,7 +397,20 @@ reader's own computer. Note: `@embedpdf/*` were installed from
 registry.npmjs.org because Artifactory returned E401 — re-auth
 Artifactory before the next install.
 Known limitation: 2 library-owned encoder workers stay alive per
-document opened (engine worker is freed); see SPEC "PDF Library".
+document opened (engine worker is freed); now documented in the
+`@alok2say/pdf-reader` README.
+
+## PDF VIEWER EXTRACTED INTO `@alok2say/pdf-reader` (2026-10-31)
+
+New sibling repo `~/AlokPersonalRepo/pdf-reader-element` (local only, no
+GitHub remote yet; target registry GitHub Packages): `<pdf-reader>` Web
+Component + React adapter, wraps EmbedPDF 2.1.0, ships `pdfium.wasm`.
+DemoQuizApp branch `feature/use-pdf-reader-package` vendors
+`vendor/alok2say-pdf-reader-0.1.0.tgz` and uses
+`@alok2say/pdf-reader/react` on `/library/[slug]`; the wasm copy
+machinery is gone (Turbopack ships the package's wasm). To update:
+rebuild + `npm pack` in the library, copy the tarball into `vendor/`,
+reinstall (lockfile integrity changes).
 
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
