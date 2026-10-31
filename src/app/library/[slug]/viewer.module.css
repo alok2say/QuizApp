@@ -36,8 +36,3 @@
   min-height: 32rem;
   border-top: 1px solid var(--rule);
 }
-
-.loading {
-  padding: 2rem 16px;
-  color: var(--muted);
-}

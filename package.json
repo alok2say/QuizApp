@@ -3,18 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/copy-pdfium-wasm.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/copy-pdfium-wasm.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
-    "postinstall": "node scripts/copy-pdfium-wasm.mjs"
+    "test": "vitest run"
   },
   "dependencies": {
-    "@embedpdf/pdfium": "2.1.0",
-    "@embedpdf/react-pdf-viewer": "2.1.0",
+    "@alok2say/pdf-reader": "file:vendor/alok2say-pdf-reader-0.1.0.tgz",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcrypt": "^6.0.0",

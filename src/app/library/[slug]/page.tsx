@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDocument } from '@/lib/library/catalog'
-import { PdfViewerLoader } from './PdfViewerLoader'
+import { PdfReader } from '@alok2say/pdf-reader/react'
 import styles from './viewer.module.css'
 
 export default async function LibraryDocumentPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -19,7 +19,7 @@ export default async function LibraryDocumentPage({ params }: { params: Promise<
       </div>
       <div className={styles.frame}>
         {/* keyed so moving between documents re-initializes the viewer */}
-        <PdfViewerLoader key={doc.slug} src={doc.src} />
+        <PdfReader key={doc.slug} src={doc.src} style={{ position: 'absolute', inset: 0 }} />
       </div>
     </div>
   )
