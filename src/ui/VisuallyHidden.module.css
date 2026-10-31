@@ -1,0 +1,8 @@
+.hidden {
+  position: absolute;
+  width: 1px; /* token-exempt: visually-hidden pattern */
+  height: 1px; /* token-exempt: visually-hidden pattern */
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,0 +1,29 @@
+.page {
+  flex: 1;
+  padding: var(--page-top) var(--gutter) var(--space-16);
+}
+
+.cover {
+  padding-top: var(--page-top-cover);
+}
+
+.hero {
+  padding-top: var(--page-top-hero);
+}
+
+.main {
+  max-width: var(--width-default);
+  margin: 0 auto;
+}
+
+.narrow {
+  max-width: var(--width-narrow);
+}
+
+.medium {
+  max-width: var(--width-medium);
+}
+
+.wide {
+  max-width: var(--width-wide);
+}
