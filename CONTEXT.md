@@ -370,8 +370,9 @@ on :3000.
 1. Lint debt: 53 `no-explicit-any` in test mocks + 2
    `react-hooks/set-state-in-effect` in `QuizTakeForm.tsx` (fix those
    two for real). Make `vitest` + `tsc` + `eslint` the end-of-plan gate.
-2. Remaining navigation gaps: post-login return to the originally
-   requested page (`callbackUrl`), active-link highlighting. Also Next
+2. Remaining navigation gaps: active-link highlighting; signup → login
+   doesn't carry `callbackUrl`. (Post-login return done: `be5d37a`,
+   `safeCallbackUrl()` in `src/lib/safeRedirect.ts`.) Also Next
    16 deprecates `middleware.ts` → `proxy.ts` (codemod:
    `npx @next/codemod@canary middleware-to-proxy .`).
 3. `IMMEDIATE` feedback mode remains explicitly out of scope until a

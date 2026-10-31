@@ -1,6 +1,6 @@
 # Pages & Navigation
 
-Snapshot as of 2026-10-31 (after commit `7f03983`, shared site header). Describes what's in
+Snapshot as of 2026-10-31 (after commit `be5d37a`, post-login return). Describes what's in
 the code today, not the target design — see `SPEC.md` "Pages & Routes"
 for that.
 
@@ -13,7 +13,8 @@ checks the JWT role via `isAuthorizedForPath` (`src/lib/authorization.ts`):
 - **Logged in (`USER` or `ADMIN`):** everything under `/quizzes`
 - **`ADMIN` only:** everything under `/admin`
 
-Unauthorized requests are redirected to `/login`. Each protected page
+Unauthorized requests are redirected to `/login?callbackUrl=<original
+path + query>`. Each protected page
 also calls `getCurrentUser()` and redirects to `/login` itself as a
 second check.
 
@@ -52,7 +53,8 @@ second check.
 
  Home /  ── "Browse quizzes" (logged in) or "Log in" (logged out)
 
- /signup ──success──► /login ──success──► /   (always Home; header refreshes)
+ /signup ──success──► /login ──success──► callbackUrl if present and safe, else /
+                                            (header refreshes)
 
  /quizzes ──Start/Resume/Retake──► /take/[attemptId] ──submit or timer expiry──► /result/[attemptId]
     │  ▲                                                                            │
@@ -74,7 +76,9 @@ second check.
 - **Take page, attempt already submitted** → result page (can't re-take
   a submitted attempt by URL).
 - **Result page, attempt not yet submitted** (`409`) → take page.
-- **Any protected page while logged out / wrong role** → `/login`.
+- **Any protected page while logged out / wrong role** →
+  `/login?callbackUrl=…`; after login you return there
+  (`safeCallbackUrl()` rejects anything but same-site paths).
 
 ## Known navigation gaps
 
@@ -82,7 +86,8 @@ Closed by the shared header (`7f03983`): no way back to Home from most
 pages, login/signup not linked, admin pages with no way out, result/
 leaderboard with no route to `/quizzes` (now via header "Quizzes").
 
+Closed by `be5d37a`: post-login now returns to the requested page.
+
 Still open:
-1. Post-login always lands on `/` instead of the originally requested
-   page (no `callbackUrl` handling).
-2. No active-link highlighting in the header.
+1. No active-link highlighting in the header.
+2. Signup → login doesn't carry `callbackUrl`.

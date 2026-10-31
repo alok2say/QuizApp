@@ -390,4 +390,27 @@ in `7f03983`.
   clicking Log out, in light and dark mode; no horizontal overflow at
   360px width.
 
+## Post-login return to the requested page (2026-10-31)
+
+Design in `SPEC.md` (`4536cbc`), code in `be5d37a`.
+
+- **Carry the destination in the URL** — the middleware already knows
+  the blocked path, so it appends `?callbackUrl=<path+query>` to the
+  `/login` redirect. URL state survives the round trip without cookies
+  or storage.
+- **Read it in the event handler** — per Next 16's docs, reading
+  `new URLSearchParams(window.location.search)` inside a callback avoids
+  `useSearchParams()`, which would need a `<Suspense>` boundary for a
+  prerendered client page. The value is only needed at submit time.
+- **Open-redirect guard (TDD)** — anyone can craft
+  `/login?callbackUrl=https://evil.example`, so the value is untrusted
+  input. `safeCallbackUrl()` allows only paths starting with `/`, and
+  rejects `//host` and `/\host` (browsers treat both as another host).
+  Tests written first (failed on missing module), then the function;
+  94/94 passing.
+- **Verification** — `curl` showed the `307` to
+  `/login?callbackUrl=%2Fquizzes%2F…%3Fx%3D1`. Headless Chromium logged
+  in from a blocked leaderboard URL and landed back on it; `https://`
+  and `//` callbacks and a bare `/login` all landed on `/`.
+
 <!-- Continue appending one entry per step as we go. -->
