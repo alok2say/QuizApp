@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import type { QuizListItem } from '@/lib/quiz/queries'
-import { ButtonLink, Description, EmptyState, Heading, List, ListRow, Meta, Page, PageHeader } from '@/ui'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { EmptyState, Page, PageHeader } from '@/ui'
 import { StartQuizButton } from './StartQuizButton'
-import styles from './QuizRow.module.css'
 
 export function QuizListView({ quizzes }: { quizzes: QuizListItem[] }) {
   return (
@@ -12,52 +14,63 @@ export function QuizListView({ quizzes }: { quizzes: QuizListItem[] }) {
       {quizzes.length === 0 && <EmptyState>No quizzes yet. Check back soon.</EmptyState>}
 
       {quizzes.length > 0 && (
-        <List>
+        <ul className="grid gap-4">
           {quizzes.map((quiz) => (
-            <QuizRow key={quiz.id} quiz={quiz} />
+            <li key={quiz.id}>
+              <QuizCard quiz={quiz} />
+            </li>
           ))}
-        </List>
+        </ul>
       )}
     </Page>
   )
 }
 
-function QuizRow({ quiz }: { quiz: QuizListItem }) {
+const STATUS = {
+  notStarted: { label: 'Not started', variant: 'outline' },
+  inProgress: { label: 'In progress', variant: 'secondary' },
+  completed: { label: 'Completed', variant: 'default' },
+} as const
+
+function QuizCard({ quiz }: { quiz: QuizListItem }) {
   const attempt = quiz.latestAttempt
   const submitted = attempt && attempt.submittedAt !== null
   const canRetake = quiz.retakePolicy !== 'SINGLE_ATTEMPT'
-
-  const bubbleClass = submitted ? styles.done : attempt ? styles.inProgress : ''
-  const statusLabel = submitted ? 'Completed' : attempt ? 'In progress' : 'Not started'
+  const status = STATUS[submitted ? 'completed' : attempt ? 'inProgress' : 'notStarted']
 
   return (
-    <ListRow className={styles.row}>
-      <span className={`${styles.bubble} ${bubbleClass}`} role="img" aria-label={statusLabel} />
-
-      <div>
-        <Heading>{quiz.title}</Heading>
-        {quiz.description && <Description>{quiz.description}</Description>}
-        <Meta>
-          {attempt && !submitted && <span>In progress</span>}
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <h2>{quiz.title}</h2>
+        </CardTitle>
+        {quiz.description && <CardDescription>{quiz.description}</CardDescription>}
+        <CardAction>
+          <Badge variant={status.variant}>{status.label}</Badge>
+        </CardAction>
+      </CardHeader>
+      <CardFooter className="flex-wrap justify-between gap-4">
+        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
           {attempt && submitted && <span>Scored {attempt.score}</span>}
           <span>{Math.round(quiz.timeLimitSeconds / 60)} min</span>
-          <Link href={`/quizzes/${quiz.id}/leaderboard`}>Leaderboard</Link>
-        </Meta>
-      </div>
+          <Link href={`/quizzes/${quiz.id}/leaderboard`} className="text-foreground underline underline-offset-4">
+            Leaderboard
+          </Link>
+        </p>
+        <div>
+          {!attempt && <StartQuizButton quizId={quiz.id} label="Start quiz" />}
 
-      <div className={styles.action}>
-        {!attempt && <StartQuizButton quizId={quiz.id} label="Start quiz" />}
+          {attempt && !submitted && <StartQuizButton quizId={quiz.id} label="Resume quiz" />}
 
-        {attempt && !submitted && <StartQuizButton quizId={quiz.id} label="Resume quiz" />}
-
-        {attempt && submitted && (canRetake ? (
-          <StartQuizButton quizId={quiz.id} label="Retake quiz" variant="secondary" />
-        ) : (
-          <ButtonLink variant="secondary" href={`/quizzes/${quiz.id}/result/${attempt.id}`}>
-            View result
-          </ButtonLink>
-        ))}
-      </div>
-    </ListRow>
+          {attempt && submitted && (canRetake ? (
+            <StartQuizButton quizId={quiz.id} label="Retake quiz" variant="outline" />
+          ) : (
+            <Link href={`/quizzes/${quiz.id}/result/${attempt.id}`} className={buttonVariants({ variant: 'outline' })}>
+              View result
+            </Link>
+          ))}
+        </div>
+      </CardFooter>
+    </Card>
   )
 }
