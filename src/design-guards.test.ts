@@ -12,8 +12,6 @@ const isTest = (file: string) => /\.test\.tsx?$/.test(file)
 const PENDING_MODULES: string[] = [
   'src/features/admin/AdminQuizListView.module.css',
   'src/features/admin/QuizJsonEditor.module.css',
-  'src/features/attempt/LeaderboardView.module.css',
-  'src/features/attempt/ResultView.module.css',
   'src/features/attempt/TakeView.module.css',
   'src/features/attempt/answerSheet.module.css',
   'src/features/design/DesignCatalog.module.css',

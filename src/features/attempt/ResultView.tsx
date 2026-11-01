@@ -1,8 +1,12 @@
+import Link from 'next/link'
+import { CircleCheck, CircleX } from 'lucide-react'
 import type { AttemptResult } from '@/lib/quiz/queries'
-import { Actions, Page, PageHeader, TextLink, VisuallyHidden } from '@/ui'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import { Page, PageHeader } from '@/ui'
 import { StartQuizButton } from '@/features/quizzes/StartQuizButton'
-import sheet from './answerSheet.module.css'
-import styles from './ResultView.module.css'
 
 type Result = Extract<AttemptResult, { ok: true }>
 
@@ -12,72 +16,85 @@ export function ResultView({ result }: { result: Result }) {
   return (
     <Page>
       <PageHeader title={result.quizTitle} />
-      <p className={styles.score}>
-        {result.score}
-        <span className={styles.outOf}> / {result.maxScore}</span>
-      </p>
 
-      <ol className={styles.summary} aria-label="Questions at a glance">
+      <Card>
+        <CardHeader>
+          <p className="text-6xl font-bold tracking-tight tabular-nums">
+            {result.score}
+            <span className="font-medium text-muted-foreground"> / {result.maxScore}</span>
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <ol className="flex flex-wrap gap-2" aria-label="Questions at a glance">
+            {result.questions.map((question, index) => (
+              <li key={question.id}>
+                <a
+                  href={`#q-${index + 1}`}
+                  aria-label={`Question ${index + 1}: ${question.isCorrect ? 'correct' : 'incorrect'}`}
+                  className={cn(
+                    buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+                    question.isCorrect ? 'text-success' : 'text-destructive',
+                  )}
+                >
+                  {question.isCorrect ? <CircleCheck /> : <CircleX />}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <div className="flex flex-wrap items-center gap-4">
+            {canRetake && <StartQuizButton quizId={result.quizId} label="Retake quiz" />}
+            <Link href={`/quizzes/${result.quizId}/leaderboard`} className={buttonVariants({ variant: 'outline' })}>
+              See leaderboard
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ol className="mt-8 space-y-4">
         {result.questions.map((question, index) => (
-          <li key={question.id}>
-            <a
-              href={`#q-${index + 1}`}
-              className={question.isCorrect ? styles.summaryRight : styles.summaryWrong}
-              aria-label={`Question ${index + 1}: ${question.isCorrect ? 'correct' : 'incorrect'}`}
-            >
-              {question.isCorrect ? '●' : '✗'}
-            </a>
-          </li>
-        ))}
-      </ol>
-
-      <Actions spacing="loose">
-        {canRetake && <StartQuizButton quizId={result.quizId} label="Retake quiz" />}
-        <TextLink href={`/quizzes/${result.quizId}/leaderboard`}>See leaderboard</TextLink>
-      </Actions>
-
-      <ol className={`${sheet.questions} ${styles.questions}`}>
-        {result.questions.map((question, index) => (
-          <li key={question.id} id={`q-${index + 1}`} className={sheet.question}>
-            <span className={sheet.number}>{index + 1}</span>
-            <div>
-              <div className={styles.questionHead}>
-                <h2 className={sheet.prompt}>{question.text}</h2>
-                <p className={styles.points}>
-                  {question.pointsAwarded} / {question.points}
-                </p>
-              </div>
-
-              <ul className={sheet.options}>
-                {question.options.map((option, optionIndex) => {
-                  const wrongPick = option.wasSelected && !option.isCorrect
-                  const markClass = [
-                    sheet.mark,
-                    question.type === 'MULTI_SELECT' ? sheet.square : '',
-                    option.wasSelected && option.isCorrect ? sheet.filled : '',
-                    wrongPick ? sheet.wrong : '',
-                    option.isCorrect ? sheet.correct : '',
-                  ].join(' ')
-
-                  return (
-                    <li key={option.id} className={sheet.option}>
-                      <span className={markClass} aria-hidden="true">
-                        {String.fromCharCode(65 + optionIndex)}
-                      </span>
-                      {option.text}
-                      {option.isCorrect && <span className={sheet.tick} aria-hidden="true">✓</span>}
-                      {wrongPick && <span className={sheet.cross} aria-hidden="true">✗</span>}
-                      <VisuallyHidden>
-                        {[
-                          option.wasSelected ? 'your answer' : '',
-                          option.isCorrect ? 'correct answer' : '',
-                        ].filter(Boolean).join(', ')}
-                      </VisuallyHidden>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
+          <li key={question.id} id={`q-${index + 1}`} className="scroll-mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <h2>
+                    {index + 1}. {question.text}
+                  </h2>
+                </CardTitle>
+                <CardAction>
+                  <Badge variant="outline" className="tabular-nums">
+                    {question.pointsAwarded} / {question.points}
+                  </Badge>
+                </CardAction>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {question.options.map((option, optionIndex) => {
+                    const wrongPick = option.wasSelected && !option.isCorrect
+                    return (
+                      <li
+                        key={option.id}
+                        className={cn(
+                          'flex flex-wrap items-center gap-3 rounded-md border px-3 py-2',
+                          option.isCorrect && 'border-success',
+                          wrongPick && 'border-destructive',
+                        )}
+                      >
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold" aria-hidden="true">
+                          {String.fromCharCode(65 + optionIndex)}
+                        </span>
+                        <span className="flex-1">{option.text}</span>
+                        {option.isCorrect && (
+                          <Badge className="bg-success text-success-foreground">Correct answer</Badge>
+                        )}
+                        {option.wasSelected && (
+                          <Badge variant={wrongPick ? 'destructive' : 'secondary'}>Your answer</Badge>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </CardContent>
+            </Card>
           </li>
         ))}
       </ol>
