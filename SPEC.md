@@ -834,3 +834,59 @@ take, result, leaderboard"). Same tokens, font and answer-sheet marks.
   load. No keyboard shortcuts; no separate review screen.
 - Helpers in `src/features/attempt/questionNav.ts` (tested):
   `clampIndex`, `parseCachedIndex`, `answeredCount`, `bubbleLabel`.
+
+## shadcn design system (designed 2026-11-01)
+
+Replaces "Design System Structure" styling and the earlier per-page
+visual designs. Goal: every screen built from shadcn components, so the
+look is standard and consistent. Today's look is **not** preserved.
+
+- **Stack:** Tailwind CSS v4 (`@tailwindcss/postcss`) + shadcn
+  (`npx shadcn@latest init --defaults`: preset `base-nova`, Base UI
+  primitives, neutral palette, Geist font replacing Bricolage,
+  `lucide-react` icons). Generated components live in
+  `src/components/ui` and are ours to edit.
+- **Theme:** shadcn's CSS variables in `src/app/globals.css` are the only
+  place colors and radius are defined; one extra `--success` (and
+  `--color-success`) because shadcn has none. Dark mode follows the
+  device: the `dark` variant is `@media (prefers-color-scheme: dark)`,
+  dark variable values sit in that media query. `src/styles/tokens.css`
+  and every `*.module.css` are deleted.
+- **Component map:** header = Buttons (`ghost`) as nav links with the
+  active section marked (`aria-current`); home, quiz list, library =
+  Card (+ Badge for quiz status); login/signup = Card with Field / Label
+  / Input / Button, errors and "Account created" as Alert; take = Card
+  per question, RadioGroup (single) / Checkbox (multi), Progress plus
+  numbered Buttons to jump, timer as Badge (destructive under 60s),
+  Previous / Next Buttons; result = score Card, per-question Card with
+  correct / incorrect Badges; leaderboard = Table (own row highlighted);
+  admin list = Table; JSON editor = Textarea, "What goes in the JSON" =
+  Collapsible, errors = Alert (destructive); confirms ("Delete this
+  quiz?", "Replace the editor content?") = AlertDialog instead of
+  `window.confirm`.
+- **Layers:** `src/app` routes unchanged (no styling, ESLint rule
+  stays); `src/features` Views use `@/components/ui` directly;
+  `src/ui` keeps only app-level layout shadcn lacks (`Page`,
+  `PageHeader`, `EmptyState`) plus `NavLink`, written with Tailwind.
+- **Unchanged:** data, auth, timers, answer caching, redirects, API
+  calls, and all user-facing copy except new dialog button labels
+  ("Cancel", "Delete", "Replace").
+- **Guardrails:** tests fail on any `*.module.css`, on color literals
+  (hex / rgb / hsl / oklch) outside `globals.css`, and on arbitrary
+  Tailwind values (`-[…]`) in `src/features` / `src/ui`. `/design` is
+  a catalog of the shadcn components in use.
+- **Out of scope:** a dark-mode toggle, custom brand colors (one theme
+  edit later), shadcn components not needed yet.
+- **Implemented 2026-11-01** on branch `shadcn-design-system`; guide
+  `docs/DESIGN_SYSTEM.md`. Decisions made during the build: success /
+  info Alerts pass `role="status"`; link-buttons are `buttonVariants()`
+  on Next `Link`; result answers show visible "Correct answer" / "Your
+  answer" Badges; the leaderboard header row is visible; take-page
+  buttons read "Previous" / "Next" with chevron icons; the upload
+  dialog is titled "Replace the editor content?"; the PDF frame's
+  minimum height is `min-h-96`; library "Read" links are named
+  "Read <title>".
+- **Tooling note:** run shadcn with the public registry:
+  `npm_config_registry=https://registry.npmjs.org npx shadcn@latest add <name>`
+  (the global Artifactory login is expired); `NODE_AUTH_TOKEN` is needed
+  for any full `npm install` because of `@alok2say/pdf-reader`.

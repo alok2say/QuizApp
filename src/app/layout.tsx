@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
-import "@/styles/tokens.css";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { getCurrentUser } from "@/lib/session";
 import { SiteHeader } from "@/features/site/SiteHeader";
+import { cn } from "@/lib/utils";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "DemoQuizApp",
@@ -21,7 +18,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getCurrentUser();
 
   return (
-    <html lang="en" className={bricolage.variable}>
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body>
         <Providers>
           <SiteHeader user={user} />

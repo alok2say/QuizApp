@@ -1,115 +1,95 @@
-# Design system: how to apply a new design
+# Design system: shadcn on Tailwind
 
-The app is built in four layers so that a new look is made in a few
-places, not in every page.
+Every screen is built from [shadcn](https://ui.shadcn.com) components on
+Tailwind CSS v4, preset `base-nova` (Base UI primitives, neutral palette,
+Geist font, `lucide-react` icons). The look is shadcn's standard one,
+the same everywhere.
 
 ```
-src/app/            Routes only: auth checks, data loading, redirects.
-                    Renders one View. No CSS (ESLint blocks *.module.css imports).
-src/features/<area> Views and behaviour (forms, buttons that call APIs) for
-                    site, home, auth, library, quizzes, attempt, admin, design.
-                    Built from @/ui. CSS only for screen-specific pieces.
-src/ui/             The design system: presentational components, no data,
-                    no API calls. Exported from src/ui/index.ts.
-src/styles/tokens.css  Every visual value.
+src/app/                 Routes only: auth, data, redirects. No styling (ESLint).
+src/features/<area>/     Views and behaviour; built from @/components/ui with
+                         Tailwind classes.
+src/components/ui/       shadcn components (generated, ours to edit).
+src/ui/                  App-level layout shadcn doesn't have:
+                         Page, PageHeader, EmptyState, NavLink.
+src/app/globals.css      The theme: shadcn's CSS variables, light and dark.
 ```
 
-## Where each kind of change goes
+## Changing the look
 
-| You want to change | Edit |
+| You want to change | Do this |
 |---|---|
-| Colors, fonts, type sizes, spacing, radii, borders, widths | `src/styles/tokens.css` |
-| How buttons, links, fields, notices, lists, page headers or the top bar look | the component in `src/ui/` |
-| The layout of one screen | its View in `src/features/<area>/` |
-| A screen-specific piece (answer-sheet marks, quiz status bubble, take-page bar, result score, leaderboard table, PDF frame, JSON editor) | that feature's `*.module.css` |
-| Data, auth or redirects | the route in `src/app/` (the design is untouched) |
+| Colors, radius | Edit the variables in `src/app/globals.css`: `--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--ring`, `--radius`, plus `--success` (our addition). Light values sit in `:root`; dark values in `@media (prefers-color-scheme: dark)`. |
+| The whole style | Apply another shadcn preset: `npx shadcn@latest apply <preset>` (see the registry note below). |
+| How one component looks everywhere | Edit its file in `src/components/ui/` (e.g. `button.tsx` variants). |
+| One screen's layout | Its View in `src/features/<area>/` |
+| The font | `src/app/layout.tsx` (next/font, exposed as `--font-sans`) |
 
-Two token edits are enough to restyle every page. Changing
-`--color-accent` to teal and `--space-unit` from `0.25rem` to `0.3rem`
-changed all 60 page screenshots, without touching a page.
+Dark mode follows the device setting: the Tailwind `dark` variant is
+`@media (prefers-color-scheme: dark)`, so every `dark:` class and the
+dark variables switch together. There is no toggle.
 
-## Tokens
+## Which component where
 
-- **Color:** `--color-text`, `--color-bg`, `--color-text-muted`,
-  `--color-accent`, `--color-on-accent`, `--color-border`,
-  `--color-success`, `--color-danger`. Each one has a dark-mode value
-  under `@media (prefers-color-scheme: dark)`.
-- **Spacing:** `--space-N = calc(var(--space-unit) * N)`. Fractional
-  steps use a dash, for example `--space-2-5`. Change `--space-unit` to
-  make everything tighter or roomier.
-- **Type:** two font families (`--font-body`, `--font-mono`), sizes from
-  `--text-sm` to `--text-stat`, fluid titles (`--text-title-*`,
-  `--text-score`), `--weight-*`, `--leading-*` and `--tracking-*`.
-- **Shape:** `--radius-*`, `--border-thin/medium/thick`, `--focus-ring`,
-  `--focus-offset` and `--underline-offset*`.
-- **Layout:** `--width-narrow/medium/default/wide`, `--gutter` and
-  `--page-top*`.
+| Screen | Components |
+|---|---|
+| Header | `NavLink` (ghost Button style, `aria-current` for the section), ghost `Button` for Log out |
+| Home, library, quiz list | `Card`; `Badge` for page count and quiz status |
+| Login, signup | `Card` with `Field` / `FieldLabel` / `Input` / `FieldDescription`, `Alert` for errors and "Account created" |
+| Take quiz | `Badge` timer, `Progress`, numbered icon `Button`s, `Card` per question, `RadioGroup` / `Checkbox` |
+| Result | score `Card`, per-question `Card`s with `Badge`s |
+| Leaderboard, admin list | `Table` inside a `Card` |
+| Quiz editor | `Collapsible`, `Textarea`, destructive `Alert`, `AlertDialog` for Upload replace |
+| Delete quiz | `AlertDialog` |
 
-The new font goes in `src/app/layout.tsx` (next/font, as `--font-sans`)
-and `--font-body` in `tokens.css`.
+Link-buttons put `buttonVariants()` on a Next `Link`. The generated
+`Alert` always has `role="alert"`; pass `role="status"` for non-error
+messages.
 
-## Components (`@/ui`)
+All of them, with variants and the color swatches, are on **`/design`**
+(not linked from the header).
 
-- **Page structure:** `Page` (`width`, `top`) and `PageHeader` (`title`,
-  `intro`, `size`: display, page, cover or sub; plus an optional
-  `action`). Also `Heading` and `VisuallyHidden`.
-- **Actions:** `Button` and `ButtonLink` (primary or secondary), `TextLink`
-  (default or muted), `TextButton` (default or danger), and `Actions`, a
-  row of them.
-- **Forms:** `Form`, `Field`, `Input`, `ErrorMessage` (body or small), and
-  `Notice` (success, accent or danger).
-- **Content:** `List` and `ListRow` (with `density` and `align`),
-  `Description`, `Meta` (with `spacing` and `tabular`), and `EmptyState`.
-- **Navigation:** `TopBar`, `NavLink` (marks the current section) and
-  `NavButton`.
+## Adding a component
 
-All of them are shown with their variants on **`/design`**. That page
-isn't linked from the header.
-
-## The guardrails
-
-- **Undefined tokens:** `src/styles/tokens.test.ts` fails if a CSS file
-  uses a `var(--…)` that `tokens.css` doesn't define.
-- **Dark mode gaps:** the same test fails if dark mode is missing one of
-  the color tokens.
-- **Raw values:** it also fails if any CSS file other than `tokens.css`
-  contains a raw color or a number with `rem`, `em`, `px`, `vh` or `vw`.
-  A line can opt out with `/* token-exempt: <reason> */`. Today's
-  exemptions:
-  - `src/app/globals.css`: `max-width: 100vw` (viewport cap)
-  - `src/ui/VisuallyHidden.module.css`: `1px` × 2 (visually-hidden pattern)
-  - `src/features/attempt/answerSheet.module.css`: `1px` × 2 (hidden native input)
-  - `src/features/admin/QuizJsonEditor.module.css`: `min-height: 60vh`
-  - `src/features/library/DocumentView.module.css`: `min-height: 32rem`
-  - `src/features/quizzes/QuizRow.module.css`: `max-width: 14rem` and
-    `@media (max-width: 34rem)` (media queries can't use custom properties)
-- **CSS in routes:** ESLint blocks `*.module.css` imports in
-  `src/app/**`.
-
-## Checking a redesign with screenshots
-
-`scripts/visual-snapshots.py` captures every page in light and dark, at
-1280px and 360px widths. It also takes two extra captures that need an
-interaction first: the focused login field, and a checked answer.
+The global npm config points at an expired Artifactory login, so use the
+public registry:
 
 ```sh
-export SNAP_USER_EMAIL=... SNAP_USER_PASSWORD=...     # any account
-export SNAP_ADMIN_EMAIL=... SNAP_ADMIN_PASSWORD=...   # an ADMIN account
-export SNAP_QUIZ_ID=... SNAP_TAKE_URL=/quizzes/.../take/... SNAP_RESULT_URL=/quizzes/.../result/...
-
-python3 scripts/visual-snapshots.py capture before
-# ...change tokens or ui...
-python3 scripts/visual-snapshots.py capture after
-python3 scripts/visual-snapshots.py compare before after   # px differing per file
+npm_config_registry=https://registry.npmjs.org npx shadcn@latest add dialog
 ```
 
-**What to expect:**
-- For a restructure, every file should show `0 px differ`. For a
-  redesign, open the changed files and look at them.
-- Pages whose env vars aren't set are skipped.
-- While capturing, the script aborts every non-GET `/api/` request
-  except login, so opening an expired take page can't submit the
-  attempt.
-- PDF content and the take-page timer are masked.
-- Pages that show live data (quizzes, leaderboard) change whenever
-  someone takes a quiz. Capture both runs close together.
+Read the generated file before using it: these are Base UI components,
+whose props differ from the Radix ones in most shadcn examples
+(`value` / `onValueChange` on `RadioGroup`, `checked` / `onCheckedChange`
+on `Checkbox`, `render` instead of `asChild`).
+
+A full `npm install` also needs `NODE_AUTH_TOKEN` because of
+`@alok2say/pdf-reader` (see `CONTEXT.md`).
+
+## Guardrails
+
+`src/design-guards.test.ts` fails when:
+- any `*.module.css` file exists, or any stylesheet besides
+  `src/app/globals.css`;
+- a color literal (hex, `rgb()`, `hsl()`, `oklch()`) appears outside
+  `globals.css`;
+- a Tailwind arbitrary value such as `p-[13px]` appears in
+  `src/features` or `src/ui` (arbitrary variants like
+  `aria-[current=page]:` are fine).
+
+ESLint blocks CSS imports in `src/app/**`.
+
+## Reviewing a change with screenshots
+
+`scripts/visual-snapshots.py` captures every page in light and dark at
+1280px and 360px. It's a review tool, not a pass/fail gate.
+
+```sh
+python3 scripts/visual-snapshots.py capture before
+# ...edit the theme or a component...
+python3 scripts/visual-snapshots.py capture after
+python3 scripts/visual-snapshots.py compare before after
+```
+
+The env vars it needs (test accounts, quiz and attempt URLs) are
+described at the top of the script; the dev accounts are in `CONTEXT.md`.

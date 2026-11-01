@@ -2,12 +2,20 @@
 
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { TakeableQuestion } from '@/lib/quiz/queries'
 import { formatDuration } from '@/lib/format'
-import { Button } from '@/ui'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Progress } from '@/components/ui/progress'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { cn } from '@/lib/utils'
 import { answeredCount, bubbleLabel, clampIndex, parseCachedIndex } from './questionNav'
-import sheet from './answerSheet.module.css'
-import styles from './TakeView.module.css'
+
+// Shared widths so the sticky bar, the question and the footer line up
+const COLUMN = 'mx-auto w-full max-w-3xl px-4'
 
 type Props = {
   quizId: string
@@ -54,14 +62,14 @@ export function QuizTakeForm(props: Props) {
 
   if (!hydrated) {
     return (
-      <div className={styles.page}>
-        <div className={styles.bar}>
-          <div className={styles.barTop}>
-            <h1 className={styles.title}>{props.quizTitle}</h1>
+      <div className="flex flex-1 flex-col">
+        <div className="sticky top-0 z-10 border-b bg-background">
+          <div className={cn(COLUMN, 'py-4')}>
+            <h1 className="text-xl font-semibold tracking-tight">{props.quizTitle}</h1>
           </div>
         </div>
-        <main className={styles.main}>
-          <p className={styles.loading}>Loading your answers…</p>
+        <main className={cn(COLUMN, 'flex-1 py-8')}>
+          <p className="text-muted-foreground">Loading your answers…</p>
         </main>
       </div>
     )
@@ -166,104 +174,150 @@ function AttemptForm({ quizId, attemptId, quizTitle, questions, remainingSeconds
   const multi = question?.type === 'MULTI_SELECT'
 
   return (
-    <div className={styles.page}>
-      <div className={styles.bar}>
-        <div className={styles.barTop}>
-          <h1 className={styles.title}>{quizTitle}</h1>
-          <p
-            className={`${styles.timer} ${secondsLeft < 60 ? styles.lowTime : ''}`}
-            aria-label={`Time left ${formatDuration(secondsLeft)}`}
-          >
-            {formatDuration(secondsLeft)}
-          </p>
-        </div>
+    <div className="flex flex-1 flex-col">
+      <div className="sticky top-0 z-10 border-b bg-background">
+        <div className={cn(COLUMN, 'space-y-3 py-4')}>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-semibold tracking-tight">{quizTitle}</h1>
+            <Badge
+              variant={secondsLeft < 60 ? 'destructive' : 'outline'}
+              className="h-7 px-3 text-base tabular-nums"
+              aria-label={`Time left ${formatDuration(secondsLeft)}`}
+            >
+              {formatDuration(secondsLeft)}
+            </Badge>
+          </div>
 
-        <div className={styles.barBottom}>
-          <ol className={styles.strip} aria-label="Questions">
-            {questions.map((q, index) => {
-              const isAnswered = (answers[q.id] ?? []).length > 0
-              return (
-                <li key={q.id}>
-                  <button
-                    type="button"
-                    className={`${styles.bubble} ${isAnswered ? styles.answered : ''}`}
-                    aria-label={bubbleLabel(index, isAnswered)}
-                    aria-current={index === current ? 'step' : undefined}
-                    onClick={() => goTo(index)}
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              )
-            })}
-          </ol>
-          <p className={styles.count}>
-            Question {current + 1} of {total}
-          </p>
+          <Progress value={total === 0 ? 0 : (answered / total) * 100} aria-label="Answered" />
+
+          <div className="flex items-center gap-4">
+            <ol className="-m-1 flex min-w-0 flex-1 gap-2 overflow-x-auto p-1" aria-label="Questions">
+              {questions.map((q, index) => {
+                const isAnswered = (answers[q.id] ?? []).length > 0
+                return (
+                  <li key={q.id}>
+                    <Button
+                      variant={isAnswered ? 'default' : 'outline'}
+                      size="icon-sm"
+                      className="rounded-full tabular-nums aria-[current=step]:ring-2 aria-[current=step]:ring-ring aria-[current=step]:ring-offset-2 aria-[current=step]:ring-offset-background"
+                      aria-label={bubbleLabel(index, isAnswered)}
+                      aria-current={index === current ? 'step' : undefined}
+                      onClick={() => goTo(index)}
+                    >
+                      {index + 1}
+                    </Button>
+                  </li>
+                )
+              })}
+            </ol>
+            <p className="shrink-0 text-sm text-muted-foreground tabular-nums">
+              Question {current + 1} of {total}
+            </p>
+          </div>
         </div>
       </div>
 
-      <main className={styles.main}>
+      <main className={cn(COLUMN, 'flex-1 py-8')}>
         {question && (
-          <div key={question.id}>
-            <p className={styles.number} aria-hidden="true">
-              {current + 1}
-            </p>
-            <fieldset className={styles.fieldset}>
-              <legend ref={promptRef} tabIndex={-1} className={styles.prompt}>
-                {question.text}
-              </legend>
-              {multi && <p className={sheet.hint}>Pick all that apply</p>}
+          <Card key={question.id}>
+            <CardHeader>
+              <p className="text-4xl font-bold tracking-tight text-muted-foreground tabular-nums" aria-hidden="true">
+                {current + 1}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <fieldset className="min-w-0">
+                <legend
+                  ref={promptRef}
+                  tabIndex={-1}
+                  className="text-2xl font-semibold tracking-tight outline-none"
+                >
+                  {question.text}
+                </legend>
+                {multi && <p className="mt-1 text-sm text-muted-foreground">Pick all that apply</p>}
 
-              <div className={styles.options}>
-                {question.options.map((option, optionIndex) => (
-                  <label key={option.id} className={styles.option}>
-                    <input
-                      className={sheet.input}
-                      type={multi ? 'checkbox' : 'radio'}
-                      name={question.id}
-                      checked={(answers[question.id] ?? []).includes(option.id)}
-                      onChange={() => toggleOption(question, option.id)}
-                    />
-                    <span className={`${sheet.mark} ${multi ? sheet.square : ''}`} aria-hidden="true">
-                      {String.fromCharCode(65 + optionIndex)}
-                    </span>
-                    {option.text}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
+                {multi ? (
+                  <div className="mt-6 grid gap-2">
+                    {question.options.map((option, optionIndex) => {
+                      const checked = (answers[question.id] ?? []).includes(option.id)
+                      return (
+                        <label key={option.id} className={optionRow(checked)}>
+                          <Checkbox checked={checked} onCheckedChange={() => toggleOption(question, option.id)} />
+                          <OptionText letter={optionIndex} text={option.text} />
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <RadioGroup
+                    className="mt-6"
+                    value={(answers[question.id] ?? [])[0] ?? null}
+                    onValueChange={(value) => toggleOption(question, String(value))}
+                  >
+                    {question.options.map((option, optionIndex) => (
+                      <label
+                        key={option.id}
+                        className={optionRow((answers[question.id] ?? []).includes(option.id))}
+                      >
+                        <RadioGroupItem value={option.id} />
+                        <OptionText letter={optionIndex} text={option.text} />
+                      </label>
+                    ))}
+                  </RadioGroup>
+                )}
+              </fieldset>
+            </CardContent>
+          </Card>
         )}
       </main>
 
-      <div className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.prev}>
-            {current > 0 && (
-              <Button variant="secondary" onClick={() => goTo(current - 1)}>
-                ‹ Previous
-              </Button>
-            )}
-          </div>
-
-          <p className={styles.progress}>
+      <div className="sticky bottom-0 z-10 border-t bg-background">
+        <div className={cn(COLUMN, 'grid grid-cols-2 items-center gap-3 py-4 sm:grid-cols-3')}>
+          <p className="col-span-2 text-center text-sm text-muted-foreground tabular-nums sm:order-2 sm:col-span-1">
             {isLast && unanswered > 0
               ? `${unanswered} ${unanswered === 1 ? 'question' : 'questions'} unanswered`
               : `${answered} of ${total} answered`}
           </p>
-
-          <div className={styles.next}>
+          <div className="justify-self-start sm:order-1">
+            {current > 0 && (
+              <Button variant="outline" size="lg" onClick={() => goTo(current - 1)}>
+                <ChevronLeft />
+                Previous
+              </Button>
+            )}
+          </div>
+          <div className="justify-self-end sm:order-3">
             {isLast ? (
-              <Button onClick={submit} disabled={submitting}>
+              <Button size="lg" onClick={submit} disabled={submitting}>
                 {submitting ? 'Submitting…' : 'Submit answers'}
               </Button>
             ) : (
-              <Button onClick={() => goTo(current + 1)}>Next ›</Button>
+              <Button size="lg" onClick={() => goTo(current + 1)}>
+                Next
+                <ChevronRight />
+              </Button>
             )}
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+function optionRow(selected: boolean) {
+  return cn(
+    'flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50',
+    selected && 'border-primary bg-muted/50',
+  )
+}
+
+function OptionText({ letter, text }: { letter: number; text: string }) {
+  return (
+    <span className="flex items-center gap-3">
+      <span className="text-sm font-semibold text-muted-foreground" aria-hidden="true">
+        {String.fromCharCode(65 + letter)}
+      </span>
+      <span>{text}</span>
+    </span>
   )
 }

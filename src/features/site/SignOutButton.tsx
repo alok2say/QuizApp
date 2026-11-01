@@ -1,8 +1,12 @@
 'use client'
 
 import { signOut } from 'next-auth/react'
-import { NavButton } from '@/ui'
+import { Button } from '@/components/ui/button'
 
 export function SignOutButton() {
-  return <NavButton onClick={() => signOut({ callbackUrl: '/' })}>Log out</NavButton>
+  return (
+    <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => signOut({ callbackUrl: '/' })}>
+      Log out
+    </Button>
+  )
 }

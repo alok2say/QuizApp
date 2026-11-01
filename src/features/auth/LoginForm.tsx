@@ -4,8 +4,14 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { withCallbackUrl } from '@/lib/safeRedirect'
-import { Button, ErrorMessage, Field, Form, Input, Notice, Page, PageHeader, TextLink } from '@/ui'
-import styles from './auth.module.css'
+import Link from 'next/link'
+import { CircleAlert, CircleCheck } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Page } from '@/ui'
 
 // callbackUrl arrives already sanitized by the server page
 export function LoginForm({ callbackUrl, justCreated }: { callbackUrl: string; justCreated: boolean }) {
@@ -38,39 +44,67 @@ export function LoginForm({ callbackUrl, justCreated }: { callbackUrl: string; j
   }
 
   return (
-    <Page width="narrow" top="cover">
-      <PageHeader size="cover" title="Log in" intro="Pick up where you left off." />
+    <Page width="narrow">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <h1 className="text-2xl font-semibold tracking-tight">Log in</h1>
+          </CardTitle>
+          <CardDescription>Pick up where you left off.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {justCreated && (
+            <Alert role="status" className="mb-6">
+              <CircleCheck />
+              <AlertDescription>Account created. Log in to start.</AlertDescription>
+            </Alert>
+          )}
 
-      {justCreated && <Notice tone="success">Account created. Log in to start.</Notice>}
-
-      <Form onSubmit={handleSubmit}>
-        <Field label="Email">
-          <Input
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Field>
-        <Field label="Password">
-          <Input
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Field>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <Button type="submit" disabled={submitting}>
-          {submitting ? 'Logging in…' : 'Log in'}
-        </Button>
-      </Form>
-
-      <p className={styles.switch}>
-        New here? <TextLink href={withCallbackUrl('/signup', callbackUrl)}>Create an account</TextLink>
-      </p>
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                <Input
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="login-password">Password</FieldLabel>
+                <Input
+                  id="login-password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Field>
+              {error && (
+                <Alert variant="destructive">
+                  <CircleAlert />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button type="submit" size="lg" className="w-full" disabled={submitting}>
+                {submitting ? 'Logging in…' : 'Log in'}
+              </Button>
+            </FieldGroup>
+          </form>
+        </CardContent>
+        <CardFooter className="justify-center text-muted-foreground">
+          <p>
+            New here?{' '}
+            <Link className="text-foreground underline underline-offset-4" href={withCallbackUrl('/signup', callbackUrl)}>
+              Create an account
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </Page>
   )
 }

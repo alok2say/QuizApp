@@ -3,19 +3,28 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { readErrorBody } from '@/lib/errorBody'
-import { ErrorMessage, TextButton } from '@/ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 
 export function DeleteQuizButton({ quizId }: { quizId: string }) {
   const router = useRouter()
+  const [open, setOpen] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleClick() {
-    // confirm first — deleting a quiz is irreversible, no undo
-    if (!window.confirm('Delete this quiz? This cannot be undone.')) {
-      return
-    }
-
+  // runs only after the dialog is confirmed: deleting a quiz is irreversible
+  async function handleDelete() {
+    setOpen(false)
     setPending(true)
     setError(null)
 
@@ -34,10 +43,30 @@ export function DeleteQuizButton({ quizId }: { quizId: string }) {
 
   return (
     <div>
-      <TextButton tone="danger" onClick={handleClick} disabled={pending}>
-        {pending ? 'Deleting…' : 'Delete'}
-      </TextButton>
-      {error && <ErrorMessage size="small">{error}</ErrorMessage>}
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger
+          render={<Button variant="ghost" size="sm" className="text-destructive" disabled={pending} />}
+        >
+          {pending ? 'Deleting…' : 'Delete'}
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this quiz?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {error && (
+        <p role="alert" className="mt-1 text-sm text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

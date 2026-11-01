@@ -1,32 +1,20 @@
-import styles from './PageHeader.module.css'
-
-type Size = 'display' | 'page' | 'cover' | 'sub'
-
-// The page's h1, an optional intro line, and an optional action beside the title
+// The page's h1, an optional description, and an optional action on the right
 export function PageHeader({
   title,
-  intro,
-  size = 'page',
+  description,
   action,
 }: {
   title: React.ReactNode
-  intro?: React.ReactNode
-  size?: Size
+  description?: React.ReactNode
   action?: React.ReactNode
 }) {
-  const heading = <h1 className={styles.title}>{title}</h1>
-
   return (
-    <div className={styles[size]}>
-      {action ? (
-        <div className={styles.row}>
-          {heading}
-          {action}
-        </div>
-      ) : (
-        heading
-      )}
-      {intro && <p className={styles.intro}>{intro}</p>}
+    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+        {description && <p className="text-muted-foreground">{description}</p>}
+      </div>
+      {action}
     </div>
   )
 }

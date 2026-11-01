@@ -1,21 +1,12 @@
-import styles from './Page.module.css'
+import { cn } from '@/lib/utils'
 
-type Width = 'narrow' | 'medium' | 'default' | 'wide'
-type Top = 'default' | 'cover' | 'hero'
+const WIDTH = {
+  narrow: 'max-w-sm',
+  default: 'max-w-3xl',
+  wide: 'max-w-5xl',
+}
 
-// The page shell: outer padding, then a centered column of the given width
-export function Page({
-  width = 'default',
-  top = 'default',
-  children,
-}: {
-  width?: Width
-  top?: Top
-  children: React.ReactNode
-}) {
-  return (
-    <div className={top === 'default' ? styles.page : `${styles.page} ${styles[top]}`}>
-      <main className={width === 'default' ? styles.main : `${styles.main} ${styles[width]}`}>{children}</main>
-    </div>
-  )
+// The page shell: a centered column with the standard gutters
+export function Page({ width = 'default', children }: { width?: keyof typeof WIDTH; children: React.ReactNode }) {
+  return <main className={cn('mx-auto w-full flex-1 px-4 py-10', WIDTH[width])}>{children}</main>
 }

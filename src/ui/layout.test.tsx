@@ -1,46 +1,34 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test } from 'vitest'
-import { Heading, Page, PageHeader, VisuallyHidden } from './index'
-import pageStyles from './Page.module.css'
-import headerStyles from './PageHeader.module.css'
+import { EmptyState, Page, PageHeader } from './index'
 
 const html = (node: React.ReactElement) => renderToStaticMarkup(node)
 
 describe('layout primitives', () => {
-  test('Page wraps children in main with the width class', () => {
-    const out = html(<Page width="wide">x</Page>)
-    expect(out).toMatch(
-      new RegExp(`^<div class="[^"]*${pageStyles.page}[^"]*"><main class="[^"]*${pageStyles.wide}[^"]*">x</main></div>$`),
-    )
+  test('Page renders a centered main with the width class', () => {
+    expect(html(<Page>x</Page>)).toMatch(/^<main class="[^"]*\bmx-auto\b[^"]*\bmax-w-3xl\b[^"]*">x<\/main>$/)
+    expect(html(<Page width="narrow">x</Page>)).toContain('max-w-sm')
+    expect(html(<Page width="wide">x</Page>)).toContain('max-w-5xl')
   })
 
-  test('Page top variant goes on the outer div', () => {
-    const out = html(<Page top="hero">x</Page>)
-    expect(out.startsWith(`<div class="${pageStyles.page} ${pageStyles.hero}"`)).toBe(true)
-  })
-
-  test('PageHeader renders h1 then intro', () => {
-    const out = html(<PageHeader title="Quizzes" intro="Pick one." />)
+  test('PageHeader renders h1 then description', () => {
+    const out = html(<PageHeader title="Quizzes" description="Pick one." />)
     expect(out.indexOf('<h1')).toBeGreaterThan(-1)
     expect(out.indexOf('<h1')).toBeLessThan(out.indexOf('Pick one.'))
-    expect(out).toContain(headerStyles.page)
+    expect(out).toContain('text-muted-foreground')
   })
 
-  test('PageHeader without intro renders no paragraph', () => {
+  test('PageHeader without description renders no paragraph', () => {
     expect(html(<PageHeader title="Quizzes" />)).not.toContain('<p')
   })
 
-  test('PageHeader renders action next to the title', () => {
-    const out = html(<PageHeader title="Manage quizzes" action={<a href="/new">New quiz</a>} />)
-    expect(out).toMatch(new RegExp(`class="${headerStyles.row}"><h1[^>]*>Manage quizzes</h1><a href="/new">New quiz</a></div>`))
+  test('PageHeader renders the action', () => {
+    expect(html(<PageHeader title="Manage quizzes" action={<a href="/new">New quiz</a>} />)).toContain(
+      '<a href="/new">New quiz</a>',
+    )
   })
 
-  test('Heading defaults to h2 and accepts h3', () => {
-    expect(html(<Heading>T</Heading>).startsWith('<h2')).toBe(true)
-    expect(html(<Heading as="h3" id="x">T</Heading>)).toMatch(/^<h3 id="x"/)
-  })
-
-  test('VisuallyHidden can render a thead', () => {
-    expect(html(<table><VisuallyHidden as="thead"><tr><th>R</th></tr></VisuallyHidden></table>)).toContain('<thead class=')
+  test('EmptyState is a muted paragraph', () => {
+    expect(html(<EmptyState>None yet.</EmptyState>)).toMatch(/^<p class="[^"]*text-muted-foreground[^"]*">None yet\.<\/p>$/)
   })
 })
