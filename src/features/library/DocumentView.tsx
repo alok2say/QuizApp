@@ -11,7 +11,7 @@ export function DocumentView({ doc }: { doc: LibraryDocument }) {
       <div className={styles.head}>
         <TextLink href="/library" tone="muted">Library</TextLink>
         <div className={styles.title}>
-          <PageHeader size="sub" title={doc.title} />
+          <PageHeader title={doc.title} />
         </div>
       </div>
       <div className={styles.frame}>

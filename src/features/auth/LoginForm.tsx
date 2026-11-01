@@ -38,8 +38,8 @@ export function LoginForm({ callbackUrl, justCreated }: { callbackUrl: string; j
   }
 
   return (
-    <Page width="narrow" top="cover">
-      <PageHeader size="cover" title="Log in" intro="Pick up where you left off." />
+    <Page width="narrow">
+      <PageHeader title="Log in" description="Pick up where you left off." />
 
       {justCreated && <Notice tone="success">Account created. Log in to start.</Notice>}
 

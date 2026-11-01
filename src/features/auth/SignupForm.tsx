@@ -40,8 +40,8 @@ export function SignupForm({ callbackUrl }: { callbackUrl: string }) {
   }
 
   return (
-    <Page width="narrow" top="cover">
-      <PageHeader size="cover" title="Create an account" intro="Takes a few seconds. No email check." />
+    <Page width="narrow">
+      <PageHeader title="Create an account" description="Takes a few seconds. No email check." />
 
       <Form onSubmit={handleSubmit}>
         <Field label="Name (optional)">

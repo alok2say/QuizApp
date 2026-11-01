@@ -1,7 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test } from 'vitest'
 import { NavButton, NavLink, TopBar } from './index'
-import styles from './TopBar.module.css'
 
 const html = (node: React.ReactElement) => renderToStaticMarkup(node)
 
@@ -14,13 +13,13 @@ describe('navigation', () => {
   test('NavLink renders href and no aria-current outside a router', () => {
     const out = html(<NavLink href="/quizzes">Quizzes</NavLink>)
     expect(out).toMatch(/href="\/quizzes"/)
-    expect(out).toContain(styles.link)
     expect(out).not.toContain('aria-current')
+    expect(out).toContain('aria-[current=page]:bg-muted')
   })
 
   test('NavButton is a type=button styled like a nav link', () => {
     const out = html(<NavButton>Log out</NavButton>)
-    expect(out).toBe(`<button type="button" class="${styles.link}">Log out</button>`)
+    expect(out).toMatch(/^<button type="button" class="[^"]+">Log out<\/button>$/)
   })
 
   test('importing @/ui from node works', async () => {

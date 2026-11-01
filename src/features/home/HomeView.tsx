@@ -3,8 +3,8 @@ import styles from './HomeView.module.css'
 
 export function HomeView({ signedIn }: { signedIn: boolean }) {
   return (
-    <Page width="medium" top="hero">
-      <PageHeader size="display" title="DemoQuizApp" intro="Take a quiz and see where you rank." />
+    <Page>
+      <PageHeader title="DemoQuizApp" description="Take a quiz and see where you rank." />
 
       <nav aria-label="Main">
         <Actions gap="loose" spacing="loose">

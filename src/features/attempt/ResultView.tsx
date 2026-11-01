@@ -11,7 +11,7 @@ export function ResultView({ result }: { result: Result }) {
 
   return (
     <Page>
-      <PageHeader size="sub" title={result.quizTitle} />
+      <PageHeader title={result.quizTitle} />
       <p className={styles.score}>
         {result.score}
         <span className={styles.outOf}> / {result.maxScore}</span>

@@ -41,7 +41,7 @@ export function DesignCatalog() {
     <Page>
       <PageHeader
         title="Design system"
-        intro="Every shared component in the current design. Change src/styles/tokens.css or src/ui and this page follows."
+        description="Every shared component in the current design. Change src/styles/tokens.css or src/ui and this page follows."
       />
 
       <Section title="Colors">
@@ -60,10 +60,10 @@ export function DesignCatalog() {
 
       <Section title="Page headers">
         <div className={styles.stack}>
-          <PageHeader size="display" title="Display" intro="Home page title." />
-          <PageHeader size="page" title="Page" intro="List pages: quizzes, library, leaderboard." />
-          <PageHeader size="cover" title="Cover" intro="Log in and sign up." />
-          <PageHeader size="sub" title="Sub" />
+          <PageHeader title="Display" description="Home page title." />
+          <PageHeader title="Page" description="List pages: quizzes, library, leaderboard." />
+          <PageHeader title="Cover" description="Log in and sign up." />
+          <PageHeader title="Sub" />
           <PageHeader title="With an action" action={<ButtonLink href="/design">Action</ButtonLink>} />
         </div>
       </Section>

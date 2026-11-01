@@ -7,7 +7,7 @@ import styles from './QuizRow.module.css'
 export function QuizListView({ quizzes }: { quizzes: QuizListItem[] }) {
   return (
     <Page>
-      <PageHeader title="Quizzes" intro="Pick one to start, or pick up where you left off." />
+      <PageHeader title="Quizzes" description="Pick one to start, or pick up where you left off." />
 
       {quizzes.length === 0 && <EmptyState>No quizzes yet. Check back soon.</EmptyState>}
 

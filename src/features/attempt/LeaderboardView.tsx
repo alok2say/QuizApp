@@ -17,7 +17,7 @@ export function LeaderboardView({ board, viewerId, quizId }: { board: Board; vie
     <Page>
       <PageHeader
         title={`${board.quizTitle} leaderboard`}
-        intro="Best attempt per person. Ties go to the faster time."
+        description="Best attempt per person. Ties go to the faster time."
       />
 
       {empty && <EmptyState>No one has finished this quiz yet.</EmptyState>}

@@ -4,7 +4,7 @@ import { ButtonLink, Description, EmptyState, Heading, List, ListRow, Meta, Page
 export function LibraryListView({ documents }: { documents: LibraryDocument[] }) {
   return (
     <Page>
-      <PageHeader title="Library" intro="PDFs you can read right here in the app." />
+      <PageHeader title="Library" description="PDFs you can read right here in the app." />
 
       {documents.length === 0 && <EmptyState>No documents yet.</EmptyState>}
 
