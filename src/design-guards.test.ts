@@ -18,7 +18,6 @@ const PENDING_MODULES: string[] = [
   'src/features/attempt/answerSheet.module.css',
   'src/features/auth/auth.module.css',
   'src/features/design/DesignCatalog.module.css',
-  'src/features/home/HomeView.module.css',
   'src/features/library/DocumentView.module.css',
   'src/features/quizzes/QuizRow.module.css',
   'src/ui/Actions.module.css',
@@ -29,7 +28,6 @@ const PENDING_MODULES: string[] = [
   'src/ui/Notice.module.css',
   'src/ui/Text.module.css',
   'src/ui/TextLink.module.css',
-  'src/ui/TopBar.module.css',
   'src/ui/VisuallyHidden.module.css',
 ]
 

@@ -12,14 +12,11 @@ import {
   List,
   ListRow,
   Meta,
-  NavButton,
-  NavLink,
   Notice,
   Page,
   PageHeader,
   TextButton,
   TextLink,
-  TopBar,
 } from '@/ui'
 import styles from './DesignCatalog.module.css'
 
@@ -128,16 +125,6 @@ export function DesignCatalog() {
           </ListRow>
         </List>
         <EmptyState>Empty state: nothing here yet.</EmptyState>
-      </Section>
-
-      <Section title="Top bar">
-        <div className={styles.frame}>
-          <TopBar brand={{ label: 'Brand', href: '/design' }} navLabel="Sample">
-            <NavLink href="/design">Current</NavLink>
-            <NavLink href="/library">Other</NavLink>
-            <NavButton>Button</NavButton>
-          </TopBar>
-        </div>
       </Section>
     </Page>
   )
