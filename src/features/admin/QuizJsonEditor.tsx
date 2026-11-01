@@ -3,8 +3,23 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { readErrorBody } from '@/lib/errorBody'
-import { Actions, Button, Notice, TextLink } from '@/ui'
-import styles from './QuizJsonEditor.module.css'
+import Link from 'next/link'
+import { ChevronDown, CircleAlert } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
 type Props = {
   initialJson: string
@@ -18,6 +33,8 @@ export function QuizJsonEditor({ initialJson, submitUrl, method }: Props) {
   const [errors, setErrors] = useState<string[]>([])
   const [serverError, setServerError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // an uploaded file's text, waiting for the user to confirm the replace
+  const [pendingUpload, setPendingUpload] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function handleSubmit() {
@@ -85,75 +102,98 @@ export function QuizJsonEditor({ initialJson, submitUrl, method }: Props) {
     if (!file) return
 
     // full-replace, same as Save's own semantics — confirm since it can discard unsaved edits
-    if (!window.confirm('This will replace the current editor content. Continue?')) {
-      return
-    }
-
-    setText(await file.text())
+    setPendingUpload(await file.text())
   }
 
   return (
-    <div>
-      <details className={styles.help}>
-        <summary>What goes in the JSON</summary>
-        <ul>
-          <li><code>title</code>, optional <code>description</code></li>
-          <li><code>timeLimitSeconds</code>: a positive whole number</li>
-          <li>
-            <code>retakePolicy</code>: <code>UNLIMITED_BEST</code>, <code>UNLIMITED_LATEST</code>, or{' '}
-            <code>SINGLE_ATTEMPT</code>
-          </li>
-          <li><code>feedbackMode</code>: <code>END_ONLY</code></li>
-          <li><code>leaderboardSize</code>: optional, defaults to 10</li>
-          <li>
-            <code>questions</code>: each has <code>text</code>, <code>type</code> (<code>SINGLE_SELECT</code> with
-            exactly one correct option, or <code>MULTI_SELECT</code>), optional <code>points</code> (defaults to
-            10), and at least two <code>options</code> of <code>{'{ text, isCorrect }'}</code>
-          </li>
-        </ul>
-      </details>
+    <div className="space-y-4">
+      <Collapsible>
+        <CollapsibleTrigger render={<Button variant="ghost" className="-ml-2.5" />}>
+          What goes in the JSON
+          <ChevronDown />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-muted-foreground">
+            <li><code className="font-mono text-foreground">title</code>, optional <code className="font-mono text-foreground">description</code></li>
+            <li><code className="font-mono text-foreground">timeLimitSeconds</code>: a positive whole number</li>
+            <li>
+              <code className="font-mono text-foreground">retakePolicy</code>: <code className="font-mono text-foreground">UNLIMITED_BEST</code>,{' '}
+              <code className="font-mono text-foreground">UNLIMITED_LATEST</code>, or <code className="font-mono text-foreground">SINGLE_ATTEMPT</code>
+            </li>
+            <li><code className="font-mono text-foreground">feedbackMode</code>: <code className="font-mono text-foreground">END_ONLY</code></li>
+            <li><code className="font-mono text-foreground">leaderboardSize</code>: optional, defaults to 10</li>
+            <li>
+              <code className="font-mono text-foreground">questions</code>: each has <code className="font-mono text-foreground">text</code>,{' '}
+              <code className="font-mono text-foreground">type</code> (<code className="font-mono text-foreground">SINGLE_SELECT</code> with exactly one correct
+              option, or <code className="font-mono text-foreground">MULTI_SELECT</code>), optional{' '}
+              <code className="font-mono text-foreground">points</code> (defaults to 10), and at least two{' '}
+              <code className="font-mono text-foreground">options</code> of <code className="font-mono text-foreground">{'{ text, isCorrect }'}</code>
+            </li>
+          </ul>
+        </CollapsibleContent>
+      </Collapsible>
 
-      <textarea
-        className={styles.editor}
+      <Textarea
+        className="min-h-96 font-mono text-sm"
         aria-label="Quiz JSON"
         spellCheck={false}
         value={text}
         onChange={(event) => setText(event.target.value)}
       />
       {errors.length > 0 && (
-        <Notice as="div" tone="danger" role="alert">
-          <p>Fix these before saving:</p>
-          <ul>
-            {errors.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </Notice>
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertTitle>Fix these before saving:</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc pl-5">
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       )}
       {serverError && (
-        <Notice tone="danger" role="alert">{serverError}</Notice>
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertDescription>{serverError}</AlertDescription>
+        </Alert>
       )}
-      <Actions gap="tight">
+      <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handleSubmit} disabled={submitting}>
           {submitting ? 'Saving…' : 'Save quiz'}
         </Button>
-        <Button variant="secondary" onClick={handleDownload}>
+        <Button variant="outline" onClick={handleDownload}>
           Download JSON
         </Button>
-        <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+        <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
           Upload JSON
         </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/json"
-          onChange={handleFileSelected}
-          hidden
-        />
-        <span className={styles.cancel}>
-          <TextLink href="/admin/quizzes">Cancel</TextLink>
-        </span>
-      </Actions>
+        <input ref={fileInputRef} type="file" accept="application/json" onChange={handleFileSelected} hidden />
+        <Link href="/admin/quizzes" className={cn(buttonVariants({ variant: 'link' }), 'ml-auto')}>
+          Cancel
+        </Link>
+      </div>
+
+      <AlertDialog open={pendingUpload !== null} onOpenChange={(open) => !open && setPendingUpload(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace the editor content?</AlertDialogTitle>
+            <AlertDialogDescription>This will replace the current editor content. Continue?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingUpload !== null) setText(pendingUpload)
+                setPendingUpload(null)
+              }}
+            >
+              Replace
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

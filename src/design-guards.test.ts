@@ -10,8 +10,6 @@ const isTest = (file: string) => /\.test\.tsx?$/.test(file)
 // CSS modules not yet migrated. Each migration task deletes its files and
 // removes them here; the second test fails if a listed file is already gone.
 const PENDING_MODULES: string[] = [
-  'src/features/admin/AdminQuizListView.module.css',
-  'src/features/admin/QuizJsonEditor.module.css',
   'src/features/design/DesignCatalog.module.css',
   'src/ui/Actions.module.css',
   'src/ui/Button.module.css',
