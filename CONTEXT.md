@@ -245,6 +245,12 @@ along with a couple of throwaway signup test accounts (one fixed at
 testing). Not cleaned up — harmless dev-only data, not part of any
 migration/seed.
 
+Dev login accounts (local dev DB only; never reuse these passwords):
+- **ADMIN:** `quiztest.manual@example.com` / `TestPass123!` (promoted
+  to ADMIN; sees the Admin link)
+- **USER:** `quiztest.user@example.com` / `UserPass123!` (name "Test
+  User", created 2026-11-01 via `/api/signup`; no Admin link)
+
 Full plan file `docs/superpowers/plans/2026-08-22-mcq-core.md`: all 7
 tasks' checkboxes marked `[x]`. Task 4–7 decisions (submission/scoring
 flow, leaderboard eligibility recompute rule, take/result page
