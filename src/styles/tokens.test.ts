@@ -6,6 +6,8 @@ const TOKENS = 'src/styles/tokens.css'
 // @types/node 20 has no fs.globSync, so walk the tree
 const cssFiles = (readdirSync('src', { recursive: true }) as string[])
   .filter((file) => file.endsWith('.css'))
+  // globals.css now holds the shadcn theme; this legacy test retires in the last task
+  .filter((file) => file !== 'app/globals.css')
   .map((file) => `src/${file}`)
   .sort()
 const read = (file: string) => readFileSync(file, 'utf8')
