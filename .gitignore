@@ -43,3 +43,6 @@ next-env.d.ts
 .serena/
 
 /.snapshots/
+
+# understand-anything knowledge graph (local, rebuildable)
+.understand-anything/
