@@ -28,7 +28,7 @@ second check.
 | Login | `/login` | Public | Email + password sign-in |
 | Signup | `/signup` | Public | Create account |
 | Quiz list | `/quizzes` | Logged in | All quizzes with your status (○ not started / ◐ in progress / ● submitted) and Start / Resume / Retake |
-| Take quiz | `/quizzes/[quizId]/take/[attemptId]` | Logged in | Questions, countdown timer, answers cached in `localStorage` |
+| Take quiz | `/quizzes/[quizId]/take/[attemptId]` | Logged in | One question per page with Previous / Next and a jump-to-question strip, countdown timer; answers and current question cached in `localStorage` |
 | Result | `/quizzes/[quizId]/result/[attemptId]` | Logged in | Score + per-question correct/selected answers |
 | Leaderboard | `/quizzes/[quizId]/leaderboard` | Logged in | Top N for one quiz + your own rank |
 | Admin quiz list | `/admin/quizzes` | Admin | All quizzes with Edit / Delete |

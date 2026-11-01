@@ -806,3 +806,31 @@ Implemented on branch `design-system-structure` (`cbe7230`..HEAD), plan
 - Snapshot results vs. the pre-work baseline: identical except the
   Home section `h2` line-height (2px) and the quiz bubble margin
   (0.2rem → 0.25rem).
+
+## Take quiz: one question per page (designed 2026-11-01)
+
+Replaces the single long take page (the take part of "Visual design:
+take, result, leaderboard"). Same tokens, font and answer-sheet marks.
+- **Top bar (sticky):** quiz title, `m:ss` timer (danger under 60s),
+  then a strip of numbered answer-sheet bubbles: filled = answered,
+  an outer text-colored ring (`aria-current="step"`) = the current
+  question. Each bubble is a button ("Question 2, answered" / "not
+  answered") that jumps there; the strip scrolls sideways when long.
+  Beside it: "Question N of M".
+- **Question:** large muted number, prompt at the sub-title size,
+  "Pick all that apply" for `MULTI_SELECT`; options stacked one per
+  ruled row, the whole row clickable, with a faint accent hover tint.
+- **Footer (sticky bottom):** "‹ Previous" (secondary, hidden on the
+  first question), "N of M answered", "Next ›" (primary). On the last
+  question Next becomes "Submit answers" ("Submitting…"), and the middle
+  text shows "K questions unanswered" when any are blank. Submitting
+  with blanks is allowed. Under 34rem the progress text sits above the
+  two buttons.
+- **Behaviour:** timer, auto-submit at 0 and the answer cache are
+  unchanged. The current question is cached in localStorage
+  (`quiz-attempt-<id>-current`) so a reload returns to it; both keys are
+  cleared on a successful submit. Navigating scrolls to the top and
+  moves focus to the new prompt (`<legend tabIndex=-1>`), not on first
+  load. No keyboard shortcuts; no separate review screen.
+- Helpers in `src/features/attempt/questionNav.ts` (tested):
+  `clampIndex`, `parseCachedIndex`, `answeredCount`, `bubbleLabel`.

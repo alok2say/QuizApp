@@ -786,4 +786,30 @@ on branch `feature/pdf-library`.
   pushed. `serena memories check` (validates references) isn't on PATH,
   so the `mem:` links were checked by hand.
 
+## Take quiz: one question per page (2026-11-01)
+
+- **What:** the take page shows one question at a time, with Previous
+  and Next, a strip of numbered bubbles (answered / current, click to
+  jump), "Question N of M" and the timer in a sticky bar, and a
+  sticky footer holding the buttons.
+- **Why the strip:** it does three jobs in one row: progress,
+  "where am I", and jumping back to a skipped question. That's why
+  no separate review screen was needed.
+- **Accessibility details:**
+  - Each bubble is a real `<button>` with an `aria-label` that says
+    whether it's answered, so this never depends on color alone.
+  - The current bubble gets `aria-current="step"`.
+  - After Next or Previous, focus moves to the new question's
+    `<legend>` (`tabIndex={-1}`), so a screen reader reads the new
+    question instead of staying silent.
+  - The legend has to stay the first child of its `<fieldset>`, or it
+    no longer names the group. That's why the big question number
+    sits outside the fieldset.
+- **Reload safety:** the current question number is cached next to
+  the answers. `parseCachedIndex` clamps it, so a stale or tampered
+  value can't point past the end of the quiz.
+- **The only design-system change** is one feature CSS file. The rest
+  reuses tokens and `@/ui` `Button`, which is the point of last
+  session's restructure.
+
 <!-- Continue appending one entry per step as we go. -->
