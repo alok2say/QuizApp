@@ -4,8 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { readErrorBody } from '@/lib/errorBody'
 import { withCallbackUrl } from '@/lib/safeRedirect'
-import { Button, ErrorMessage, Field, Form, Input, Page, PageHeader, TextLink } from '@/ui'
-import styles from './auth.module.css'
+import Link from 'next/link'
+import { CircleAlert } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Page } from '@/ui'
 
 // callbackUrl arrives already sanitized by the server page
 export function SignupForm({ callbackUrl }: { callbackUrl: string }) {
@@ -41,40 +47,66 @@ export function SignupForm({ callbackUrl }: { callbackUrl: string }) {
 
   return (
     <Page width="narrow">
-      <PageHeader title="Create an account" description="Takes a few seconds. No email check." />
-
-      <Form onSubmit={handleSubmit}>
-        <Field label="Name (optional)">
-          <Input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
-        </Field>
-        <Field label="Email">
-          <Input
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Field>
-        <Field label="Password" help="At least 8 characters">
-          <Input
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Field>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <Button type="submit" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Create account'}
-        </Button>
-      </Form>
-
-      <p className={styles.switch}>
-        Already have an account? <TextLink href={withCallbackUrl('/login', callbackUrl)}>Log in</TextLink>
-      </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
+          </CardTitle>
+          <CardDescription>Takes a few seconds. No email check.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="signup-name">Name (optional)</FieldLabel>
+                <Input id="signup-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="signup-email">Email</FieldLabel>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="signup-password">Password</FieldLabel>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  aria-describedby="signup-password-help"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <FieldDescription id="signup-password-help">At least 8 characters</FieldDescription>
+              </Field>
+              {error && (
+                <Alert variant="destructive">
+                  <CircleAlert />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button type="submit" size="lg" className="w-full" disabled={submitting}>
+                {submitting ? 'Creating account…' : 'Create account'}
+              </Button>
+            </FieldGroup>
+          </form>
+        </CardContent>
+        <CardFooter className="justify-center text-muted-foreground">
+          <p>
+            Already have an account?{' '}
+            <Link className="text-foreground underline underline-offset-4" href={withCallbackUrl('/login', callbackUrl)}>
+              Log in
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </Page>
   )
 }

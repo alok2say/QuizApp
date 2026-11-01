@@ -16,7 +16,6 @@ const PENDING_MODULES: string[] = [
   'src/features/attempt/ResultView.module.css',
   'src/features/attempt/TakeView.module.css',
   'src/features/attempt/answerSheet.module.css',
-  'src/features/auth/auth.module.css',
   'src/features/design/DesignCatalog.module.css',
   'src/features/library/DocumentView.module.css',
   'src/features/quizzes/QuizRow.module.css',
