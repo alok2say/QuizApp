@@ -877,6 +877,15 @@ look is standard and consistent. Today's look is **not** preserved.
   a catalog of the shadcn components in use.
 - **Out of scope:** a dark-mode toggle, custom brand colors (one theme
   edit later), shadcn components not needed yet.
+- **Implemented 2026-11-01** on branch `shadcn-design-system`; guide
+  `docs/DESIGN_SYSTEM.md`. Decisions made during the build: success /
+  info Alerts pass `role="status"`; link-buttons are `buttonVariants()`
+  on Next `Link`; result answers show visible "Correct answer" / "Your
+  answer" Badges; the leaderboard header row is visible; take-page
+  buttons read "Previous" / "Next" with chevron icons; the upload
+  dialog is titled "Replace the editor content?"; the PDF frame's
+  minimum height is `min-h-96`; library "Read" links are named
+  "Read <title>".
 - **Tooling note:** run shadcn with the public registry:
   `npm_config_registry=https://registry.npmjs.org npx shadcn@latest add <name>`
   (the global Artifactory login is expired); `NODE_AUTH_TOKEN` is needed

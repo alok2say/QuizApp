@@ -812,4 +812,38 @@ on branch `feature/pdf-library`.
   reuses tokens and `@/ui` `Button`, which is the point of last
   session's restructure.
 
+## Moving the app onto shadcn (2026-11-01)
+
+- **What:** every screen is now built from shadcn components on
+  Tailwind CSS v4.
+  - The theme is shadcn's CSS variables in `globals.css`.
+  - The look is shadcn's standard one: neutral palette, Geist font.
+  - The CSS modules, `tokens.css` and most of the old `src/ui` are gone.
+- **Why:** you wanted a standard, consistent look built from shared
+  components, rather than a hand-made one. shadcn copies each
+  component's source into `src/components/ui`, so it's our code to
+  restyle, not a locked library.
+- **Tailwind first:** `shadcn init` refuses to run without Tailwind,
+  which was the first `npx shadcn init` failure. Tailwind v4 needs only
+  `@tailwindcss/postcss` in `postcss.config.mjs` and
+  `@import "tailwindcss"`; there is no `tailwind.config` file.
+- **Base UI, not Radix:** the current default preset (`base-nova`) is
+  built on Base UI. Most online shadcn examples use Radix props
+  (`asChild`, `onCheckedChange` with Radix types). Here it's `render`,
+  `value` / `onValueChange` and `checked` / `onCheckedChange`, so read
+  each generated file first.
+- **Dark mode by device:** `init` sets dark mode up as a `.dark` class.
+  Replacing it with `@custom-variant dark (@media (prefers-color-scheme: dark))`
+  kept the app's no-toggle behaviour.
+- **Same ratchet as last time:** a test listed the CSS modules not yet
+  migrated, and each task deleted its own. The final guards allow
+  exactly one stylesheet, `globals.css`, no color literals elsewhere,
+  and no one-off Tailwind values like `p-[13px]`.
+- **Behaviour checked in the browser, not just looks:**
+  - Base UI RadioGroup and Checkbox kept saving picks (reload test).
+  - Cancel in an AlertDialog sends nothing; confirm sends exactly one
+    DELETE.
+  - Upload asks before replacing the editor content.
+  - Every error still has an alert role.
+
 <!-- Continue appending one entry per step as we go. -->

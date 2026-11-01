@@ -433,6 +433,17 @@ Visible change: none, except a 2px Home section-heading shift, a 0.05rem
 quiz-bubble shift, and error text under Start/Delete buttons is now
 danger-colored.
 
+## SHADCN DESIGN SYSTEM: COMPLETE ON BRANCH `shadcn-design-system` (2026-11-01)
+
+Every screen is built from shadcn (Tailwind v4, preset `base-nova`,
+Base UI, neutral palette, Geist). Theme = shadcn variables in
+`src/app/globals.css` (dark follows the device). `tokens.css`, all CSS
+modules and the old `src/ui` components are gone; `src/ui` keeps Page,
+PageHeader, EmptyState, NavLink. Guards: `src/design-guards.test.ts`.
+Guide: `docs/DESIGN_SYSTEM.md`. Add components with
+`npm_config_registry=https://registry.npmjs.org npx shadcn@latest add <name>`.
+Supersedes the "Design System Structure" styling notes above.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after
