@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import "@/styles/tokens.css";
 import "./globals.css";
 import { Providers } from "./providers";
 import { getCurrentUser } from "@/lib/session";

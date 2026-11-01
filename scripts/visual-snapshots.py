@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Capture every page as screenshots and compare two runs pixel by pixel.
 
-Use it before and after a structural or visual change:
+A review tool, not a pass/fail gate: after a theme or component change,
+capture and look at every page; compare two runs to see exactly what moved.
+
 
     python3 scripts/visual-snapshots.py capture baseline
     ...make the change...
@@ -15,7 +17,7 @@ SNAP_ADMIN_PASSWORD (can be the same account). Optional: SNAP_QUIZ_ID,
 SNAP_TAKE_URL, SNAP_RESULT_URL. Pages whose env vars are unset are
 skipped. Credentials are read from the environment only.
 
-While capturing, every non-GET request to /api/ except login is aborted,
+While capturing, every non-GET request to /api/ except /api/auth/ is aborted,
 so opening a take page whose time is up can't submit the attempt.
 """
 

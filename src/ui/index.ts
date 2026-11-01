@@ -1,14 +1,6 @@
-// The design system. Views import from '@/ui'; see docs/DESIGN_SYSTEM.md.
+// App-level layout pieces shadcn doesn't provide. Everything else comes from
+// '@/components/ui' (shadcn). See docs/DESIGN_SYSTEM.md.
 export { Page } from './Page'
 export { PageHeader } from './PageHeader'
-export { Heading } from './Heading'
-export { VisuallyHidden } from './VisuallyHidden'
-export { Button, ButtonLink } from './Button'
-export { TextLink, TextButton } from './TextLink'
-export { Form, Field, Input, ErrorMessage } from './Form'
-export { Notice } from './Notice'
-export { List, ListRow } from './List'
-export { Description, Meta } from './Text'
 export { EmptyState } from './EmptyState'
-export { Actions } from './Actions'
 export { NavLink } from './NavLink'

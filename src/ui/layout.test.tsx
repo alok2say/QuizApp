@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test } from 'vitest'
-import { EmptyState, Heading, Page, PageHeader, VisuallyHidden } from './index'
+import { EmptyState, Page, PageHeader } from './index'
 
 const html = (node: React.ReactElement) => renderToStaticMarkup(node)
 
@@ -30,14 +30,5 @@ describe('layout primitives', () => {
 
   test('EmptyState is a muted paragraph', () => {
     expect(html(<EmptyState>None yet.</EmptyState>)).toMatch(/^<p class="[^"]*text-muted-foreground[^"]*">None yet\.<\/p>$/)
-  })
-
-  // legacy components, removed with the old design system
-  test('Heading defaults to h2', () => {
-    expect(html(<Heading>T</Heading>).startsWith('<h2')).toBe(true)
-  })
-
-  test('VisuallyHidden can render a thead', () => {
-    expect(html(<table><VisuallyHidden as="thead"><tr><th>R</th></tr></VisuallyHidden></table>)).toContain('<thead class=')
   })
 })

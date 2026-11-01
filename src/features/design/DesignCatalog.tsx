@@ -1,139 +1,197 @@
-import {
-  Actions,
-  Button,
-  ButtonLink,
-  Description,
-  EmptyState,
-  ErrorMessage,
-  Field,
-  Form,
-  Heading,
-  Input,
-  List,
-  ListRow,
-  Meta,
-  Notice,
-  Page,
-  PageHeader,
-  TextButton,
-  TextLink,
-} from '@/ui'
-import styles from './DesignCatalog.module.css'
+import Link from 'next/link'
+import { CircleAlert, CircleCheck } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Separator } from '@/components/ui/separator'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import { EmptyState, Page, PageHeader } from '@/ui'
 
 const COLORS = [
-  ['--color-text', 'Text'],
-  ['--color-bg', 'Background'],
-  ['--color-text-muted', 'Muted text'],
-  ['--color-accent', 'Accent'],
-  ['--color-on-accent', 'Text on accent'],
-  ['--color-border', 'Borders and rules'],
-  ['--color-success', 'Success'],
-  ['--color-danger', 'Danger'],
+  ['bg-background', 'Background'],
+  ['bg-foreground', 'Foreground'],
+  ['bg-primary', 'Primary'],
+  ['bg-secondary', 'Secondary'],
+  ['bg-muted', 'Muted'],
+  ['bg-accent', 'Accent'],
+  ['bg-destructive', 'Destructive'],
+  ['bg-success', 'Success'],
 ] as const
 
-// Every ui component and variant on one page, in the active tokens.
-// Check a design change here first, then run scripts/visual-snapshots.py.
+// The shadcn components the app uses, with their variants, in the current
+// theme. Change the variables in src/app/globals.css and this page follows.
 export function DesignCatalog() {
   return (
-    <Page>
+    <Page width="wide">
       <PageHeader
         title="Design system"
-        description="Every shared component in the current design. Change src/styles/tokens.css or src/ui and this page follows."
+        description="The shadcn components this app uses, in the current theme (src/app/globals.css)."
       />
 
-      <Section title="Colors">
-        <ul className={styles.swatches}>
-          {COLORS.map(([token, label]) => (
-            <li key={token} className={styles.swatch}>
-              <span className={styles.chip} style={{ background: `var(${token})` }} />
-              <span>
-                {label}
-                <code className={styles.token}>{token}</code>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section title="Page headers">
-        <div className={styles.stack}>
-          <PageHeader title="Display" description="Home page title." />
-          <PageHeader title="Page" description="List pages: quizzes, library, leaderboard." />
-          <PageHeader title="Cover" description="Log in and sign up." />
-          <PageHeader title="Sub" />
-          <PageHeader title="With an action" action={<ButtonLink href="/design">Action</ButtonLink>} />
-        </div>
-      </Section>
-
-      <Section title="Buttons and links">
-        <Actions>
-          <Button>Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button disabled>Disabled</Button>
-          <ButtonLink href="/design" variant="secondary">Button link</ButtonLink>
-        </Actions>
-        <Actions>
-          <TextLink href="/design">Text link</TextLink>
-          <TextLink href="/design" tone="muted">Muted link</TextLink>
-          <TextButton>Text button</TextButton>
-          <TextButton tone="danger">Danger</TextButton>
-        </Actions>
-      </Section>
-
-      <Section title="Forms and messages">
-        <Form>
-          <Field label="Email">
-            <Input type="email" defaultValue="reader@example.com" />
-          </Field>
-          <Field label="Password" help="At least 8 characters">
-            <Input type="password" defaultValue="password" />
-          </Field>
-          <ErrorMessage>That email and password don&apos;t match.</ErrorMessage>
-          <Button type="button">Log in</Button>
-        </Form>
-        <ErrorMessage size="small">Small error, under a button.</ErrorMessage>
-        <Notice tone="success">Success notice.</Notice>
-        <Notice tone="accent">Accent notice.</Notice>
-        <Notice as="div" tone="danger">
-          <p>Danger notice with a list:</p>
-          <ul>
-            <li>First problem</li>
+      <div className="space-y-12">
+        <Section title="Colors">
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {COLORS.map(([className, label]) => (
+              <li key={className} className="flex items-center gap-3">
+                <span className={`size-10 shrink-0 rounded-md border ${className}`} />
+                <span className="text-sm">
+                  {label}
+                  <code className="block font-mono text-xs text-muted-foreground">{className}</code>
+                </span>
+              </li>
+            ))}
           </ul>
-        </Notice>
-      </Section>
+        </Section>
 
-      <Section title="Lists">
-        <List>
-          <ListRow>
-            <div>
-              <Heading as="h3">List row</Heading>
-              <Description>A description under the title.</Description>
-              <Meta>
-                <span>Meta</span>
-                <span>10 min</span>
-                <a href="/design">Link</a>
-              </Meta>
+        <Section title="Buttons">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button>Default</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="outline">Outline</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="destructive">Destructive</Button>
+            <Button variant="link">Link</Button>
+            <Button disabled>Disabled</Button>
+            <Link href="/design" className={buttonVariants({ variant: 'outline' })}>
+              Link styled as a button
+            </Link>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Button size="sm">Small</Button>
+            <Button size="lg">Large</Button>
+            <Button size="icon-sm" variant="outline" className="rounded-full">
+              3
+            </Button>
+          </div>
+        </Section>
+
+        <Section title="Badges">
+          <div className="flex flex-wrap gap-2">
+            <Badge>Completed</Badge>
+            <Badge variant="secondary">In progress</Badge>
+            <Badge variant="outline">Not started</Badge>
+            <Badge variant="destructive">0:42</Badge>
+            <Badge className="bg-success text-success-foreground">Correct answer</Badge>
+          </div>
+        </Section>
+
+        <Section title="Card">
+          <Card className="max-w-md">
+            <CardHeader>
+              <CardTitle>Sample Quiz</CardTitle>
+              <CardDescription>A card title, description and footer.</CardDescription>
+            </CardHeader>
+            <CardFooter className="justify-between">
+              <span className="text-muted-foreground">5 min</span>
+              <Button>Start quiz</Button>
+            </CardFooter>
+          </Card>
+        </Section>
+
+        <Section title="Forms">
+          <form className="max-w-sm">
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="design-email">Email</FieldLabel>
+                <Input id="design-email" type="email" defaultValue="reader@example.com" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="design-password">Password</FieldLabel>
+                <Input id="design-password" type="password" defaultValue="password" />
+                <FieldDescription>At least 8 characters</FieldDescription>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="design-json">Textarea</FieldLabel>
+                <Textarea id="design-json" className="font-mono" defaultValue={'{ "title": "New Quiz" }'} />
+              </Field>
+            </FieldGroup>
+          </form>
+        </Section>
+
+        <Section title="Choices and progress">
+          <div className="grid max-w-md gap-6">
+            <RadioGroup defaultValue="paris" aria-label="Single choice">
+              {['Paris', 'London'].map((city) => (
+                <label key={city} className="flex items-center gap-3">
+                  <RadioGroupItem value={city.toLowerCase()} />
+                  {city}
+                </label>
+              ))}
+            </RadioGroup>
+            <div className="grid gap-2">
+              {['Red', 'Green'].map((color, index) => (
+                <label key={color} className="flex items-center gap-3">
+                  <Checkbox defaultChecked={index === 0} />
+                  {color}
+                </label>
+              ))}
             </div>
-            <ButtonLink href="/design" variant="secondary">Open</ButtonLink>
-          </ListRow>
-          <ListRow density="compact" align="baseline">
-            <div>
-              <Heading as="h3">Compact row</Heading>
-              <Meta spacing="tight" tabular>3 questions, added 1 Nov 2026</Meta>
-            </div>
-            <TextLink href="/design">Edit</TextLink>
-          </ListRow>
-        </List>
-        <EmptyState>Empty state: nothing here yet.</EmptyState>
-      </Section>
+            <Progress value={40} aria-label="Answered" />
+          </div>
+        </Section>
+
+        <Section title="Alerts">
+          <div className="grid max-w-md gap-3">
+            <Alert role="status">
+              <CircleCheck />
+              <AlertDescription>Account created. Log in to start.</AlertDescription>
+            </Alert>
+            <Alert variant="destructive">
+              <CircleAlert />
+              <AlertTitle>Fix these before saving:</AlertTitle>
+              <AlertDescription>Invalid JSON syntax.</AlertDescription>
+            </Alert>
+          </div>
+        </Section>
+
+        <Section title="Table">
+          <Card className="max-w-md py-0">
+            <CardContent className="px-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="pl-4">Rank</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="pr-4 text-right">Score</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className="bg-muted font-medium">
+                    <TableCell className="pl-4">1</TableCell>
+                    <TableCell>You</TableCell>
+                    <TableCell className="pr-4 text-right">50 / 70</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="pl-4">2</TableCell>
+                    <TableCell>Test User</TableCell>
+                    <TableCell className="pr-4 text-right">40 / 70</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </Section>
+
+        <Section title="Empty state">
+          <EmptyState>No quizzes yet. Check back soon.</EmptyState>
+        </Section>
+      </div>
     </Page>
   )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className={styles.section}>
-      <Heading>{title}</Heading>
+    <section>
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <Separator className="mt-2 mb-4" />
       {children}
     </section>
   )
