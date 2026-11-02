@@ -444,6 +444,59 @@ Guide: `docs/DESIGN_SYSTEM.md`. Add components with
 `npm_config_registry=https://registry.npmjs.org npx shadcn@latest add <name>`.
 Supersedes the "Design System Structure" styling notes above.
 
+## SESSION HANDOFF (saved 2026-11-02) — start here
+
+**State:** `main` == `origin/main` at `6a676d7`, working tree clean, all
+green (124 tests, lint, tsc, build). Dev server was running on :3000.
+
+**Done in the 2026-11-01 session (all merged and pushed):**
+1. Design System Structure (routes → features → ui → tokens): superseded
+   by item 3 for styling, but the layering stays.
+2. Take quiz, one question per page: Previous/Next, jump-to-question
+   bubbles, Question N of M, sticky timer bar and footer, the current
+   question cached so a reload returns to it.
+3. shadcn design system (PR #1, merge `2967747`): Tailwind v4 + shadcn
+   `base-nova`; every screen on shadcn components; `AlertDialog` confirms;
+   guards in `src/design-guards.test.ts`; guide `docs/DESIGN_SYSTEM.md`;
+   catalog at `/design`.
+4. PDF viewer page: sub header removed (`6a676d7`); the title is now a
+   screen-reader-only h1.
+5. Dev accounts recorded below (ADMIN + USER).
+
+**Open / next (pick one):**
+- Small fixes:
+  - StartQuizButton crashes on a body-less error response (use `readErrorBody`).
+  - Delete stays "Deleting…" on a network failure (fetch reject not caught).
+  - Focus drops to `<body>` after confirming Delete.
+  - `middleware.ts` → `proxy.ts` codemod.
+- shadcn minors:
+  - The guards miss palette classes like `bg-red-500`.
+  - The Collapsible help unmounts when closed (`keepMounted`).
+  - The current-bubble ring overlaps the focus ring.
+  - The `shadcn` CLI could be a devDependency.
+  - No automated test of take-form answer saving.
+- Not yet tested end to end: a real quiz submit and a real delete on
+  the shadcn UI. All browser checks so far blocked writes.
+- Backlog (parked by the user):
+  - Editing or deleting a quiz that has attempts returns a 500 (options below).
+  - `IMMEDIATE` feedback mode.
+  - The Home "Events" section.
+  - PDFs downloaded from a server.
+- Test data left in the dev DB:
+  - An open Sample Quiz attempt for `quiztest.user`
+    (`cmvxdust7004pqqsi3hi8of0h`).
+  - Admin-account attempts started by live use on 2026-11-01.
+
+**Working notes:**
+- npm/npx need `npm_config_registry=https://registry.npmjs.org` (the
+  Artifactory login has expired), and `NODE_AUTH_TOKEN=$(gh auth token
+  --user alok2say)` for full installs.
+- GitHub actions run as alok2say: the repo-local credential helper for
+  git, and `GH_TOKEN=$(gh auth token --user alok2say)` for `gh`.
+- Another Claude session sometimes commits in this repo (Serena
+  onboarding, deny rules, `.gitignore`), so check `git log` and
+  `git status` first.
+
 ## Next steps
 1. Lint debt: cleared — `eslint .` is clean repo-wide. The 53
    `no-explicit-any` in test mocks were fixed in the commit after
